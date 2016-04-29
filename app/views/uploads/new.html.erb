@@ -1,0 +1,8 @@
+<h1>New Upload</h1>
+<p>LA LA <%= ENV['FILE_SYSTEM'] %></p>
+<button type="button" data-toggle="browse-everything" data-route="<%=browse_everything_engine.root_path%>"
+        data-target="#myForm" class="btn btn-large btn-success" id="browse">Browse!</button>
+
+<%= render 'form' %>
+
+<%= link_to 'Back', uploads_path %>
