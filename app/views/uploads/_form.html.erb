@@ -15,6 +15,12 @@
     <%= f.label :uuid %><br>
     <%= f.text_field :uuid %>
   </div>
+
+    <div class="field">
+      <%= f.label "Select a file to upload" %>&nbsp;
+      <%= f.file_field :file %>
+    </div>
+
   <div class="actions">
     <%= f.submit %>
   </div>

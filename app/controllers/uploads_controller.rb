@@ -25,6 +25,12 @@ class UploadsController < ApplicationController
   # POST /uploads.json
   def create
     @upload = Upload.new(upload_params)
+    puts upload_params[:file]
+    dir = ENV['TRANSFER_LOCATION'] + '/' + upload_params[:uuid] + '/'
+    FileUtils.mkdir(dir)
+    FileUtils.mkdir(dir + 'submissionDocumentation')
+    FileUtils.chmod 0644,upload_params[:file].tempfile
+    FileUtils.mv(upload_params[:file].tempfile,dir + upload_params[:file].original_filename)
 
     respond_to do |format|
       if @upload.save
@@ -69,6 +75,6 @@ class UploadsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def upload_params
-      params.require(:upload).permit(:uuid)
+      params.require(:upload).permit(:uuid,:file)
     end
 end

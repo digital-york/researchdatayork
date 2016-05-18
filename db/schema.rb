@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160428192739) do
+ActiveRecord::Schema.define(version: 20160504103552) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20160428192739) do
     t.string   "uuid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "file"
   end
 
   create_table "users", force: :cascade do |t|
