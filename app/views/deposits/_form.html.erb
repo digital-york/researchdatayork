@@ -1,29 +1,30 @@
 <%= form_for(@deposit) do |f| %>
-  <% if @deposit.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@deposit.errors.count, "error") %> prohibited this deposit from being saved:</h2>
+    <% if @deposit.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@deposit.errors.count, "error") %> prohibited this deposit from being saved:</h2>
 
-      <ul>
-      <% @deposit.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :uuid %><br>
-    <%= f.text_field :uuid %>
-  </div>
+          <ul>
+            <% @deposit.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
 
     <div class="field">
-      <%= f.label :people %><br>
-      <%= f.text_field :people %>
+      <%= f.label :uuid %><br>
+      <%= f.text_field :uuid, :readonly => true, :value => 'uuid' %>
     </div>
 
     <div class="field">
       <%= f.label :title %><br>
-      <%= f.text_field :title %>
+      <%= f.text_field :title, :readonly => true, :value => 'title' %>
+    </div>
+
+
+    <div class="field">
+      <%= f.label :people %><br>
+      <%= f.text_field :people, :readonly => true, :value => 'people' %>
     </div>
 
     <div class="field">
@@ -31,7 +32,7 @@
       <%= f.file_field :file %>
     </div>
 
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
 <% end %>

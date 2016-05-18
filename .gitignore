@@ -19,7 +19,4 @@
 
 # Ignore fedora data
 /fcrepo4-data
-
-# Ignore dlibhydra library
-/lib/dlibhydra
-/lib/dlibhydra.rb
+/solr

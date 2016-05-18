@@ -6,8 +6,6 @@ class DepositsController < ApplicationController
   # GET /deposits
   # GET /deposits.json
   def index
-    # not deposits, datasets
-    # @deposits = Deposit.all
     c = Puree::Collection.new(resource_type: :dataset)
 
     # Get minimal datasets, optionally specifying a quantity (default is 20)
@@ -16,11 +14,9 @@ class DepositsController < ApplicationController
           password: ENV['PURE_PASSWORD'],
           qty:      10
 
-    # Get UUIDs for datasets
-    uuids = c.uuid
-
-    puts 'hello ...'
-    puts uuids
+    # not deposits, datasets
+    @deposits = c.uuid
+        #Dlibhydra::Dataset.all
 
   end
 
@@ -33,7 +29,9 @@ class DepositsController < ApplicationController
   def new
     # here should have an id attribute
     # should be an existing pure uuid
-    @deposit = deposit.new
+    @deposit = Deposit.new
+        #Dlibhydra::Aip.new
+    @dataset = Dlibhydra::Dataset.new
   end
 
   # GET /deposits/1/edit
@@ -44,7 +42,6 @@ class DepositsController < ApplicationController
   # POST /deposits.json
   def create
     # @deposit = deposit.new(deposit_params)
-    @dataset = Dlibhydra::Dataset.new
     @dataset.preflabel = deposit_params[:uuid]
     puts deposit_params[:file]
     dir = ENV['TRANSFER_LOCATION'] + '/' + deposit_params[:uuid] + '/'

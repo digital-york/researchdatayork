@@ -10,6 +10,16 @@
     </tr>
   </thead>
 
+  <tbody>
+  <% @deposits.each do |upload| %>
+      <tr>
+        <td><%= upload %></td>
+        <td><%= link_to 'Show', upload %></td>
+        <td><%= link_to 'Edit', edit_deposit_path(upload) %></td>
+        <td><%= link_to 'Destroy', upload, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+  <% end %>
+  </tbody>
 
 </table>
 
