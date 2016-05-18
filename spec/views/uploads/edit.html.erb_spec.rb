@@ -1,18 +1,18 @@
 require 'rails_helper'
 
-RSpec.describe "uploads/edit", type: :view do
+RSpec.describe "deposits/edit", type: :view do
   before(:each) do
-    @upload = assign(:upload, Upload.create!(
+    @deposit = assign(:deposit, deposit.create!(
       :uuid => "MyString"
     ))
   end
 
-  it "renders the edit upload form" do
+  it "renders the edit deposit form" do
     render
 
-    assert_select "form[action=?][method=?]", upload_path(@upload), "post" do
+    assert_select "form[action=?][method=?]", deposit_path(@deposit), "post" do
 
-      assert_select "input#upload_uuid[name=?]", "upload[uuid]"
+      assert_select "input#deposit_uuid[name=?]", "deposit[uuid]"
     end
   end
 end

@@ -47,7 +47,7 @@
   <dataDir>${solr.blacklight-core.data.dir:}</dataDir>
   
   <requestDispatcher handleSelect="true" >
-    <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048000" />
+    <requestParsers enableRemoteStreaming="false" multipartdepositLimitInKB="2048000" />
   </requestDispatcher>
   
   <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler" />

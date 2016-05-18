@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  resources :uploads
-  resources :uploads
-          mount Blacklight::Engine => '/'
+  resources :deposits
+
+  mount Blacklight::Engine => '/'
 
   root to: "catalog#index"
   concern :searchable, Blacklight::Routes::Searchable.new

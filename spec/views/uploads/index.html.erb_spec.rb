@@ -1,18 +1,18 @@
 require 'rails_helper'
 
-RSpec.describe "uploads/index", type: :view do
+RSpec.describe "deposits/index", type: :view do
   before(:each) do
-    assign(:uploads, [
-      Upload.create!(
+    assign(:deposits, [
+      deposit.create!(
         :uuid => "Uuid"
       ),
-      Upload.create!(
+      deposit.create!(
         :uuid => "Uuid"
       )
     ])
   end
 
-  it "renders a list of uploads" do
+  it "renders a list of deposits" do
     render
     assert_select "tr>td", :text => "Uuid".to_s, :count => 2
   end

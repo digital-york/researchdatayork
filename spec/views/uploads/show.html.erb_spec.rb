@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe "uploads/show", type: :view do
+RSpec.describe "deposits/show", type: :view do
   before(:each) do
-    @upload = assign(:upload, Upload.create!(
+    @deposit = assign(:deposit, deposit.create!(
       :uuid => "Uuid"
     ))
   end

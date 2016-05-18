@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
+
+gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 'master'
+gem 'puree'
 gem 'browse-everything'
 gem 'hydra', '9.1.0'
 gem 'hydra-works', '0.7.0'
