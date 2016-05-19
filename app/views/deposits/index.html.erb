@@ -1,5 +1,17 @@
 <p id="notice"><%= notice %></p>
 
+<p>Here refresh list, and quantity option AND/OR add using pure_uuid option</p>
+<%= form_for @deposit, url: deposits_path do |f| %>
+    <div class="field">
+      <%= f.label :pure_uuid %><br>
+      <%= f.text_field :pure_uuid%>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+<% end %>
+
+
 <h1>Listing deposits</h1>
 
 <table>

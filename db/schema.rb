@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 20160518205527) do
     t.string   "uuid"
     t.string   "title"
     t.string   "people"
+    t.string   "pure_uuid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
