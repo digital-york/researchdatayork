@@ -11,6 +11,8 @@ class DepositsController < ApplicationController
   # GET /deposits.json
   def index
 
+    # For users who aren't logged in, ask for their ID
+
     # This is a basic ActiveRecord object. It is never saved.
     @deposit = Deposit.new
 
@@ -32,7 +34,7 @@ class DepositsController < ApplicationController
 
     if params[:refresh] == 'true'
       c = Puree::Collection.new(resource_type: :dataset)
-      quantity = 2
+      quantity = 5
       unless params[:refresh_num].nil?
         quantity = params[:refresh_num]
       end
@@ -77,6 +79,7 @@ class DepositsController < ApplicationController
           unless d.available[:year] == ''
             local_d.date_available = "#{d.available['year']}/#{d.available['month']}/#{d.available['day']}"
           end
+          local_d.index_dump = d.metadata.to_s
           local_d.save
         end
 
@@ -108,29 +111,39 @@ class DepositsController < ApplicationController
   # GET /deposits/1
   # GET /deposits/1.json
   def show
-    # use this for aip creation and data upload
-    # show dataset info
-    # create aip
 
-    # For the other form we should have an id for the dataset, look this up and create new Aip
-    # If we don't have an id, sent back an error or could we hide the form?
-    notice = 'The deposit was successful.'
+    @notice = ''
 
-    #Dlibhydra::Aip.new
-    @dataset.preflabel = deposit_params[:uuid]
-    dir = ENV['TRANSFER_LOCATION'] + '/' + deposit_params[:uuid] + '/'
-    FileUtils.mkdir(dir)
-    FileUtils.mkdir(dir + 'submissionDocumentation')
-    FileUtils.chmod 0644, deposit_params[:file].tempfile
-    FileUtils.mv(deposit_params[:file].tempfile, dir + deposit_params[:file].original_filename)
-    respond_to do |format|
-      if @dataset.save
-        format.html { render :show, notice: notice }
-        format.json { render :show, status: :created, location: @deposit }
+    if params[:deposit]
+      if params[:deposit][:file]
+        @aip = Dlibhydra::Aip.new
+        @aip.preflabel = 'Dataset AIP'
+        @aip.readme = params[:deposit][:readme]
+        @aip.save
+        @dataset.aip << @aip
+        @dataset.save
+
+        @notice = 'The deposit was successful.'
+
+        dir_pure = ENV['TRANSFER_LOCATION'] + '/' + @dataset.pure_uuid
+        dir = dir_pure + '/' + params[:id] + '/'
+
+        # write metadata.json
+
+        # TODO check if first bit exists
+        FileUtils.mkdir(dir_pure)
+        FileUtils.mkdir(dir)
+        FileUtils.mkdir(dir + 'submissionDocumentation')
+        FileUtils.chmod 0644, params[:deposit][:file].tempfile
+        FileUtils.mv(params[:deposit][:file].tempfile, dir + params[:deposit][:file].original_filename)
+        @dataset = nil
       else
-        format.html { render :new }
-        format.json { render json: @deposit.errors, status: :unprocessable_entity }
+        @notice = "You didn't deposit any data!"
       end
+    end
+    respond_to do |format|
+      format.html { render :show, notice: @notice }
+      format.json { render :show, status: :created, location: @deposit }
     end
   end
 
@@ -181,6 +194,7 @@ class DepositsController < ApplicationController
             uuid: uuid
       @dataset.pure_uuid = uuid
       @dataset.preflabel = d.title
+      puts d.metadata
       if d.access == ''
         @dataset.access_rights = 'not set'
       else
@@ -194,6 +208,7 @@ class DepositsController < ApplicationController
       unless d.available[:year] == ''
         @dataset.date_available = "#{d.available['year']}/#{d.available['month']}/#{d.available['day']}"
       end
+      @dataset.index_dump = d.metadata.to_s
       @dataset.save
 
       respond_to do |format|
@@ -240,15 +255,24 @@ class DepositsController < ApplicationController
     end
   end
 
+  # Search
+  def search
+
+  end
+
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_deposit
-    @deposit = deposit.find(params[:id])
+    @deposit = Deposit.new
+    @dataset = Dlibhydra::Dataset.find(params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
-  # TODO add access rights, date available, embargo, submission doco, readme, remove people and add contact email/name
+  # TODO add contact email/name
   def deposit_params
-    params.require(:deposit).permit(:uuid, :file, :title, :people, :refresh, :refresh_num, :pure_uuid)
+    params.permit(:deposit, :uuid, :file, :submission_doco,
+                  :title, :refresh, :refresh_num,
+                  :pure_uuid, :readme, :access,
+                  :embargo_end, :available)
   end
 end

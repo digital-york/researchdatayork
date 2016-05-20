@@ -28,10 +28,13 @@ ActiveRecord::Schema.define(version: 20160518205527) do
   create_table "deposits", force: :cascade do |t|
     t.string   "uuid"
     t.string   "title"
-    t.string   "people"
     t.string   "pure_uuid"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string   "readme"
+    t.string   "available"
+    t.string   "embargo_end"
+    t.string   "access"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "searches", force: :cascade do |t|

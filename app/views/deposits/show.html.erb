@@ -1,7 +1,33 @@
-<p id="notice"><%= notice %></p>
+<% if @dataset.nil? %>
+
+    <h1>Thanks!</h1>
+
+    <p>Your deposit was successful.</p>
+    <p>You can re-use this link to deposit more data for this PURE Dataset:<br/>
+
+      <%= link_to 'http://researchdata.york.ac.uk' + deposit_path.to_s, deposit_path  %>
+
+    </p>
+
+    <%= button_to 'Submit more data now', deposit_path  %>
+
+    <br />
+    <p>If you submit another datast to PURE, we'll send you a new deposit link.</p>
+
+<% else %>
+
+<h1>Data Deposit</h1>
+
+    <%= @notice %>
 
 <p>
-  We're done!
+  <strong>PURE unique identifier:</strong> <%= @dataset.pure_uuid  %><br />
+    <strong>Dataset title:</strong> <%= @dataset.title  %><br />
+  <%if @dataset.aip.size > 0 %>
+    <strong><%= @dataset.aip.size %></strong> data deposits have been added for this PURE dataset.
+  <% end %>
 </p>
 
-<%= link_to 'Back', deposits_path %>
+<%= render 'formaip' %>
+
+<% end %>

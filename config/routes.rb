@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resources :deposits
+  post '/deposits/:id', to: 'deposits#show'
 
   mount Blacklight::Engine => '/'
 
@@ -8,24 +9,24 @@ Rails.application.routes.draw do
 
   root to: 'deposits#index'
 
-resource :catalog, only: [:index], as: 'catalog', path: '/catalog', controller: 'catalog' do
-  concerns :searchable
-end
+  resource :catalog, only: [:index], as: 'catalog', path: '/catalog', controller: 'catalog' do
+    concerns :searchable
+  end
 
   devise_for :users
   concern :exportable, Blacklight::Routes::Exportable.new
 
-resources :solr_documents, only: [:show], path: '/catalog', controller: 'catalog' do
-  concerns :exportable
-end
-
-resources :bookmarks do
-  concerns :exportable
-
-  collection do
-    delete 'clear'
+  resources :solr_documents, only: [:show], path: '/catalog', controller: 'catalog' do
+    concerns :exportable
   end
-end
+
+  resources :bookmarks do
+    concerns :exportable
+
+    collection do
+      delete 'clear'
+    end
+  end
 
   mount BrowseEverything::Engine => '/browse'
   # The priority is based upon order of creation: first created -> highest priority.
