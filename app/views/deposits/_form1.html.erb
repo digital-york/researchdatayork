@@ -13,17 +13,23 @@
 
     <div class="field">
       <%= f.label :uuid %><br>
-      <%= f.text_field :uuid %>
+      <%= f.text_field :uuid, :readonly => false, :value => 'uuid' %>
     </div>
 
     <div class="field">
       <%= f.label :title %><br>
-      <%= f.text_field :title %>
+      <%= f.text_field :title, :readonly => true, :value => 'title' %>
     </div>
+
 
     <div class="field">
       <%= f.label :people %><br>
-      <%= f.text_field :people %>
+      <%= f.text_field :people, :readonly => true, :value => 'people' %>
+    </div>
+
+    <div class="field">
+      <%= f.label "Select a file to deposit" %>&nbsp;
+      <%= f.file_field :file %>
     </div>
 
     <div class="actions">

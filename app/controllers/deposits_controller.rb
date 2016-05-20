@@ -4,6 +4,8 @@ class DepositsController < ApplicationController
   include Puree
 
   #20ee85c3-f53c-4ab6-8e50-270b0ddd3686
+  # there is a problem with project
+  #e3f87d05-ab3c-49ef-a69d-0a9805b77d2f - live object with project
 
   # GET /deposits
   # GET /deposits.json
@@ -14,16 +16,23 @@ class DepositsController < ApplicationController
 
     # Get all dataset records from Solr
     solr = RSolr.connect :url => ENV['SOLR_DEV']
-    # add get number step here?
-    response = solr.get 'select', :params => {
+    # Get number of results to return
+    resp = solr.get 'select', :params => {
         :q => 'has_model_ssim:"Dlibhydra::Dataset"',
-        :fl => 'pure_uuid_tesim',
-        :rows => 500
+        :rows => 0
     }
+
+    unless resp['response']['numFound'] == 0
+      response = solr.get 'select', :params => {
+          :q => 'has_model_ssim:"Dlibhydra::Dataset"',
+          :fl => 'pure_uuid_tesim',
+          :rows => resp['response']['numFound']
+      }
+    end
 
     if params[:refresh] == 'true'
       c = Puree::Collection.new(resource_type: :dataset)
-      quantity = 100
+      quantity = 2
       unless params[:refresh_num].nil?
         quantity = params[:refresh_num]
       end
@@ -41,42 +50,100 @@ class DepositsController < ApplicationController
               username: ENV['PURE_USERNAME'],
               password: ENV['PURE_PASSWORD'],
               uuid: uuid
-        unless response.to_s.include? uuid
+
+        # Only include UoY datasets
+        # Update those for which a record already exists
+        unless d.publisher.exclude? 'University of York'
+          if response.to_s.include? uuid
+            r = solr.get 'select', :params => {
+                :q => 'pure_uuid_tesim:"' + uuid + '"',
+                :fl => 'id',
+                :rows => 1
+            }
+            local_d = Dlibhydra::Dataset.find(r['response']['docs'][0]['id'])
+          end
           local_d.pure_uuid = uuid
-          local_d.preflabel = d.title[0]
+          local_d.preflabel = d.title
+
+          if d.access == ''
+            local_d.access_rights = 'not set'
+          else
+            local_d.access_rights = d.access
+          end
+          local_d.date_available = "#{d.available['year']}"
+          unless d.available[:month] == ''
+            local_d.date_available = "#{d.available['year']}/#{d.available['month']}}"
+          end
+          unless d.available[:year] == ''
+            local_d.date_available = "#{d.available['year']}/#{d.available['month']}/#{d.available['day']}"
+          end
           local_d.save
         end
 
       end
-      @deposits = [response.to_s]
-      @deposits = c.uuid
 
     end
 
     # check if we have it in solr, if not create a dataset
-    response = solr.get 'select', :params => {
+    resp = solr.get 'select', :params => {
         :q => 'has_model_ssim:"Dlibhydra::Dataset"',
-        :fl => 'id,pure_uuid_tesim,preflabel_tesim',
-        :rows => 100
+        :rows => 0
     }
-    # Change this to provide only the bit of the response we need to look through!
-    @deposits = [response.to_s]
 
+    unless resp['response']['numFound'] == 0
+      response = solr.get 'select', :params => {
+          :q => 'has_model_ssim:"Dlibhydra::Dataset"',
+          :fl => 'id,pure_uuid_tesim,preflabel_tesim,date_available_tesim,access_rights_tesim',
+          :rows => resp['response']['numFound']
+      }
+    end
+    # Change this to provide only the bit of the response we need to look through!
+    if response.nil?
+      @deposits = []
+    else
+      @deposits = response['response']
+    end
   end
 
   # GET /deposits/1
   # GET /deposits/1.json
   def show
+    # use this for aip creation and data upload
+    # show dataset info
+    # create aip
+
+    # For the other form we should have an id for the dataset, look this up and create new Aip
+    # If we don't have an id, sent back an error or could we hide the form?
+    notice = 'The deposit was successful.'
+
+    #Dlibhydra::Aip.new
+    @dataset.preflabel = deposit_params[:uuid]
+    dir = ENV['TRANSFER_LOCATION'] + '/' + deposit_params[:uuid] + '/'
+    FileUtils.mkdir(dir)
+    FileUtils.mkdir(dir + 'submissionDocumentation')
+    FileUtils.chmod 0644, deposit_params[:file].tempfile
+    FileUtils.mv(deposit_params[:file].tempfile, dir + deposit_params[:file].original_filename)
+    respond_to do |format|
+      if @dataset.save
+        format.html { render :show, notice: notice }
+        format.json { render :show, status: :created, location: @deposit }
+      else
+        format.html { render :new }
+        format.json { render json: @deposit.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   # GET /deposits/new
   def new
     # This is a basic ActiveRecord object. It is never saved.
     @deposit = Deposit.new
+    # Use this for a new dataset
   end
 
   # GET /deposits/1/edit
   def edit
+    # Use this for editing datasets
   end
 
   # POST /deposits
@@ -88,45 +155,58 @@ class DepositsController < ApplicationController
     if params[:deposit][:pure_uuid]
 
       uuid = params[:deposit][:pure_uuid]
-      query = 'pure_uuid_tesim:"' + uuid + '"'
-      notice = 'PURE data already added'
+      query = 'pure_uuid_tesim:"' + uuid + '""'
+      notice = 'PURE data was successfully added.'
 
       solr = RSolr.connect :url => ENV['SOLR_DEV']
       response = solr.get 'select', :params => {
           :q => query,
-          :rows => 0
+          :rows => 1,
+          :fl => 'id,pure_uuid_tesim'
       }
+      if response['response']['numFound'] > 0
+        notice = 'Dataset object already exists for this PURE UUID. Metadata updated.'
+        r = solr.get 'select', :params => {
+            :q => 'pure_uuid_tesim:"' + uuid + '"',
+            :fl => 'id',
+            :rows => 1
+        }
+        @dataset = Dlibhydra::Dataset.find(r['response']['docs'][0]['id'])
+      end
 
       d = Puree::Dataset.new
       d.get endpoint: ENV['PURE_ENDPOINT'],
             username: ENV['PURE_USERNAME'],
             password: ENV['PURE_PASSWORD'],
             uuid: uuid
-      unless response.to_s.include? uuid
-        @dataset.pure_uuid = uuid
-        @dataset.preflabel = d.title[0]
-        @dataset.save
-        notice = 'PURE data was successfully added.'
+      @dataset.pure_uuid = uuid
+      @dataset.preflabel = d.title
+      if d.access == ''
+        @dataset.access_rights = 'not set'
+      else
+        @dataset.access_rights = d.access
       end
+
+      @dataset.date_available = "#{d.available['year']}"
+      unless d.available[:month] == ''
+        @dataset.date_available = "#{d.available['year']}/#{d.available['month']}}"
+      end
+      unless d.available[:year] == ''
+        @dataset.date_available = "#{d.available['year']}/#{d.available['month']}/#{d.available['day']}"
+      end
+      @dataset.save
+
       respond_to do |format|
         format.html { redirect_to deposits_path, notice: notice }
         format.json { render :index, status: :created, location: @dataset }
       end
     else
-      # For the other form we should have an id for the dataset, look this up and create new Aip
-      # If we don't have an id, sent back an error or could we hide the form?
+      # Create new dataset from scratch
       notice = 'The deposit was successful.'
 
-      #Dlibhydra::Aip.new
-      @dataset.preflabel = deposit_params[:uuid]
-      dir = ENV['TRANSFER_LOCATION'] + '/' + deposit_params[:uuid] + '/'
-      FileUtils.mkdir(dir)
-      FileUtils.mkdir(dir + 'submissionDocumentation')
-      FileUtils.chmod 0644, deposit_params[:file].tempfile
-      FileUtils.mv(deposit_params[:file].tempfile, dir + deposit_params[:file].original_filename)
       respond_to do |format|
         if @dataset.save
-          format.html { render :show, notice: 'deposit was successfully made.' }
+          format.html { render :show, notice: notice }
           format.json { render :show, status: :created, location: @deposit }
         else
           format.html { render :new }
@@ -167,6 +247,7 @@ class DepositsController < ApplicationController
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
+  # TODO add access rights, date available, embargo, submission doco, readme, remove people and add contact email/name
   def deposit_params
     params.require(:deposit).permit(:uuid, :file, :title, :people, :refresh, :refresh_num, :pure_uuid)
   end
