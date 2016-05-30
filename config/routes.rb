@@ -1,6 +1,22 @@
 Rails.application.routes.draw do
+
+  resources :datasets
   resources :deposits
   post '/deposits/:id', to: 'deposits#show'
+
+  # update api for archivematica
+  scope '/api' do
+    scope '/v1' do
+      scope '/aip' do
+        scope '/:id' do
+          # get '/' => 'api_aips#show'
+          # post '/'  => 'api_aips#create'
+          put '/' => 'api_aips#update'
+          # delete '/' => 'api_aips#destroy'
+        end
+      end
+    end
+  end
 
   mount Blacklight::Engine => '/'
 

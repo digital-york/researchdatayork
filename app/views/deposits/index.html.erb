@@ -1,4 +1,6 @@
 
+<p><strong>TODO:</strong> Add login and display something for people who hit this page but don't have access.</p>
+
 <table class="table">
   <tbody>
   <tr>
@@ -26,40 +28,50 @@
 <h1>Datasets</h1>
 
 <% unless @deposits == [] %>
-  <p>Listing <%= @deposits['numFound']%> datasets</p>
+  <p>Listing <%= @deposits['numFound']%> dataset<% unless @deposits['numFound'] == 1 %>s<% end %></p>
 
 <table class="table-striped table-bordered table">
   <thead>
   <tr>
-    <th>PURE UUID</th>
-    <th>Title</th>
-    <th>Access</th>
-    <th>Embargo</th>
-    <th>Date Available</th>
-    <th>Date of last access</th>
-    <th>URLs</th>
-    <th>AIP Status</th>
-    <th>DIP Status</th>
+    <th style="width:20%">Dataset</th>
+    <th style="width:10%">Access</th>
+    <th style="width:10%">Embargo</th>
+    <th style="width:10%">Date Available</th>
+    <th style="width:10%">Date of last access</th>
+    <th style="width:20%">AIPs</th>
+    <th style="width:20%">DIP Status</th>
   </tr>
   </thead>
 
   <tbody>
   <% @deposits['docs'].each do |upload| %>
       <tr>
-        <td><%= upload['pure_uuid_tesim'][0] %></td>
-        <td><%= upload['preflabel_tesim'][0] %></td>
-        <td><%= upload['access_rights_tesim'][0] %></td>
-        <td>e</td>
-        <td><%= upload['date_available_tesim'][0] %></td>
-        <td>a</td>
         <td>
-          <strong>Transfer URL:</strong><br />
-          http://researchdata.york.ac.uk/deposit/<%= upload['id'] %><br />
+          <strong>PURE UUID:</strong> <%= upload['pure_uuid_tesim'][0] %><br />
+          <strong>Title:</strong>  <%= upload['preflabel_tesim'][0] %><br />
+          <strong>Deposit URL:</strong><br />
+          <%= link_to 'http://researchdata.york.ac.uk/deposits/' + upload['id'], 'deposits/' + upload['id'] %>
+          <br />
           <strong>Request URL: </strong><br />
-          http://researchdata.york.ac.uk/dataset/<%= upload['id'] %>
+          <%= link_to 'http://researchdata.york.ac.uk/datasets/' + upload['id'], 'datasets/' + upload['id'] %>
         </td>
-        <td>aip</td>
-        <td>dip</td>
+        <td><%= upload['access_rights_tesim'][0] %></td>
+        <td>TODO</td>
+        <td><%= upload['date_available_tesim'][0] %></td>
+        <td>TODO</td>
+        <td>
+
+        <% aip_list = aips(upload['id']) %>
+          <% if aip_list.class == Array %>
+            <%= aip_list.size %> aips deposited <br />
+              <% aip_list.each do |aip| %>
+                  <%= aip %>
+              <% end %>
+          <% else %>
+             <%= aip_list %>
+          <% end %>
+        </td>
+        <td>TODO</td>
       </tr>
   <% end %>
   </tbody>

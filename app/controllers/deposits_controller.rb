@@ -1,7 +1,13 @@
 class DepositsController < ApplicationController
+  helper DepositsHelper
   before_action :set_deposit, only: [:show, :edit, :update, :destroy]
   include Dlibhydra
   include Puree
+  include SearchPure
+  include SearchSolr
+  include CreateDataset
+  include CreateAip
+  include DepositData
 
   #20ee85c3-f53c-4ab6-8e50-270b0ddd3686
   # there is a problem with project
@@ -11,100 +17,45 @@ class DepositsController < ApplicationController
   # GET /deposits.json
   def index
 
-    # For users who aren't logged in, ask for their ID
-
     # This is a basic ActiveRecord object. It is never saved.
     @deposit = Deposit.new
 
-    # Get all dataset records from Solr
-    solr = RSolr.connect :url => ENV['SOLR_DEV']
     # Get number of results to return
-    resp = solr.get 'select', :params => {
-        :q => 'has_model_ssim:"Dlibhydra::Dataset"',
-        :rows => 0
-    }
-
-    unless resp['response']['numFound'] == 0
-      response = solr.get 'select', :params => {
-          :q => 'has_model_ssim:"Dlibhydra::Dataset"',
-          :fl => 'pure_uuid_tesim',
-          :rows => resp['response']['numFound']
-      }
+    num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
+    response = nil
+    # Get all dataset records from Solr
+    unless num_results == 0
+      response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"','pure_uuid_tesim',num_results)
     end
 
     if params[:refresh] == 'true'
-      c = Puree::Collection.new(resource_type: :dataset)
-      quantity = 5
-      unless params[:refresh_num].nil?
-        quantity = params[:refresh_num]
+      if params[:refresh_num]
+        c = get_uuids(params[:refresh_num])
+        get_datasets_from_collection(c,response)
+      elsif params[:refresh_date]
+        c = get_uuids_created_from_tonow(params[:refresh_date])
+        get_datasets_from_collection(c,response)
+        c = get_uuids_modified_from_tonow(params[:refresh_date])
+        get_datasets_from_collection(c,response)
+      else
+        c = get_uuids
+        get_datasets_from_collection(c,response)
       end
-
-      # Get minimal datasets, optionally specifying a quantity (default is 20)
-      c.get endpoint: ENV['PURE_ENDPOINT'],
-            username: ENV['PURE_USERNAME'],
-            password: ENV['PURE_PASSWORD'],
-            qty: quantity
-
-      c.uuid.each do |uuid|
-        local_d = Dlibhydra::Dataset.new
-        d = Puree::Dataset.new
-        d.get endpoint: ENV['PURE_ENDPOINT'],
-              username: ENV['PURE_USERNAME'],
-              password: ENV['PURE_PASSWORD'],
-              uuid: uuid
-
-        # Only include UoY datasets
-        # Update those for which a record already exists
-        unless d.publisher.exclude? 'University of York'
-          if response.to_s.include? uuid
-            r = solr.get 'select', :params => {
-                :q => 'pure_uuid_tesim:"' + uuid + '"',
-                :fl => 'id',
-                :rows => 1
-            }
-            local_d = Dlibhydra::Dataset.find(r['response']['docs'][0]['id'])
-          end
-          local_d.pure_uuid = uuid
-          local_d.preflabel = d.title
-
-          if d.access == ''
-            local_d.access_rights = 'not set'
-          else
-            local_d.access_rights = d.access
-          end
-          local_d.date_available = "#{d.available['year']}"
-          unless d.available[:month] == ''
-            local_d.date_available = "#{d.available['year']}/#{d.available['month']}}"
-          end
-          unless d.available[:year] == ''
-            local_d.date_available = "#{d.available['year']}/#{d.available['month']}/#{d.available['day']}"
-          end
-          local_d.index_dump = d.metadata.to_s
-          local_d.save
-        end
-
-      end
-
     end
 
     # check if we have it in solr, if not create a dataset
-    resp = solr.get 'select', :params => {
-        :q => 'has_model_ssim:"Dlibhydra::Dataset"',
-        :rows => 0
-    }
+    num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
 
-    unless resp['response']['numFound'] == 0
-      response = solr.get 'select', :params => {
-          :q => 'has_model_ssim:"Dlibhydra::Dataset"',
-          :fl => 'id,pure_uuid_tesim,preflabel_tesim,date_available_tesim,access_rights_tesim',
-          :rows => resp['response']['numFound']
-      }
+    unless num_results  == 0
+      response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"',
+                                  'id,pure_uuid_tesim,preflabel_tesim,date_available_tesim,access_rights_tesim',
+                                  num_results)
     end
-    # Change this to provide only the bit of the response we need to look through!
+
     if response.nil?
       @deposits = []
     else
-      @deposits = response['response']
+      @deposits = response
     end
   end
 
@@ -116,26 +67,14 @@ class DepositsController < ApplicationController
 
     if params[:deposit]
       if params[:deposit][:file]
-        @aip = Dlibhydra::Aip.new
-        @aip.preflabel = 'Dataset AIP'
-        @aip.readme = params[:deposit][:readme]
-        @aip.save
-        @dataset.aip << @aip
-        @dataset.save
-
+        @aip = new_aip
+        set_user_deposit(@dataset,params[:deposit][:readme])
+        new_deposit(@dataset.id,@aip.id)
+        add_metadata(@dataset.index_dump)
+        deposit_files(params[:deposit][:file])
+        # TODO write metadata.json
+        # TODO add submission info
         @notice = 'The deposit was successful.'
-
-        dir_pure = ENV['TRANSFER_LOCATION'] + '/' + @dataset.pure_uuid
-        dir = dir_pure + '/' + params[:id] + '/'
-
-        # write metadata.json
-
-        # TODO check if first bit exists
-        FileUtils.mkdir(dir_pure)
-        FileUtils.mkdir(dir)
-        FileUtils.mkdir(dir + 'submissionDocumentation')
-        FileUtils.chmod 0644, params[:deposit][:file].tempfile
-        FileUtils.mv(params[:deposit][:file].tempfile, dir + params[:deposit][:file].original_filename)
         @dataset = nil
       else
         @notice = "You didn't deposit any data!"
@@ -151,7 +90,6 @@ class DepositsController < ApplicationController
   def new
     # This is a basic ActiveRecord object. It is never saved.
     @deposit = Deposit.new
-    # Use this for a new dataset
   end
 
   # GET /deposits/1/edit
@@ -162,71 +100,40 @@ class DepositsController < ApplicationController
   # POST /deposits
   # POST /deposits.json
   def create
-    # Move this into the if statement
-
-    @dataset = Dlibhydra::Dataset.new
+ d
+    # If a pure uuid has been supplied
     if params[:deposit][:pure_uuid]
 
+      # Check solr for a dataset object
       uuid = params[:deposit][:pure_uuid]
       query = 'pure_uuid_tesim:"' + uuid + '""'
-      notice = 'PURE data was successfully added.'
+      response = solr_query_short(query,'id,pure_uuid_tesim',1)
 
-      solr = RSolr.connect :url => ENV['SOLR_DEV']
-      response = solr.get 'select', :params => {
-          :q => query,
-          :rows => 1,
-          :fl => 'id,pure_uuid_tesim'
-      }
-      if response['response']['numFound'] > 0
-        notice = 'Dataset object already exists for this PURE UUID. Metadata updated.'
-        r = solr.get 'select', :params => {
-            :q => 'pure_uuid_tesim:"' + uuid + '"',
-            :fl => 'id',
-            :rows => 1
-        }
-        @dataset = Dlibhydra::Dataset.find(r['response']['docs'][0]['id'])
-      end
-
-      d = Puree::Dataset.new
-      d.get endpoint: ENV['PURE_ENDPOINT'],
-            username: ENV['PURE_USERNAME'],
-            password: ENV['PURE_PASSWORD'],
-            uuid: uuid
-      @dataset.pure_uuid = uuid
-      @dataset.preflabel = d.title
-      puts d.metadata
-      if d.access == ''
-        @dataset.access_rights = 'not set'
+      # If there is no dataset, create one
+      # Otherwise use existing dataset object
+      if response['numFound'] == 0
+        notice = 'PURE data was successfully added.'
+        @dataset = new_dataset
       else
-        @dataset.access_rights = d.access
+        notice = 'Dataset object already exists for this PURE UUID. Metadata updated.'
+        @dataset = find_dataset(response['docs'][0]['id'])
       end
 
-      @dataset.date_available = "#{d.available['year']}"
-      unless d.available[:month] == ''
-        @dataset.date_available = "#{d.available['year']}/#{d.available['month']}}"
-      end
-      unless d.available[:year] == ''
-        @dataset.date_available = "#{d.available['year']}/#{d.available['month']}/#{d.available['day']}"
-      end
-      @dataset.index_dump = d.metadata.to_s
-      @dataset.save
+      # Fetch metadata from pure and update the dataset
+      d = get_pure_dataset(uuid)
+      @dataset = get_dataset(@dataset,d)
 
       respond_to do |format|
         format.html { redirect_to deposits_path, notice: notice }
-        format.json { render :index, status: :created, location: @dataset }
+        # format.json { render :index, status: :created, location: @dataset }
       end
     else
-      # Create new dataset from scratch
+      # TODO Create new dataset from scratch
       notice = 'The deposit was successful.'
 
       respond_to do |format|
-        if @dataset.save
-          format.html { render :show, notice: notice }
-          format.json { render :show, status: :created, location: @deposit }
-        else
-          format.html { render :new }
-          format.json { render json: @deposit.errors, status: :unprocessable_entity }
-        end
+        format.html { render :show, notice: notice }
+        # format.json { render :show, status: :created, location: @deposit }
       end
     end
   end
@@ -234,6 +141,7 @@ class DepositsController < ApplicationController
   # PATCH/PUT /deposits/1
   # PATCH/PUT /deposits/1.json
   def update
+    # TODO
     respond_to do |format|
       if @deposit.update(deposit_params)
         format.html { redirect_to @deposit, notice: 'deposit was successfully updated.' }
@@ -248,6 +156,7 @@ class DepositsController < ApplicationController
   # DELETE /deposits/1
   # DELETE /deposits/1.json
   def destroy
+    # TODO
     @deposit.destroy
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: 'deposit was successfully destroyed.' }
@@ -257,7 +166,7 @@ class DepositsController < ApplicationController
 
   # Search
   def search
-
+    # TODO
   end
 
   private
@@ -275,4 +184,25 @@ class DepositsController < ApplicationController
                   :pure_uuid, :readme, :access,
                   :embargo_end, :available)
   end
-end
+
+  private
+
+  # Given a Puree collection, get each dataset
+  # Create a new Hydra dataset, or update an existing one
+  # Ignore data not published by the given publisher
+  def get_datasets_from_collection(c, response)
+    c.uuid.each do |uuid|
+      d = get_pure_dataset(uuid)
+      unless d.publisher.exclude? ENV['PUBLISHER']
+        if response != nil and response.to_s.include? uuid
+          r = solr_query_short('pure_uuid_tesim:"' + uuid + '"','id',1)
+          local_d = find_dataset(r['docs'][0]['id'])
+        else
+          local_d = new_dataset
+        end
+        set_metadata(local_d,d)
+      end
+    end
+    end
+
+  end
