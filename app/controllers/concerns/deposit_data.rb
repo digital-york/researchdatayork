@@ -30,9 +30,9 @@ module DepositData
   end
 
   def add_metadata(metadata)
-    puts metadata
     require 'json'
-    File.write(@dir_aip + 'metadata.json', metadata.to_json)
+    # TODO eval is a bit dodgy, consider replacing
+    File.write(@dir_aip + 'metadata.json', eval("[#{metadata}]").to_json)
   end
 
   def add_submission_documentation

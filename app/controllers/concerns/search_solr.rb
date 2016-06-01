@@ -6,9 +6,10 @@ module SearchSolr
     #attr_reader :month, :contests
   end
 
-  def get_number_of_results(q='*:*')
+  def get_number_of_results(q='*:*',fq='')
     response = solr_connect.get 'select', :params => {
         :q => q,
+        :fq => fq,
         :rows => 0
     }
     response['response']['numFound']
@@ -17,6 +18,16 @@ module SearchSolr
   def solr_query_short(q='*:*',fl='id',rows=0)
     response = solr_connect.get 'select', :params => {
         :q => q,
+        :fl => fl,
+        :rows => rows
+    }
+    response['response']
+  end
+
+  def solr_filter_query(q='*:*',fq='',fl='id',rows=0)
+    response = solr_connect.get 'select', :params => {
+        :q => q,
+        :fq => fq,
         :fl => fl,
         :rows => rows
     }
