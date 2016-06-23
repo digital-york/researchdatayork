@@ -34,12 +34,14 @@
   <thead>
   <tr>
     <th style="width:20%">Dataset</th>
+    <th style="width:20%">Workflow Status</th>
     <th style="width:10%">Access</th>
-    <th style="width:10%">Embargo</th>
+    <th style="width:10%">Date Created in PURE</th>
     <th style="width:10%">Date Available</th>
     <th style="width:10%">Date of last access</th>
-    <th style="width:20%">AIPs</th>
-    <th style="width:20%">DIP Status</th>
+    <th style="width:10%">Embargo</th>
+    <th style="width:20%">AIP</th>
+    <th style="width:20%">DIP</th>
   </tr>
   </thead>
 
@@ -49,15 +51,35 @@
         <td>
           <strong>PURE UUID:</strong> <%= upload['pure_uuid_tesim'][0] %><br />
           <strong>Title:</strong>  <%= upload['preflabel_tesim'][0] %><br />
+          <strong>Creator:</strong>
+          <% upload['creator_ssim'].each do | i |%>
+            <%= get_preflabel(i) %>;&nbsp;
+          <% end %>
+          <br />
+          <strong>Managing Org:</strong>
+          <% upload['pureOrganisation_ssim'].each do | i |%>
+              <%= get_preflabel(i) %>
+              <% end %>
+          <br />
+          <strong>DOI:</strong>
+          <% upload['doi_tesim'].each do | doi | %>
+              <%= doi %>;&nbsp;
+          <% end %><br />
+          <strong>Links:</strong>
+          <% upload['pure_link_tesim'].each do | link | %>
+              <%= link %>;&nbsp;
+          <% end %><br />
           <strong>Deposit URL:</strong><br />
           <%= link_to 'http://researchdata.york.ac.uk/deposits/' + upload['id'], 'deposits/' + upload['id'] %>
           <br />
           <strong>Request URL: </strong><br />
           <%= link_to 'http://researchdata.york.ac.uk/datasets/' + upload['id'], 'datasets/' + upload['id'] %>
         </td>
-        <td><%= upload['access_rights_tesim'][0] %></td>
         <td>TODO</td>
+        <td><%= upload['access_rights_tesim'][0] %></td>
+        <td><%= upload['pure_creation_tesim'][0].split('T')[0] %></td>
         <td><%= upload['date_available_tesim'][0] %></td>
+        <td>TODO</td>
         <td>TODO</td>
         <td>
 
@@ -71,7 +93,36 @@
              <%= aip_list %>
           <% end %>
         </td>
-        <td>TODO</td>
+        <td>
+          <% dip_list = dips(upload['id']) %>
+          <% if dip_list.class == Array %>
+              <%= dip_list.size %> dips <br />
+              <% dip_list.each do |dip| %>
+                  <% @dip = Dlibhydra::Dip.find(dip) %>
+                  <%= @dip.id %><br />
+                  requested by <%= @dip.first_requestor %> <br />
+                  <% if @dip.status.nil? %>
+                    <%= link_to 'Approve', 'http://localhost:3000/reingest/' + upload['id'] %>
+                  <% elsif @dip.status == 'UPLOADED' %>
+                      <%= @dip.status %>
+                  <% else %>
+                    <%= @dip.status %>
+                      <%= form_for @deposit, url: dipuuid_path do |f| %>
+                          <%= f.hidden_field :id, :value =>upload['id'] %>
+                          <div class="field">
+                            <%= f.label 'DIP UUID' %><br>
+                            <%= f.text_field :dipuuid %>
+                          </div>
+                          <div class="actions">
+                            <%= f.submit 'Update DIP' %>
+                          </div>
+                      <% end %>
+                  <% end %>
+              <% end %>
+          <% else %>
+              <%= dip_list %>
+          <% end %>
+        </td>
       </tr>
   <% end %>
   </tbody>

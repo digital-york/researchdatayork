@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   resources :datasets
   resources :deposits
   post '/deposits/:id', to: 'deposits#show'
+  post '/datasets/:id', to: 'datasets#show'
+  get '/reingest/:id', to: 'deposits#reingest'
+  post '/dipuuid', to: 'deposits#dipuuid'
 
   # update api for archivematica
   scope '/api' do

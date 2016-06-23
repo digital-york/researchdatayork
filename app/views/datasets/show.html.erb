@@ -1,16 +1,53 @@
 <p id="notice"><%= notice %></p>
 
-<p>Show page</p>
-
+<h1><%= @dataset.title  %></h1>
+<br />
 <p>
   <strong>PURE unique identifier:</strong> <%= @dataset.pure_uuid  %><br />
   <strong>Dataset title:</strong> <%= @dataset.title  %><br />
 </p>
 
 <p>
-  <%if @dataset.dip.size == 0 %>
-      We need to prepare this data for download, please provide your email address below and we will contact you as soon as the download is ready.
+  <%if @dataset.aip.size == 0 %>
+        The researcher has not yet deposited the data.
   <% else %>
-      <strong><%= @dataset.dip.size %></strong> data deposits have been added for this PURE dataset.
+    <%if @dataset.dip.size == 0 %>
+        We need to prepare this data for download, please provide your email address below and we will contact you as soon as the download is ready.
+
+        <p>
+          <%= form_for @request, url: dataset_path do |f| %>
+            <div class="field">
+              <%= f.label 'Email Address' %><br>
+              <%= f.text_field :email %>
+            </div>
+            <div class="actions">
+              <%= f.submit 'Request Data' %>
+            </div>
+        <% end %>
+      <% else %>
+        <%if @dataset.dip == NilClass%>
+          The data is being prepared for download.
+        <% else %>
+            <%if @dataset.dip.first.dip_uuid.nil? %>
+            The data is being prepared for download.
+            <% else %>
+
+              <% @dataset.dip.first.members.each do |m|
+                if m.class == Dlibhydra::GenericWork
+                  m.members.each do |f| %>
+                    <%= link_to m.preflabel,f.files.first.uri.to_s%> <br />
+                  <% end
+                     else %>
+                        <%= link_to m.files.first.original_name,m.files.first.uri.to_s%> <br />
+
+                  <%
+                end
+              end
+              %>
+
+            <% end %>
+        <% end %>
+    <% end %>
   <% end %>
+</p>
 </p>

@@ -20,11 +20,11 @@ module CreateAip
     self.set_aip_preflabel('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime("%Y-%m-%d %R")}")
     self.set_readme(readme)
     self.set_data_status('Not Yet Processed')
-    set_member_of(dataset)
+    self.set_aip_member_of(dataset)
     @aip.save
   end
 
-  def set_member_of(dataset)
+  def set_aip_member_of(dataset)
     dataset.aip << @aip
     dataset.save
   end
@@ -32,8 +32,20 @@ module CreateAip
   def set_aip_uuid(uuid)
     @aip.aip_uuid = uuid
   end
-  def set_aip_location(location)
-    @aip.aip_location = location
+  def set_current_path(value)
+    @aip.current_path = value
+  end
+  def set_current_full_path(value)
+    @aip.current_full_path = value
+  end
+  def set_package_size(value)
+    @aip.package_size = value
+  end
+  def set_current_location(value)
+    @aip.current_location = value
+  end
+  def set_resource_uri(value)
+    @aip.resource_uri = value
   end
   def set_aip_preflabel(title)
     @aip.preflabel = title
@@ -41,9 +53,9 @@ module CreateAip
   def set_readme(readme)
     @aip.readme = readme
   end
-  def set_data_status(status)
+  def set_status(status)
     # TODO check vocab?
-    @aip.data_status = status
+    @aip.status = status
   end
 
 end

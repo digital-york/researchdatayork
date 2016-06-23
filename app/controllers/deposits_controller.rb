@@ -8,6 +8,8 @@ class DepositsController < ApplicationController
   include CreateDataset
   include CreateAip
   include DepositData
+  include ReingestAip
+  include CreateDip
 
   #20ee85c3-f53c-4ab6-8e50-270b0ddd3686
   # there is a problem with project
@@ -48,7 +50,9 @@ class DepositsController < ApplicationController
 
     unless num_results  == 0
       response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"',
-                                  'id,pure_uuid_tesim,preflabel_tesim,date_available_tesim,access_rights_tesim',
+                                  'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
+                                    access_rights_tesim,creator_ssim,pureOrganisation_ssim,
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim,pure_date_of_production',
                                   num_results)
     end
 
@@ -100,7 +104,7 @@ class DepositsController < ApplicationController
   # POST /deposits
   # POST /deposits.json
   def create
- d
+
     # If a pure uuid has been supplied
     if params[:deposit][:pure_uuid]
 
@@ -121,7 +125,7 @@ class DepositsController < ApplicationController
 
       # Fetch metadata from pure and update the dataset
       d = get_pure_dataset(uuid)
-      @dataset = get_dataset(@dataset,d)
+      set_metadata(@dataset,d)
 
       respond_to do |format|
         format.html { redirect_to deposits_path, notice: notice }
@@ -169,6 +173,24 @@ class DepositsController < ApplicationController
     # TODO
   end
 
+  # Reingest
+  def reingest
+    message = reingest_aip('objects',params[:id])
+    respond_to do |format|
+      format.html { redirect_to deposits_url, notice: message['message'] }
+      format.json { head :no_content }
+    end
+  end
+
+  def dipuuid
+    puts params
+    message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
+    respond_to do |format|
+      format.html { redirect_to deposits_url, notice: message }
+      format.json { head :no_content }
+    end
+  end
+
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_deposit
@@ -177,12 +199,11 @@ class DepositsController < ApplicationController
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
-  # TODO add contact email/name
   def deposit_params
     params.permit(:deposit, :uuid, :file, :submission_doco,
                   :title, :refresh, :refresh_num,
                   :pure_uuid, :readme, :access,
-                  :embargo_end, :available)
+                  :embargo_end, :available, :dipuuid)
   end
 
   private

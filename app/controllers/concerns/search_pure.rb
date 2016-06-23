@@ -8,11 +8,13 @@ module SearchPure
   end
 
   def get_uuids(limit=1,c_from=nil,c_to=nil,m_from=nil,m_to=nil)
-    c = Puree::Collection.new(resource_type: :dataset)
-    c.get endpoint: ENV['PURE_ENDPOINT'],
-          username: ENV['PURE_USERNAME'],
-          password: ENV['PURE_PASSWORD'],
-          limit: limit,
+    Puree::Configuration.configure do |c|
+      c.endpoint = ENV['PURE_ENDPOINT']
+      c.username = ENV['PURE_USERNAME']
+      c.password = ENV['PURE_PASSWORD']
+    end
+    c = Puree::Collection.new(api: :dataset)
+    c.find limit: limit,
           offset: nil,
           created_start:  c_from, # optional
           created_end:    c_to, # optional
@@ -41,11 +43,13 @@ module SearchPure
   end
 
   def get_pure_dataset(uuid)
+    Puree::Configuration.configure do |c|
+      c.endpoint = ENV['PURE_ENDPOINT']
+      c.username = ENV['PURE_USERNAME']
+      c.password = ENV['PURE_PASSWORD']
+    end
     d = Puree::Dataset.new
-    d.get endpoint: ENV['PURE_ENDPOINT'],
-          username: ENV['PURE_USERNAME'],
-          password: ENV['PURE_PASSWORD'],
-          uuid: uuid
+    d.find uuid: uuid
     d
   end
 
