@@ -9,7 +9,7 @@ Bundler.require(*Rails.groups)
 # Load as otherwise ENV['GOOGLE KEYS'] were being rendered as text rather than getting the variable
 Dotenv::Railtie.load
 
-module researchdatayork
+module Researchdatayork
   class Application < Rails::Application
     
     config.generators do |g|

@@ -62,14 +62,21 @@
               <% end %>
           <br />
           <strong>DOI:</strong>
+          <% unless upload['doi_tesim'].nil? %>
           <% upload['doi_tesim'].each do | doi | %>
-              <%= doi %>;&nbsp;
+              <%= doi %>
+              <%= check_doi(doi) %>
+              ;&nbsp;
+          <% end %>
           <% end %><br />
           <strong>Links:</strong>
+          <% unless upload['pure_link_tesim'].nil? %>
           <% upload['pure_link_tesim'].each do | link | %>
               <%= link %>;&nbsp;
+          <% end %>
           <% end %><br />
-          <strong>Deposit URL:</strong><br />
+
+              <strong>Deposit URL:</strong><br />
           <%= link_to 'http://researchdata.york.ac.uk/deposits/' + upload['id'], 'deposits/' + upload['id'] %>
           <br />
           <strong>Request URL: </strong><br />
