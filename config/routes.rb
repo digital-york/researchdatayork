@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount Qa::Engine => '/qa'
+
 
   resources :datasets
   resources :deposits

@@ -63,6 +63,8 @@ GEM
       activemodel (= 4.2.6)
       activesupport (= 4.2.6)
       arel (~> 6.0)
+    activerecord-import (0.14.1)
+      activerecord (>= 3.2)
     activesupport (4.2.6)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
@@ -326,6 +328,12 @@ GEM
     puree (0.14.0)
       httparty (~> 0.13)
       nokogiri (~> 1.6)
+    qa (0.6.0)
+      activerecord-import
+      deprecation
+      faraday
+      nokogiri (~> 1.6.0)
+      rails (>= 3.2.13, < 5.0)
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -534,6 +542,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   puree (= 0.14.0)
+  qa
   rails (= 4.2.6)
   rsolr (~> 1.0.6)
   rspec-rails

@@ -1,0 +1,21 @@
+:terms:
+    - :id: public
+      :term: Public
+    - :id: notpublic
+      :term: Not Public
+    - :id: waiting-info
+      :term: Awaiting Info
+    - :id: waiting-data
+      :term: Awaiting Data
+    - :id: nodata-external
+      :term: No Data (external)
+    - :id: nodata-dept
+      :term: No Data (dept)
+    - :id: closed-pub-all
+      :term: Closed Until Pub (all)
+    - :id: closed-pub-data
+      :term: Closed Until Pub (data)
+    - :id: complete
+      :term: Complete
+    - :id: new
+      :term: New

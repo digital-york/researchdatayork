@@ -9,6 +9,7 @@ gem 'hydra', '9.1.0'
 gem 'hydra-works', '0.7.0'
 gem 'dotenv-rails', :groups => [:development, :test, :production]
 gem 'faraday'
+gem 'qa'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
