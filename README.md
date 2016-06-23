@@ -5,14 +5,12 @@ phase three of the 'Filling the Digital Preservation Gap' project of the Jisc Re
 
 This application is currently in development.
 
-This application will soon change name to github.com/digital-york/researchdatayork.git
-
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rdmonitor', :git => 'git://github.com/digital-york/rdmonitor.git', branch: 'master'
+gem 'researchdatayork', :git => 'git://github.com/digital-york/researchdatayork.git', branch: 'master'
 ```
 
 And then execute:
