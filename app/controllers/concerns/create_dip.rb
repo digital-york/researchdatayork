@@ -79,19 +79,20 @@ module CreateDip
     @dip.first_requestor = value
   end
 
-  #TODO extend this
+  # TODO extend this to capture folder structure
+  # TODO tidy up use (should it be original file? how do we know - from mets in aip?)
+  # TODO link AIP and DIP
   def ingest_dip(dip_location)
 
     location = ENV['DIP_LOCATION'] + '/' + dip_location
-
+    gw = Dlibhydra::GenericWork.new
+    obj_fs = Hydra::Works::FileSet.new
+    label = ''
     Dir.foreach(location) do |item|
-      next if item == '.' or item == '..'
-      gw = Dlibhydra::GenericWork.new
-      obj_fs = Hydra::Works::FileSet.new
-      label = ''
+      next if item == '.' or item == '..' or item == '.DS_Store'
       if item == 'objects'
         Dir.foreach(location + '/objects') do |object|
-          next if object == '.' or object == '..'
+          next if object == '.' or object == '..' or object == '.DS_Store'
           gw.preflabel = object
           #obj_fs.preflabel = object
           label = object
@@ -104,18 +105,41 @@ module CreateDip
           @dip.members << gw
           save_dip
         end
+      end
+    end
+    Dir.foreach(location) do |item|
+      next if item == '.' or item == '..' or item == '.DS_Store'
+      if item == 'objects'
+        puts 'do nothing'
+      # TODO I don't think thumbnail and ocr text are working
       elsif item == 'thumbnails'
         Dir.foreach(location + '/thumbnails') do |thumb|
-          next if thumb == '.' or thumb == '..'
+          next if thumb == '.' or thumb == '..' or thumb == '.DS_Store'
           th_id = thumb.sub! '.jpg', ''
+          puts th_id
           if label.include? th_id
-            path = location + '/thumbnails/' + thumb
+            path = location + '/thumbnails/' + thumb + '.jpg'
             file = open(path)
-            Hydra::Works::UploadFileToFileSet.call(obj_fs, file)
+            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:thumbnail,update_existing: false)
+            obj_fs.save
+          end
+        end
+      elsif item == 'OCRfiles'
+        Dir.foreach(location + '/OCRfiles') do |ocr|
+          next if ocr == '.' or ocr == '..' or ocr == '.DS_Store'
+          ocr_id = ocr.sub! '.txt', ''
+          puts label
+          puts ocr_id
+          if label.include? ocr_id
+            path = location + '/OCRfiles/' + ocr + '.txt'
+            file = open(path)
+            puts path
+            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:extracted_text,update_existing: false)
             obj_fs.save
           end
         end
       else
+        next if item == '.' or item == '..' or item == '.DS_Store'
         fs = Hydra::Works::FileSet.new
         #fs.preflabel = item
         fs.save
@@ -125,8 +149,8 @@ module CreateDip
         Hydra::Works::UploadFileToFileSet.call(fs, file)
         fs.save
       end
-
     end
+    puts obj_fs.files
 
   end
 
