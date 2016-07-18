@@ -7,8 +7,8 @@ module CreateDip
     attr_reader :dip
   end
 
-  def create_dip
-    @dip = Dlibhydra::Dip.new
+  def create_dip(dataset)
+    @dip = dataset.aip[0]
   end
 
   def save_dip
@@ -17,7 +17,7 @@ module CreateDip
 
   def update_dip(id, uuid)
     dataset = Dlibhydra::Dataset.find(id)
-    @dip = dataset.dip[0]
+    @dip = dataset.aip[0]
     dip_info = get_dip_details(uuid)
     ingest_dip(dip_info['current_path'])
     set_dip_current_path(dip_info['current_path'])
@@ -25,17 +25,12 @@ module CreateDip
     set_dip_status(dip_info['status'])
     set_dip_current_full_path(dip_info['current_path'])
     set_dip_current_location(dip_info['current_location'])
-    set_dip_resource_uri(dip_info['resource_uri'])
+    #set_dip_resource_uri(dip_info['resource_uri'])
     set_dip_package_size(dip_info['size'])
-    set_dip_origin_pipeline(dip_info['origin_pipeline'])
+    #set_dip_origin_pipeline(dip_info['origin_pipeline'])
     save_dip
 
-    'DIP updated with objects'
-  end
-
-  def set_dip_member_of(dataset)
-    dataset.dip << @dip
-    dataset.save
+    'AIP updated with dissemination objects'
   end
 
   def set_dip_uuid(uuid)
@@ -43,47 +38,38 @@ module CreateDip
   end
 
   def set_dip_current_path(value)
-    @dip.current_path = value
+    @dip.dip_current_path = value
   end
 
   def set_dip_current_full_path(value)
-    @dip.current_full_path = value
+    @dip.dip_current_full_path = value
   end
 
   def set_dip_package_size(value)
-    @dip.package_size = value
+    @dip.dip_size = value
   end
 
   def set_dip_current_location(value)
-    @dip.current_location = value
+    @dip.dip_current_location = value
   end
 
-  def set_dip_resource_uri(value)
-    @dip.resource_uri = value
-  end
-
+=begin
   def set_dip_origin_pipeline(value)
     @dip.origin_pipeline = value
   end
-
-  def set_dip_preflabel(title)
-    @dip.preflabel = title
-  end
+=end
 
   def set_dip_status(status)
     # TODO check vocab?
-    @dip.status = status
+    @dip.dip_status = status
   end
 
   def set_first_requestor(value)
     @dip.first_requestor = value
   end
 
-  # TODO extend this to capture folder structure
-  # TODO tidy up use (should it be original file? how do we know - from mets in aip?)
-  # TODO link AIP and DIP
+  # TODO capture folder structure
   def ingest_dip(dip_location)
-
     location = ENV['DIP_LOCATION'] + '/' + dip_location
     gw = Dlibhydra::GenericWork.new
     obj_fs = Hydra::Works::FileSet.new
@@ -92,12 +78,15 @@ module CreateDip
       next if item == '.' or item == '..' or item == '.DS_Store'
       if item == 'objects'
         Dir.foreach(location + '/objects') do |object|
+          # TODO is there more here I should exclude?
           next if object == '.' or object == '..' or object == '.DS_Store'
           gw.preflabel = object
           #obj_fs.preflabel = object
           label = object
           path = location + '/objects/' + object
           file1 = open(path)
+          # this is the service file but doesn't appear to be supported in
+          # https://github.com/projecthydra/hydra-works/blob/master/lib/hydra/works/models/concerns/file_set/contained_files.rb
           Hydra::Works::UploadFileToFileSet.call(obj_fs, file1)
           obj_fs.save
           gw.members << obj_fs
@@ -111,7 +100,6 @@ module CreateDip
       next if item == '.' or item == '..' or item == '.DS_Store'
       if item == 'objects'
         puts 'do nothing'
-      # TODO I don't think thumbnail and ocr text are working
       elsif item == 'thumbnails'
         Dir.foreach(location + '/thumbnails') do |thumb|
           next if thumb == '.' or thumb == '..' or thumb == '.DS_Store'

@@ -105,15 +105,15 @@
           <% if dip_list.class == Array %>
               <%= dip_list.size %> dips <br />
               <% dip_list.each do |dip| %>
-                  <% @dip = Dlibhydra::Dip.find(dip) %>
+                  <% @dip = Dlibhydra::Aip.find(dip) %>
                   <%= @dip.id %><br />
                   requested by <%= @dip.first_requestor %> <br />
-                  <% if @dip.status.nil? %>
+                  <% if @dip.dip_status.nil? %>
                     <%= link_to 'Approve', 'http://localhost:3000/reingest/' + upload['id'] %>
-                  <% elsif @dip.status == 'UPLOADED' %>
-                      <%= @dip.status %>
+                  <% elsif @dip.dip_status == 'UPLOADED' %>
+                      <%= @dip.dip_status %>
                   <% else %>
-                    <%= @dip.status %>
+                    <%= @dip.dip_status %>
                       <%= form_for @deposit, url: dipuuid_path do |f| %>
                           <%= f.hidden_field :id, :value =>upload['id'] %>
                           <div class="field">

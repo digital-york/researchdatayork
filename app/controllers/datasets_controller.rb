@@ -15,11 +15,9 @@ class DatasetsController < ApplicationController
   def show
     @dataset = find_dataset(params[:id])
     if params[:request]
-      create_dip
+      create_dip(@dataset)
       set_first_requestor(params[:request][:email])
-      set_dip_preflabel('DIP for ' + @dataset.pure_uuid)
       save_dip
-      set_dip_member_of(@dataset)
     end
   end
 

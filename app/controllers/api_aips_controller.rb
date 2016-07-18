@@ -21,7 +21,7 @@ class ApiAipsController < BaseApiController
     end
     # update uuid
     unless @json['aip']['status'].nil?
-      set_status(@json['aip']['status'])
+      set_aip_status(@json['aip']['status'])
     end
     # update location
     unless @json['aip']['current_path'].nil?
@@ -29,7 +29,7 @@ class ApiAipsController < BaseApiController
     end
 
     if @aip.save
-      render json:  @aip.to_json, statu: :ok
+      render json:  @aip.to_json, status: :ok
     else
       render nothing: true, status: :bad_request
     end
