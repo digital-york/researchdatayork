@@ -9,23 +9,24 @@ module CreateAip
   end
 
   def new_aip
-    Dlibhydra::Aip.new
+    Dlibhydra::Package.new
   end
 
   def find_aip(id)
-    Dlibhydra::Aip.find(id)
+    Dlibhydra::Package.find(id)
   end
 
   def set_user_deposit(dataset,readme)
     self.set_aip_preflabel('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime("%Y-%m-%d %R")}")
     self.set_readme(readme)
     self.set_aip_status('Not Yet Processed')
+    self.set_aip_uuid('tbc')
     self.set_aip_member_of(dataset)
     @aip.save
   end
 
   def set_aip_member_of(dataset)
-    dataset.aip << @aip
+    dataset.aips << @aip
     dataset.save
   end
 

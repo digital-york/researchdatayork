@@ -8,7 +8,7 @@ module CreateDip
   end
 
   def create_dip(dataset)
-    @dip = dataset.aip[0]
+    @dip = dataset.aips[0]
   end
 
   def save_dip
@@ -17,7 +17,7 @@ module CreateDip
 
   def update_dip(id, uuid)
     dataset = Dlibhydra::Dataset.find(id)
-    @dip = dataset.aip[0]
+    @dip = dataset.aips[0]
     dip_info = get_dip_details(uuid)
     ingest_dip(dip_info['current_path'])
     set_dip_current_path(dip_info['current_path'])

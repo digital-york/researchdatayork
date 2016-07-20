@@ -38,7 +38,7 @@ class ApiAipsController < BaseApiController
   private
     # Use callbacks to share common setup or constraints between actions.
     def find_aip
-      @aip = Dlibhydra::Aip.find(params[:id])
+      @aip = Dlibhydra::Package.find(params[:id])
       render nothing: true, status: :not_found unless @aip.present? #&& @aip.user == @user
     end
 

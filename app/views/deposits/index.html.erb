@@ -105,7 +105,7 @@
           <% if dip_list.class == Array %>
               <%= dip_list.size %> dips <br />
               <% dip_list.each do |dip| %>
-                  <% @dip = Dlibhydra::Aip.find(dip) %>
+                  <% @dip = Dlibhydra::Package.find(dip) %>
                   <%= @dip.id %><br />
                   requested by <%= @dip.first_requestor %> <br />
                   <% if @dip.dip_status.nil? %>

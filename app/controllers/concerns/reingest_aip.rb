@@ -10,8 +10,8 @@ module ReingestAip
   def reingest_aip(type,id)
 
     dataset = Dlibhydra::Dataset.find(id)
-    aip = dataset.aip[0]
-    dip = dataset.aip[0]
+    aip = dataset.aips[0]
+    dip = dataset.aips[0]
     dip.dip_status = 'APPROVE'
     dip.save
 
@@ -41,7 +41,7 @@ module ReingestAip
   end
 
   def find_aip(id)
-    Dlibhydra::Aip.find(id)
+    Dlibhydra::Package.find(id)
   end
 
   def set_user_deposit(dataset,readme)
