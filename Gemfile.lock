@@ -4,8 +4,8 @@ GIT
   branch: master_bak
   specs:
     dlibhydra (0.1.0)
-      active_fedora-noid (~> 1.1.0)
-      hydra-works (~> 0.1)
+      active_fedora-noid
+      hydra-works
 
 GIT
   remote: https://github.com/projecthydra/hydra.git

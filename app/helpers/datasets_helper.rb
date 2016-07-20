@@ -8,7 +8,7 @@ module DatasetsHelper
       else
         values = []
         d.aip.each do | a |
-          values << "#{a.id}: #{a.status}"
+          values << "#{a.id}: #{a.aip_status}"
         end
         return values
       end
@@ -20,12 +20,16 @@ module DatasetsHelper
   def dips(dataset)
     begin
       d = Dlibhydra::Dataset.find(dataset)
-      if d.dip.nil?
+      if d.aip.nil?
         return ''
       else
         values = []
-        d.dip.each do | a |
-          values << a.id
+        d.aip.each do | a |
+          if a.dip? == true
+            values << a.id
+          elsif a.first_requestor != nil
+            values << a.id
+          end
         end
         return values
       end

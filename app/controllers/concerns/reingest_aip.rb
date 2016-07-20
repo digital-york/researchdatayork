@@ -11,8 +11,8 @@ module ReingestAip
 
     dataset = Dlibhydra::Dataset.find(id)
     aip = dataset.aip[0]
-    dip = dataset.dip[0]
-    dip.status = 'APPROVE'
+    dip = dataset.aip[0]
+    dip.dip_status = 'APPROVE'
     dip.save
 
     unless aip.aip_uuid.nil?
@@ -47,7 +47,7 @@ module ReingestAip
   def set_user_deposit(dataset,readme)
     self.set_aip_preflabel('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime("%Y-%m-%d %R")}")
     self.set_readme(readme)
-    self.set_data_status('Not Yet Processed')
+    self.set_aip_status('Not Yet Processed')
     set_member_of(dataset)
     @aip.save
   end
@@ -61,7 +61,7 @@ module ReingestAip
     @aip.aip_uuid = uuid
   end
   def set_current_path(location)
-    @aip.current_path = location
+    @aip.aip_current_path = location
   end
   def set_aip_preflabel(title)
     @aip.preflabel = title
@@ -69,9 +69,9 @@ module ReingestAip
   def set_readme(readme)
     @aip.readme = readme
   end
-  def set_data_status(status)
+  def set_aip_status(status)
     # TODO check vocab?
-    @aip.status = status
+    @aip.aip_status = status
   end
 
 end
