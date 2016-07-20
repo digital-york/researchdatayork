@@ -73,9 +73,9 @@ module CreateDataset
     # TODO check if we have it
     r = solr_query_short('pure_uuid_tesim:' + a['uuid'],'id',1)
     if r['numFound'] == 1
-      o = Dlibhydra::PureOrganisation.find(r['docs'][0]['id'])
+      o = Dlibhydra::CurrentOrganisation.find(r['docs'][0]['id'])
     else
-      o = Dlibhydra::PureOrganisation.new
+      o = Dlibhydra::CurrentOrganisation.new
     end
     o.pure_type = a['type']
     o.pure_uuid = a['uuid']
@@ -88,9 +88,9 @@ module CreateDataset
   def create_pure_person(internal)
     r = solr_query_short('pure_uuid_tesim:' + internal['uuid'],'id',1)
     if r['numFound'] == 1
-      p = Dlibhydra::PurePerson.find(r['docs'][0]['id'])
+      p = Dlibhydra::CurrentPerson.find(r['docs'][0]['id'])
     else
-      p = Dlibhydra::PurePerson.new
+      p = Dlibhydra::CurrentPerson.new
     end
     p.pure_type = 'internal'
     p.family = internal['name']['last']
