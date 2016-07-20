@@ -70,7 +70,6 @@ module CreateDataset
       end
   end
   def set_pure_managing_org(a)
-    # TODO check if we have it
     r = solr_query_short('pure_uuid_tesim:' + a['uuid'],'id',1)
     if r['numFound'] == 1
       o = Dlibhydra::CurrentOrganisation.find(r['docs'][0]['id'])

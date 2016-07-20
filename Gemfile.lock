@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/digital-york/dlibhydra.git
-  revision: 8942e62a2418cd85309fd5a101420e495d08d21c
-  branch: master
+  revision: a51521e7bca9813648e1985616920503a94bd545
+  branch: datasetsv2
   specs:
     dlibhydra (0.1.0)
       active_fedora-noid
