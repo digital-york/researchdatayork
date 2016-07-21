@@ -74,7 +74,7 @@ class DepositsController < ApplicationController
         @aip = new_aip
         set_user_deposit(@dataset,params[:deposit][:readme])
         new_deposit(@dataset.id,@aip.id)
-        add_metadata(@dataset.index_dump)
+        add_metadata(@dataset.for_indexing)
         deposit_files(params[:deposit][:file])
         # TODO write metadata.json
         # TODO add submission info
