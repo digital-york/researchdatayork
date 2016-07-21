@@ -11,7 +11,7 @@
   <%if @dataset.aips.size == 0 %>
         The researcher has not yet deposited the data.
   <% else %>
-    <%if @dataset.aips.first.first_requestor.nil? %>
+      <% if @dataset.aips.first.requestor_email.nil? %>
         We need to prepare this data for download, please provide your email address below and we will contact you as soon as the download is ready.
 
         <p>
@@ -25,7 +25,7 @@
             </div>
         <% end %>
       <% else %>
-        <%if @dataset.aips.first.first_requestor != nil and @dataset.aips.first.dip? == false %>
+        <% if @dataset.aips.first.requestor_email != nil and @dataset.aips.first.dip? == false %>
           The data is being prepared for download.
         <% else %>
 

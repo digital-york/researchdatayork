@@ -23,11 +23,19 @@ class ApiAipsController < BaseApiController
     unless @json['aip']['status'].nil?
       set_aip_status(@json['aip']['status'])
     end
-    # update location
+    # update current path
     unless @json['aip']['current_path'].nil?
-      set_current_path(@json['aip']['current_path'])
+      set_aip_current_path(@json['aip']['current_path'])
     end
-
+    unless @json['aip']['resource_uri'].nil?
+      set_aip_resource_uri(@json['aip']['resource_uri'])
+    end
+    unless @json['aip']['current_location'].nil?
+      set_aip_current_path(@json['aip']['current_location'])
+    end
+    unless @json['aip']['origin_pipeline'].nil?
+      set_aip_origin_pipeline(@json['aip']['origin_pipeline'])
+    end
     if @aip.save
       render json:  @aip.to_json, status: :ok
     else

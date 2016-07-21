@@ -16,7 +16,7 @@ class DatasetsController < ApplicationController
     @dataset = find_dataset(params[:id])
     if params[:request]
       create_dip(@dataset)
-      set_first_requestor(params[:request][:email])
+      set_requestor_email(params[:request][:email])
       save_dip
     end
   end

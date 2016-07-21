@@ -27,7 +27,7 @@ module DatasetsHelper
         d.aips.each do | a |
           if a.dip? == true
             values << a.id
-          elsif a.first_requestor != nil
+          elsif a.requestor_email != nil
             values << a.id
           end
         end

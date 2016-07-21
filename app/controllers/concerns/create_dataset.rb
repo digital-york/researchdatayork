@@ -115,7 +115,7 @@ module CreateDataset
       p = Dlibhydra::CurrentPerson.new
     end
     p.pure_type = type
-    p.family = p['name']['last']
+    p.family_name = p['name']['last']
     p.given_name = p['name']['first']
     p.pure_uuid = p['uuid']
     p.preflabel = p['name']['first'] + ' ' + internal['name']['last']

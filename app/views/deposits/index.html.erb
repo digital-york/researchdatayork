@@ -107,7 +107,7 @@
               <% dip_list.each do |dip| %>
                   <% @dip = Dlibhydra::Package.find(dip) %>
                   <%= @dip.id %><br />
-                  requested by <%= @dip.first_requestor %> <br />
+                  requested by <%= @dip.requestor_email %> <br/>
                   <% if @dip.dip_status.nil? %>
                     <%= link_to 'Approve', 'http://localhost:3000/reingest/' + upload['id'] %>
                   <% elsif @dip.dip_status == 'UPLOADED' %>

@@ -183,7 +183,6 @@ class DepositsController < ApplicationController
   end
 
   def dipuuid
-    puts params
     message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message }

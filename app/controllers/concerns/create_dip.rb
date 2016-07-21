@@ -19,15 +19,16 @@ module CreateDip
     dataset = Dlibhydra::Dataset.find(id)
     @dip = dataset.aips[0]
     dip_info = get_dip_details(uuid)
+    # TODO some error handling here
     ingest_dip(dip_info['current_path'])
     set_dip_current_path(dip_info['current_path'])
     set_dip_uuid(dip_info['uuid'])
     set_dip_status(dip_info['status'])
-    set_dip_current_full_path(dip_info['current_path'])
-    set_dip_current_location(dip_info['current_location'])
-    #set_dip_resource_uri(dip_info['resource_uri'])
+    set_dip_size(dip_info['size'])
+    set_dip_current_location(dip_info['current_location']) # api location
+    set_dip_resource_uri(dip_info['resource_uri']) # api uri
     set_dip_package_size(dip_info['size'])
-    #set_dip_origin_pipeline(dip_info['origin_pipeline'])
+    set_dip_origin_pipeline(dip_info['origin_pipeline'])
     save_dip
 
     'AIP updated with dissemination objects'
@@ -41,11 +42,11 @@ module CreateDip
     @dip.dip_current_path = value
   end
 
-  def set_dip_current_full_path(value)
-    @dip.dip_current_full_path = value
+  def set_dip_resource_uri(value)
+    @dip.dip_resource_uri = value
   end
 
-  def set_dip_package_size(value)
+  def set_dip_size(value)
     @dip.dip_size = value
   end
 
@@ -53,19 +54,22 @@ module CreateDip
     @dip.dip_current_location = value
   end
 
-=begin
   def set_dip_origin_pipeline(value)
     @dip.origin_pipeline = value
   end
-=end
 
   def set_dip_status(status)
     # TODO check vocab?
     @dip.dip_status = status
   end
 
-  def set_first_requestor(value)
-    @dip.first_requestor = value
+  def set_requestor_email(value)
+    if @dip.nil?
+      @dip.requestor_email = [value]
+    else
+      @dip.requestor_email << value
+    end
+
   end
 
   # TODO capture folder structure

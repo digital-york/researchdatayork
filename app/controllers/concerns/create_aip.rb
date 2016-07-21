@@ -29,15 +29,11 @@ module CreateAip
     dataset.aips << @aip
     dataset.save
   end
-
   def set_aip_uuid(uuid)
     @aip.aip_uuid = uuid
   end
   def set_current_path(value)
     @aip.aip_current_path = value
-  end
-  def set_current_full_path(value)
-    @aip.aip_current_full_path = value
   end
   def set_aip_size(value)
     @aip.aip_size = value
@@ -45,11 +41,10 @@ module CreateAip
   def set_current_location(value)
     @aip.aip_current_location = value
   end
-=begin
-  def set_resource_uri(value)
-    @aip.resource_uri = value
+
+  def set_aip_resource_uri(value)
+    @aip.aip_resource_uri = value
   end
-=end
   def set_aip_preflabel(title)
     @aip.preflabel = title
   end
@@ -57,8 +52,11 @@ module CreateAip
     @aip.readme = readme
   end
   def set_aip_status(status)
-    # TODO check vocab?
     @aip.aip_status = status
+  end
+
+  def set_aip_origin_pipeline(pipeline)
+    @aip.aip_origin_pipeline = pipeline
   end
 
 end
