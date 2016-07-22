@@ -9,46 +9,42 @@ module CreateAip
   end
 
   def new_aip
-    Dlibhydra::Aip.new
+    Dlibhydra::Package.new
   end
 
   def find_aip(id)
-    Dlibhydra::Aip.find(id)
+    Dlibhydra::Package.find(id)
   end
 
   def set_user_deposit(dataset,readme)
     self.set_aip_preflabel('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime("%Y-%m-%d %R")}")
     self.set_readme(readme)
     self.set_aip_status('Not Yet Processed')
+    self.set_aip_uuid('tbc')
     self.set_aip_member_of(dataset)
     @aip.save
   end
 
   def set_aip_member_of(dataset)
-    dataset.aip << @aip
+    dataset.aips << @aip
     dataset.save
   end
-
   def set_aip_uuid(uuid)
     @aip.aip_uuid = uuid
   end
-  def set_current_path(value)
+  def set_aip_current_path(value)
     @aip.aip_current_path = value
-  end
-  def set_current_full_path(value)
-    @aip.aip_current_full_path = value
   end
   def set_aip_size(value)
     @aip.aip_size = value
   end
-  def set_current_location(value)
+  def set_aip_current_location(value)
     @aip.aip_current_location = value
   end
-=begin
-  def set_resource_uri(value)
-    @aip.resource_uri = value
+
+  def set_aip_resource_uri(value)
+    @aip.aip_resource_uri = value
   end
-=end
   def set_aip_preflabel(title)
     @aip.preflabel = title
   end
@@ -56,8 +52,11 @@ module CreateAip
     @aip.readme = readme
   end
   def set_aip_status(status)
-    # TODO check vocab?
     @aip.aip_status = status
+  end
+
+  def set_aip_origin_pipeline(pipeline)
+    @aip.aip_origin_pipeline = pipeline
   end
 
 end

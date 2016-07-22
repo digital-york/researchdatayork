@@ -8,7 +8,8 @@ module CreateDip
   end
 
   def create_dip(dataset)
-    @dip = dataset.aip[0]
+    @dip = dataset.aips[0]
+    @dip.dip_uuid = 'tbc' # so that we can call datasets.dips
   end
 
   def save_dip
@@ -17,17 +18,18 @@ module CreateDip
 
   def update_dip(id, uuid)
     dataset = Dlibhydra::Dataset.find(id)
-    @dip = dataset.aip[0]
+    @dip = dataset.aips[0]
     dip_info = get_dip_details(uuid)
+    # TODO some error handling here
     ingest_dip(dip_info['current_path'])
     set_dip_current_path(dip_info['current_path'])
     set_dip_uuid(dip_info['uuid'])
     set_dip_status(dip_info['status'])
-    set_dip_current_full_path(dip_info['current_path'])
-    set_dip_current_location(dip_info['current_location'])
-    #set_dip_resource_uri(dip_info['resource_uri'])
-    set_dip_package_size(dip_info['size'])
-    #set_dip_origin_pipeline(dip_info['origin_pipeline'])
+    set_dip_size(dip_info['size'])
+    set_dip_current_location(dip_info['current_location']) # api location
+    set_dip_resource_uri(dip_info['resource_uri']) # api uri
+    set_dip_size(dip_info['size'])
+    set_dip_origin_pipeline(dip_info['origin_pipeline'])
     save_dip
 
     'AIP updated with dissemination objects'
@@ -41,11 +43,11 @@ module CreateDip
     @dip.dip_current_path = value
   end
 
-  def set_dip_current_full_path(value)
-    @dip.dip_current_full_path = value
+  def set_dip_resource_uri(value)
+    @dip.dip_resource_uri = value
   end
 
-  def set_dip_package_size(value)
+  def set_dip_size(value)
     @dip.dip_size = value
   end
 
@@ -53,26 +55,27 @@ module CreateDip
     @dip.dip_current_location = value
   end
 
-=begin
   def set_dip_origin_pipeline(value)
     @dip.origin_pipeline = value
   end
-=end
 
   def set_dip_status(status)
-    # TODO check vocab?
     @dip.dip_status = status
   end
 
-  def set_first_requestor(value)
-    @dip.first_requestor = value
+  def set_requestor_email(value)
+    unless @dip.requestor_email.include? value
+      emails = @dip.requestor_email.clone
+      emails << value
+      @dip.requestor_email = emails
+    end
   end
 
   # TODO capture folder structure
   def ingest_dip(dip_location)
     location = ENV['DIP_LOCATION'] + '/' + dip_location
     gw = Dlibhydra::GenericWork.new
-    obj_fs = Hydra::Works::FileSet.new
+    obj_fs = Dlibhydra::FileSet.new
     label = ''
     Dir.foreach(location) do |item|
       next if item == '.' or item == '..' or item == '.DS_Store'
@@ -81,7 +84,7 @@ module CreateDip
           # TODO is there more here I should exclude?
           next if object == '.' or object == '..' or object == '.DS_Store'
           gw.preflabel = object
-          #obj_fs.preflabel = object
+          obj_fs.preflabel = object
           label = object
           path = location + '/objects/' + object
           file1 = open(path)
@@ -98,9 +101,7 @@ module CreateDip
     end
     Dir.foreach(location) do |item|
       next if item == '.' or item == '..' or item == '.DS_Store'
-      if item == 'objects'
-        puts 'do nothing'
-      elsif item == 'thumbnails'
+      if item == 'thumbnails'
         Dir.foreach(location + '/thumbnails') do |thumb|
           next if thumb == '.' or thumb == '..' or thumb == '.DS_Store'
           th_id = thumb.sub! '.jpg', ''
@@ -128,17 +129,20 @@ module CreateDip
         end
       else
         next if item == '.' or item == '..' or item == '.DS_Store'
-        fs = Hydra::Works::FileSet.new
-        #fs.preflabel = item
-        fs.save
-        @dip.members << fs
-        save_dip
-        file = open(location + '/' + item)
-        Hydra::Works::UploadFileToFileSet.call(fs, file)
-        fs.save
+        begin
+          fs = Dlibhydra::FileSet.new
+          fs.preflabel = item
+          fs.save
+          @dip.members << fs
+          file = open(location + '/' + item)
+          Hydra::Works::UploadFileToFileSet.call(fs, file)
+          save_dip
+          fs.save
+        rescue
+          # TODO log errors
+        end
       end
     end
-    puts obj_fs.files
 
   end
 
