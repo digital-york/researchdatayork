@@ -7,18 +7,14 @@
 
 <% else %>
 
-    <h1>Data Deposit</h1>
-
     <%= @notice %>
 
-    <p>
-      <strong>PURE unique identifier:</strong> <%= @dataset.pure_uuid  %><br />
-      <strong>Dataset title:</strong> <%= @dataset.title  %><br />
-    </p>
-    <%if @dataset.aip.size > 0 %>
+    <%= render 'datasets/dataset_metadata' %>
+
+    <%if @dataset.aips.size > 0 %>
         <p>
-          <strong><%= @dataset.aip.size %></strong> data deposit
-          <% if @dataset.aip.size > 1%>
+          <strong><%= @dataset.aips.size %></strong> data deposit
+          <% if @dataset.aips.size > 1%>
               <%=s%> have
           <%else%>
               has
@@ -29,6 +25,7 @@
           If you need to add, remove or update the data, please contact Matthew (unless you are Matthew).
         </p>
     <% else %>
+        <h1>Data Deposit</h1>
         <%= render 'formaip' %>
     <% end %>
 

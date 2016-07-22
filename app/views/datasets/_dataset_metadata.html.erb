@@ -1,0 +1,21 @@
+<h2><%= @dataset.title[0] %></h2>
+<br/>
+<p>
+  <strong>PURE unique identifier:</strong> <%= @dataset.pure_uuid %><br/>
+  <% unless @dataset.doi == [] or @dataset.doi == [""] %>
+      <strong>DOI:</strong>
+      <% @dataset.doi.each do |d| %>
+          <%= d %><br/>
+      <% end %>
+  <% end %>
+  <strong>Creator:</strong>
+  <% @dataset.creator.each do |c| %>
+      <%= c.preflabel %><br/>
+  <% end %>
+  <strong>Managing Department:</strong>
+  <% @dataset.managing_organisation.each do |m| %>
+      <%= m.preflabel %><br/>
+  <% end %>
+  <strong>Date Available:</strong> <%= @dataset.date_available %><br/>
+  <strong>Publisher:</strong> <%= @dataset.publisher %><br/>
+</p>

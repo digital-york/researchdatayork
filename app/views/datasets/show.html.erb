@@ -1,50 +1,34 @@
-<p id="notice"><%= notice %></p>
+<p id="notice"><%= @notice %></p>
 
-<h1><%= @dataset.title  %></h1>
-<br />
-<p>
-  <strong>PURE unique identifier:</strong> <%= @dataset.pure_uuid  %><br />
-  <strong>Dataset title:</strong> <%= @dataset.title  %><br />
-</p>
+<%= render 'dataset_metadata' %>
 
-<p>
-  <%if @dataset.aip.size == 0 %>
-        The researcher has not yet deposited the data.
-  <% else %>
-    <%if @dataset.aip.first.first_requestor.nil? %>
-        We need to prepare this data for download, please provide your email address below and we will contact you as soon as the download is ready.
 
+<% if @dataset.aips.size == 0 %>
+    <p>The researcher has not yet deposited the data.</p>
+<% else %>
+    <% if @dataset.dips.size == 0 %>
+
+        <p>We need to prepare this data for download. Please provide your email address below and we will contact
+          you as soon as the download is ready.</p>
         <p>
-          <%= form_for @request, url: dataset_path do |f| %>
-            <div class="field">
-              <%= f.label 'Email Address' %><br>
-              <%= f.text_field :email %>
-            </div>
-            <div class="actions">
-              <%= f.submit 'Request Data' %>
-            </div>
-        <% end %>
-      <% else %>
-        <%if @dataset.aip.first.first_requestor != nil and @dataset.aip.first.dip? == false %>
-          The data is being prepared for download.
+          <%= render 'form_email' %>
+        </p>
+    <% else %>
+        <% if @dataset.dips.first.dip_status != 'UPLOADED' %>
+            <p>We are preparing this data for download. Please provide your email address to be alerted once the
+              data becomes available.</p>
+            <p>
+              <%= render 'form_email' %>
+            </p>
+
         <% else %>
-
-              <% @dataset.dip.first.members.each do |m|
-                if m.class == Dlibhydra::GenericWork
-                  m.members.each do |f| %>
-                    <%= link_to m.preflabel,f.files.first.uri.to_s%> <br />
-                  <% end
-                     else %>
-                        <%= link_to m.files.first.original_name,m.files.first.uri.to_s%> <br />
-
-                  <%
-                end
-              end
-              %>
-
-            <% end %>
+            <h3>Download the Data</h3>
+            <% @dataset.dips.first.works.each do |m|
+              m.members.each do |f| %>
+                    <%= link_to m.preflabel, f.files.first.uri.to_s %> <br/>
+                <% end
+                   end
+                %>
         <% end %>
-
-  <% end %>
-</p>
-</p>
+    <% end %>
+<% end %>
