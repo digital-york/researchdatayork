@@ -1,0 +1,9 @@
+<%= form_for @request, url: dataset_path do |f| %>
+    <div class="field">
+      <%= f.label 'Email Address' %><br>
+      <%= f.text_field :email %>
+    </div>
+    <div class="actions">
+      <%= f.submit 'Request Data' %>
+    </div>
+<% end %>

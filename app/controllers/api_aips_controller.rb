@@ -31,7 +31,7 @@ class ApiAipsController < BaseApiController
       set_aip_resource_uri(@json['aip']['resource_uri'])
     end
     unless @json['aip']['current_location'].nil?
-      set_aip_current_path(@json['aip']['current_location'])
+      set_aip_current_location(@json['aip']['current_location'])
     end
     unless @json['aip']['origin_pipeline'].nil?
       set_aip_origin_pipeline(@json['aip']['origin_pipeline'])

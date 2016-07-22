@@ -32,13 +32,13 @@ module CreateAip
   def set_aip_uuid(uuid)
     @aip.aip_uuid = uuid
   end
-  def set_current_path(value)
+  def set_aip_current_path(value)
     @aip.aip_current_path = value
   end
   def set_aip_size(value)
     @aip.aip_size = value
   end
-  def set_current_location(value)
+  def set_aip_current_location(value)
     @aip.aip_current_location = value
   end
 

@@ -95,10 +95,10 @@ module CreateDataset
     else
       o = Dlibhydra::CurrentOrganisation.new
     end
-    create_pure_org(o)
+    create_pure_org(o,a)
   end
 
-  def create_pure_org(o)
+  def create_pure_org(o,a)
     o.pure_type = a['type']
     o.pure_uuid = a['uuid']
     o.name = a['name']
@@ -110,17 +110,17 @@ module CreateDataset
   def create_pure_person(p,type)
     r = solr_query_short('pure_uuid_tesim:' + p['uuid'], 'id', 1)
     if r['numFound'] == 1
-      p = Dlibhydra::CurrentPerson.find(r['docs'][0]['id'])
+      person = Dlibhydra::CurrentPerson.find(r['docs'][0]['id'])
     else
-      p = Dlibhydra::CurrentPerson.new
+      person = Dlibhydra::CurrentPerson.new
     end
-    p.pure_type = type
-    p.family_name = p['name']['last']
-    p.given_name = p['name']['first']
-    p.pure_uuid = p['uuid']
-    p.preflabel = p['name']['first'] + ' ' + internal['name']['last']
-    p.save
-    @d.creator << p
+    person.pure_type = type
+    person.family_name = p['name']['last']
+    person.given_name = p['name']['first']
+    person.pure_uuid = p['uuid']
+    person.preflabel = p['name']['first'] + ' ' + p['name']['last']
+    person.save
+    @d.creator << person
   end
 
 end

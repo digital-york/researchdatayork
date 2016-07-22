@@ -51,8 +51,8 @@ class DepositsController < ApplicationController
     unless num_results  == 0
       response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"',
                                   'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
-                                    access_rights_tesim,creator_ssim,pureOrganisation_ssim,
-                                    pure_link_tesim,doi_tesim,pure_creation_tesim,pure_date_of_production',
+                                    access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim',
                                   num_results)
     end
 

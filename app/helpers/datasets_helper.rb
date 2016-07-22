@@ -20,16 +20,12 @@ module DatasetsHelper
   def dips(dataset)
     begin
       d = Dlibhydra::Dataset.find(dataset)
-      if d.aips.nil?
+      if d.dips.nil?
         return ''
       else
         values = []
-        d.aips.each do | a |
-          if a.dip? == true
-            values << a.id
-          elsif a.requestor_email != nil
-            values << a.id
-          end
+        d.dips.each do | a |
+          values << a.id
         end
         return values
       end

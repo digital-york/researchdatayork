@@ -18,6 +18,7 @@
 .env
 *.log
 *~
+Gemfile.lock
 
 # Ignore fedora data
 /fcrepo4-data

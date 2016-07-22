@@ -48,12 +48,13 @@ module ReingestAip
     self.set_aip_preflabel('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime("%Y-%m-%d %R")}")
     self.set_readme(readme)
     self.set_aip_status('Not Yet Processed')
+    self.set_aip_uuid('tbc') # temporary; need an aip_uid to be able to add to dataset.aips
     set_member_of(dataset)
     @aip.save
   end
 
   def set_member_of(dataset)
-    dataset.aip << @aip
+    dataset.aips << @aip
     dataset.save
   end
 
