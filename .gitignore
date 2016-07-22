@@ -16,6 +16,8 @@
 !/log/.keep
 /tmp
 .env
+.log
+*~
 
 # Ignore fedora data
 /fcrepo4-data
