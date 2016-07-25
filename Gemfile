@@ -1,17 +1,13 @@
 source 'https://rubygems.org'
 
 
-#gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 'master'
-gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 'master_bak'
+gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 'master'
 gem 'puree', '0.14.0'
 gem 'active_fedora-noid'
 gem 'browse-everything'
 #gem 'hydra', '9.1.0'
-#gem 'hydra', '10.0.0'
-#gem 'hydra', :git => 'https://github.com/projecthydra/hydra.git', branch: 'master'
 gem 'hydra', :git => 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
 gem 'hydra-works', '0.7.0'
-#gem 'hydra-works', '0.10.0'
 gem 'dotenv-rails', :groups => [:development, :test, :production]
 gem 'faraday'
 gem 'qa'
@@ -67,7 +63,6 @@ group :development, :test do
 end
 
 gem 'rsolr', '~> 1.0.6'
-#gem 'rsolr', '~> 1.1.0'
 gem 'globalid'
 gem 'devise'
 gem 'devise-guests', '~> 0.3'
