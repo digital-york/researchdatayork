@@ -51,8 +51,8 @@ class DepositsController < ApplicationController
     unless num_results  == 0
       response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"',
                                   'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
-                                    access_rights_tesim,creator_ssim,pureOrganisation_ssim,
-                                    pure_link_tesim,doi_tesim,pure_creation_tesim,pure_date_of_production',
+                                    access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim',
                                   num_results)
     end
 
@@ -74,7 +74,7 @@ class DepositsController < ApplicationController
         @aip = new_aip
         set_user_deposit(@dataset,params[:deposit][:readme])
         new_deposit(@dataset.id,@aip.id)
-        add_metadata(@dataset.index_dump)
+        add_metadata(@dataset.for_indexing)
         deposit_files(params[:deposit][:file])
         # TODO write metadata.json
         # TODO add submission info
@@ -183,7 +183,6 @@ class DepositsController < ApplicationController
   end
 
   def dipuuid
-    puts params
     message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message }

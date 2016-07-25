@@ -3,11 +3,11 @@ module DatasetsHelper
   def aips(dataset)
     begin
       d = Dlibhydra::Dataset.find(dataset)
-      if d.aip.nil?
+      if d.aips.nil?
         return ''
       else
         values = []
-        d.aip.each do | a |
+        d.aips.each do | a |
           values << "#{a.id}: #{a.aip_status}"
         end
         return values
@@ -20,16 +20,12 @@ module DatasetsHelper
   def dips(dataset)
     begin
       d = Dlibhydra::Dataset.find(dataset)
-      if d.aip.nil?
+      if d.dips.nil?
         return ''
       else
         values = []
-        d.aip.each do | a |
-          if a.dip? == true
-            values << a.id
-          elsif a.first_requestor != nil
-            values << a.id
-          end
+        d.dips.each do | a |
+          values << a.id
         end
         return values
       end

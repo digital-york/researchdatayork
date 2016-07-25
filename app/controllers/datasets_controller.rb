@@ -13,12 +13,24 @@ class DatasetsController < ApplicationController
   # GET /datasets/1
   # GET /datasets/1.json
   def show
+    @notice = ''
     @dataset = find_dataset(params[:id])
     if params[:request]
-      create_dip(@dataset)
-      set_first_requestor(params[:request][:email])
-      save_dip
+      if params[:request][:email].include? '@'
+        @notice = "Thank you. We will send you an email when the data is available."
+        create_dip(@dataset)
+        set_requestor_email(params[:request][:email])
+        save_dip
+
+      else
+        @notice = 'Please provide a full email address.'
+      end
     end
+    respond_to do |format|
+      format.html { render :show, notice: @notice }
+      format.json { render :show, status: :created, location: @deposit }
+    end
+
   end
 
   private

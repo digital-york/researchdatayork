@@ -57,7 +57,7 @@
           <% end %>
           <br />
           <strong>Managing Org:</strong>
-          <% upload['pureOrganisation_ssim'].each do | i |%>
+          <% upload['pureManagingUnit_ssim'].each do | i |%>
               <%= get_preflabel(i) %>
               <% end %>
           <br />
@@ -92,7 +92,7 @@
 
         <% aip_list = aips(upload['id']) %>
           <% if aip_list.class == Array %>
-            <%= aip_list.size %> aips deposited <br />
+            <%= aip_list.size %> aip<%unless aip_list.size < 2 %>s<%end%> deposited <br />
               <% aip_list.each do |aip| %>
                   <%= aip %> <br />
               <% end %>
@@ -103,13 +103,16 @@
         <td>
           <% dip_list = dips(upload['id']) %>
           <% if dip_list.class == Array %>
-              <%= dip_list.size %> dips <br />
+              <%= dip_list.size %> dip
+              <%unless dip_list.size < 2 %>s<%end%> <br />
               <% dip_list.each do |dip| %>
-                  <% @dip = Dlibhydra::Aip.find(dip) %>
+                  <% @dip = Dlibhydra::Package.find(dip) %>
                   <%= @dip.id %><br />
-                  requested by <%= @dip.first_requestor %> <br />
-                  <% if @dip.dip_status.nil? %>
-                    <%= link_to 'Approve', 'http://localhost:3000/reingest/' + upload['id'] %>
+                  requested by <%= @dip.requestor_email %> <br/>
+                  <% if @dip.aip_status == 'UPLOADED' and @dip.dip_status.nil? %>
+                    <%= link_to 'Approve', '/reingest/' + upload['id'] %>
+                  <% elsif @dip.aip_status.nil? or @dip.aip_status != 'UPLOADED' %>
+                    Waiting for AIP upload
                   <% elsif @dip.dip_status == 'UPLOADED' %>
                       <%= @dip.dip_status %>
                   <% else %>

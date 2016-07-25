@@ -10,8 +10,8 @@ module ReingestAip
   def reingest_aip(type,id)
 
     dataset = Dlibhydra::Dataset.find(id)
-    aip = dataset.aip[0]
-    dip = dataset.aip[0]
+    aip = dataset.aips[0]
+    dip = dataset.aips[0]
     dip.dip_status = 'APPROVE'
     dip.save
 
@@ -41,19 +41,20 @@ module ReingestAip
   end
 
   def find_aip(id)
-    Dlibhydra::Aip.find(id)
+    Dlibhydra::Package.find(id)
   end
 
   def set_user_deposit(dataset,readme)
     self.set_aip_preflabel('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime("%Y-%m-%d %R")}")
     self.set_readme(readme)
     self.set_aip_status('Not Yet Processed')
+    self.set_aip_uuid('tbc') # temporary; need an aip_uid to be able to add to dataset.aips
     set_member_of(dataset)
     @aip.save
   end
 
   def set_member_of(dataset)
-    dataset.aip << @aip
+    dataset.aips << @aip
     dataset.save
   end
 
