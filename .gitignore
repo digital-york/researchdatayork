@@ -19,10 +19,9 @@
 *.log
 *~
 Gemfile.lock
+tags
 
 # Ignore fedora data
 /fcrepo4-data
 /solr
 
-# No point having Gemfile.lock in git - it could legitimately be different for everyone after running "bundle install"
-Gemfile.lock
