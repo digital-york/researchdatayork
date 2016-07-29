@@ -25,8 +25,10 @@ module DepositData
     # TODO Allow multiple files
     # TODO Unpack zip files
     # TODO Google Drive implementation
-    FileUtils.chmod 0644, file.tempfile
-    FileUtils.mv(file.tempfile, @dir_aip + file.original_filename)
+    file.each do |f|
+      FileUtils.chmod 0644, f.tempfile
+      FileUtils.mv(f.tempfile, @dir_aip + f.original_filename)
+    end
   end
 
   def add_metadata(metadata)
