@@ -70,12 +70,16 @@ module CreateDip
       @dip.requestor_email = emails
     end
   end
+  
+  def hello
+    "hello!"
+  end
 
   # TODO capture folder structure
   def ingest_dip(dip_location)
     location = ENV['DIP_LOCATION'] + '/' + dip_location
     gw = Dlibhydra::GenericWork.new
-    obj_fs = Dlibhydra::FileSet.new
+    #obj_fs = Dlibhydra::FileSet.new
     label = ''
     Dir.foreach(location) do |item|
       next if item == '.' or item == '..' or item == '.DS_Store'
@@ -83,15 +87,18 @@ module CreateDip
         Dir.foreach(location + '/objects') do |object|
           # TODO is there more here I should exclude?
           next if object == '.' or object == '..' or object == '.DS_Store'
+          obj_fs = Dlibhydra::FileSet.new
           gw.preflabel = object
           obj_fs.preflabel = object
           label = object
           path = location + '/objects/' + object
+          puts path
           file1 = open(path)
           # this is the service file but doesn't appear to be supported in
           # https://github.com/projecthydra/hydra-works/blob/master/lib/hydra/works/models/concerns/file_set/contained_files.rb
           Hydra::Works::UploadFileToFileSet.call(obj_fs, file1)
           obj_fs.save
+          Rails.logger.debug("obj_fs: #{obj_fs.files.inspect}") # FAM DEBUG
           gw.members << obj_fs
           gw.save
           @dip.members << gw
@@ -99,6 +106,7 @@ module CreateDip
         end
       end
     end
+    Rails.logger.debug("gw = #{gw.members.inspect}")
     Dir.foreach(location) do |item|
       next if item == '.' or item == '..' or item == '.DS_Store'
       if item == 'thumbnails'
@@ -109,8 +117,8 @@ module CreateDip
           if label.include? th_id
             path = location + '/thumbnails/' + thumb + '.jpg'
             file = open(path)
-            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:thumbnail,update_existing: false)
-            obj_fs.save
+#            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:thumbnail,update_existing: false)
+#            obj_fs.save
           end
         end
       elsif item == 'OCRfiles'
@@ -123,8 +131,8 @@ module CreateDip
             path = location + '/OCRfiles/' + ocr + '.txt'
             file = open(path)
             puts path
-            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:extracted_text,update_existing: false)
-            obj_fs.save
+#            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:extracted_text,update_existing: false)
+#            obj_fs.save
           end
         end
       else

@@ -25,7 +25,7 @@
             <h3>Download the Data</h3>
             <% @dataset.dips.first.works.each do |m|
               m.members.each do |f| %>
-                    <%= link_to m.preflabel, f.files.first.uri.to_s %> <br/>
+                    <%= link_to f.preflabel, f.files.first.uri.to_s %> <br/>
                 <% end
                    end
                 %>
