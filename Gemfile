@@ -69,4 +69,5 @@ gem 'devise-guests', '~> 0.3'
 group :development, :test do
   gem 'fcrepo_wrapper'
   gem 'rspec-rails'
+  gem 'awesome_print', :require => 'ap' 
 end
