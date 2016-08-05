@@ -11,6 +11,8 @@ gem 'hydra-works', '0.7.0'
 gem 'dotenv-rails', :groups => [:development, :test, :production]
 gem 'faraday'
 gem 'qa'
+# include http_headers gem for parsing http headers
+gem 'http_headers'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
