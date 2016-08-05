@@ -22,6 +22,11 @@
       <%= f.file_field :file, multiple: true %>
     </div>
 
+    <div class="field">
+      <%= f.label "Select a directory to deposit" %>&nbsp;
+      <%= f.file_field :file, multiple: true, directory: true, webkitdirectory: true, mozdirectory: true %>
+    </div>
+
     <div class="actions">
       <%= f.submit 'Deposit' %>
     </div>
