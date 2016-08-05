@@ -38,7 +38,6 @@ module DepositData
       FileUtils.mkdir_p(target_dir)
       # move this uploaded file into place (into target_dir)
       FileUtils.chmod 0644, f.tempfile
-      #FileUtils.mv(f.tempfile, @dir_aip + f.original_filename)
       FileUtils.mv(f.tempfile, target_file)
     end
   end
