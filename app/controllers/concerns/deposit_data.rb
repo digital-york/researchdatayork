@@ -24,11 +24,10 @@ module DepositData
     end
   end
 
-  def deposit_files(file)
-    # TODO Google Drive implementation
-
+  # given an array of files on the user's client machine, upload them, unzip them if they're zipped, and store them in the AIP folder 
+  def deposit_files_from_client(files)
     # handle each of the uploaded files
-    file.each do |f|
+    files.each do |f|
       # get the uploaded filename (including its path in the case of directory upload)
       h = HttpHeaders.new(f.headers)
       uploaded_filename = h.content_disposition.match(/filename=(\"?)(.+)\1/)[2] 
@@ -52,6 +51,17 @@ module DepositData
         # move this uploaded file into place (into target_dir)
         FileUtils.chmod 0644, f.tempfile
         FileUtils.mv(f.tempfile, target_file)
+      end
+    end
+  end
+
+  # given a hash of Google Drive files selected by the user, download them to the AIP folder
+  def deposit_files_from_cloud(files)
+    retriever = BrowseEverything::Retriever.new
+    files.each do |index, file|
+      target_file = File.join(@dir_aip, file['file_name'])
+      retriever.download(file, target_file) do |filename, retrieved, total|
+        # could potentially output download progess here
       end
     end
   end

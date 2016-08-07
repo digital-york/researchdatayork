@@ -27,6 +27,12 @@
       <%= f.file_field :file, multiple: true, directory: true, webkitdirectory: true, mozdirectory: true %>
     </div>
 
+    <div class="field">
+      <%= f.label "Select Google Drive files to deposit" %>&nbsp;<br>
+      <button type="button" data-toggle="browse-everything" data-route="<%=browse_everything_engine.root_path%>"
+      data-target="#new_deposit" id="browse">Choose Files</button>
+    </div>
+
     <div class="actions">
       <%= f.submit 'Deposit' %>
     </div>

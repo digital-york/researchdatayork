@@ -70,12 +70,18 @@ class DepositsController < ApplicationController
     @notice = ''
 
     if params[:deposit]
-      if params[:deposit][:file]
+      # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]  
+      if params[:deposit][:file] or params[:selected_files]
         @aip = new_aip
         set_user_deposit(@dataset,params[:deposit][:readme])
         new_deposit(@dataset.id,@aip.id)
         add_metadata(@dataset.for_indexing)
-        deposit_files(params[:deposit][:file])
+        # handle upload of client side file(s)
+        if params[:deposit][:file]
+          deposit_files_from_client(params[:deposit][:file])
+        elsif params[:selected_files]
+          deposit_files_from_cloud(params[:selected_files])
+        end
         # TODO write metadata.json
         # TODO add submission info
         @notice = 'The deposit was successful.'
