@@ -13,6 +13,8 @@ gem 'faraday'
 gem 'qa'
 # include http_headers gem for parsing http headers
 gem 'http_headers'
+# include rubyzip to handle unzipping of uploaded zip files
+gem 'rubyzip'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
