@@ -16,5 +16,5 @@
 // Required by Blacklight
 //= require blacklight/blacklight
 
-//= require_tree .
 //= require browse_everything
+//= require_tree .
