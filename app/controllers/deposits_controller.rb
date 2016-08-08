@@ -79,7 +79,8 @@ class DepositsController < ApplicationController
         # handle upload of client side file(s)
         if params[:deposit][:file]
           deposit_files_from_client(params[:deposit][:file])
-        elsif params[:selected_files]
+        end
+        if params[:selected_files]
           deposit_files_from_cloud(params[:selected_files])
         end
         # TODO write metadata.json
