@@ -18,22 +18,25 @@
     </div>
 
     <div class="field">
-      <%= f.label "Select a file to deposit" %>&nbsp;
+      <%= f.label "Select local files to deposit" %>&nbsp;
       <%= f.file_field :file, multiple: true %>
     </div>
 
     <div class="field">
-      <%= f.label "Select a directory to deposit" %>&nbsp;
+      <%= f.label "Select a local directory to deposit" %>&nbsp;
       <%= f.file_field :file, multiple: true, directory: true, webkitdirectory: true, mozdirectory: true %>
     </div>
 
     <div class="field">
       <%= f.label "Select Google Drive files to deposit" %>&nbsp;<br>
       <button type="button" data-toggle="browse-everything" data-route="<%=browse_everything_engine.root_path%>"
-      data-target="#new_deposit" id="browse">Choose Files</button>
+              data-target="#new_deposit" id="browse" style="float: left">Choose Files</button>
+      <div id="browse_everything_status" style="float: left">No file chosen</div>
+      <div style="clear: both"></div>
     </div>
 
     <div class="actions">
       <%= f.submit 'Deposit' %>
     </div>
+
 <% end %>
