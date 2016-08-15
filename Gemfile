@@ -15,6 +15,8 @@ gem 'qa'
 gem 'http_headers'
 # include rubyzip to handle unzipping of uploaded zip files
 gem 'rubyzip'
+# include Nokogiri for parsing XML
+gem 'nokogiri'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
