@@ -3,6 +3,7 @@ class DatasetsController < ApplicationController
   include Dlibhydra
   include CreateDataset
   include CreateDip
+  include ShowDip
 
   # GET /datasets
   # GET /datasets.json
@@ -15,6 +16,7 @@ class DatasetsController < ApplicationController
   def show
     @notice = ''
     @dataset = find_dataset(params[:id])
+    @dip_files = dip_directory_structure(@dataset)
     if params[:request]
       if params[:request][:email].include? '@'
         @notice = "Thank you. We will send you an email when the data is available."
