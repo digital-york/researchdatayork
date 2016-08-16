@@ -23,8 +23,11 @@
 
         <% else %>
             <h3>Download the Data</h3>
-            <% @dip_files.each do |key, f| %>
-                 <%= link_to f[:file_path], f[:file_uri] %> <br/>
+            <h4>As a zip file</h4>
+            <p><%= link_to "Download zip", format: :zip %></p>
+            <h4>As individual files</h4>
+            <% @dip_files.each do |key, file| %>
+                 <%= link_to file[:file_path], file[:file_uri] %> <br/>
             <% end %>
         <% end %>
     <% end %>

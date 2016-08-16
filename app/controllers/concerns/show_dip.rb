@@ -3,6 +3,8 @@ module ShowDip
   extend ActiveSupport::Concern
 
   require 'nokogiri'
+  require 'zip'
+  require 'open-uri'
 
   included do
     attr_reader :dip
@@ -51,6 +53,27 @@ module ShowDip
       end
     end
     dip_structure
+  end
+
+  # given a dataset, generate an in-memory zip file of the dataset's dip files (with the correct directory structure)
+  # and return the zip filestream (so that it can be written to user's browser as a zip file in the controller)
+  def dip_as_zip_filestream(dataset)
+    # first of all, get the structure of the dip files
+    dip_structure = dip_directory_structure(dataset)
+    # set up a new zip file in-memory with files sorted alphabetically
+    ::Zip.sort_entries = true
+    file_stream = Zip::OutputStream.write_buffer do |zip|     
+      # for each file in the dip
+      dip_structure.each do |file_id, file_details|
+        # get the contents of the file
+        file = open(file_details[:file_uri], &:read) 
+        # create this file in the zip
+        zip.put_next_entry(file_details[:file_path])
+        zip.write(file)
+      end
+    end
+    file_stream.rewind
+    file_stream
   end
 
 end
