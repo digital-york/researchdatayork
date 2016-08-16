@@ -52,7 +52,8 @@ module ShowDip
         end
       end
     end
-    dip_structure
+    # sort the resulting dip structure by file path
+    dip_structure.sort_by {|file_id, file_details| file_details[:file_path].downcase}.to_h
   end
 
   # given a dataset, generate an in-memory zip file of the dataset's dip files (with the correct directory structure)
