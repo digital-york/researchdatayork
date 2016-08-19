@@ -5,5 +5,3 @@
 Mime::Type.register "application/n-triples", :nt
 Mime::Type.register "application/ld+json", :jsonld
 Mime::Type.register "text/turtle", :ttl
-# add a mime type for zip files
-Mime::Type.register "application/zip", :zip
