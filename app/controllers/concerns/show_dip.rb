@@ -24,10 +24,8 @@ module ShowDip
           mets_url = f.files.first.uri.to_s  
           # get Nokogiri to parse it
           mets_doc = Nokogiri::XML(open(mets_url)) 
-          puts "parsed mets file"
           # get the file ID of every file in the DIP package
           dip_file_ids = mets_doc.xpath("//mets:fileSec/mets:fileGrp[@USE='original']/mets:file/@ID")
-          puts "found #{dip_file_ids.length} files"
           # get the file path of every file in the DIP package
           dip_file_paths = mets_doc.xpath("//mets:fileSec/mets:fileGrp[@USE='original']/mets:file/mets:FLocat/@xlink:href")   
           # for each file
@@ -35,11 +33,8 @@ module ShowDip
           dip_file_ids.each do |f|
             # get the file id as a string (need to parse out the "file-" prefix)
             file_id = f.to_s[/^file-(.*)$/, 1]
-            puts "file id = #{file_id}"
             # get the file path/name (parse out everything in the path before the DIP package id)
             file_path = dip_file_paths[filecounter].to_s[/\/[a-z0-9]{9}\/(.*)$/, 1]
-            puts dip_file_paths[filecounter].to_s
-            puts "file path = #{file_path}"
             # add these to the return array
             dip_structure[file_id] = {:file_path => file_path}
             filecounter = filecounter + 1
