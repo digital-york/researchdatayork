@@ -25,16 +25,24 @@ module ReingestAip
       end
 
       path = '/api/v2/file/' + aip.aip_uuid + '/reingest/'
-      puts path
-      params = '{"pipeline":"' + ENV['ARCHIVEMATICA_PIPELINE'] + '",
+
+      body = '{"pipeline":"' + ENV['ARCHIVEMATICA_PIPELINE'] + '",
                 "reingest_type":"' + type + '"}'
-      puts params
+
+      params = {
+          'username' => ENV['ARCHIVEMATICA_SS_USER'] ,
+          'api_key' => ENV['ARCHIVEMATICA_SS_API_KEY']
+      }
+
       response = conn.post do |req|
         req.url path
         req.headers['Content-Type'] = 'application/json'
-        req.body = params
+        req.params = params
+        req.body = body
       end
 
+      # TODO some error handling!
+      # TODO abstract faraday for re-use
       JSON.parse(response.body)
 
     end
