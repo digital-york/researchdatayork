@@ -155,9 +155,15 @@ module CreateDip
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end
 
+    params = {
+        'username' => ENV['ARCHIVEMATICA_SS_USER'] ,
+        'api_key' => ENV['ARCHIVEMATICA_SS_API_KEY']
+    }
+
     response = conn.get do |req|
       req.url '/api/v2/file/' + uuid + '/'
       req.headers['Accept'] = 'application/json'
+      req.params = params
     end
     JSON.parse(response.body)
 

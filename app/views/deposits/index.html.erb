@@ -51,30 +51,36 @@
         <td>
           <strong>PURE UUID:</strong> <%= upload['pure_uuid_tesim'][0] %><br />
           <strong>Title:</strong>  <%= upload['preflabel_tesim'][0] %><br />
+          <% unless upload['creator_ssim'].nil? %>
           <strong>Creator:</strong>
           <% upload['creator_ssim'].each do | i |%>
             <%= get_preflabel(i) %>;&nbsp;
           <% end %>
-          <br />
+              <br />
+          <% end %>
           <strong>Managing Org:</strong>
           <% upload['pureManagingUnit_ssim'].each do | i |%>
               <%= get_preflabel(i) %>
               <% end %>
           <br />
-          <strong>DOI:</strong>
           <% unless upload['doi_tesim'].nil? %>
-          <% upload['doi_tesim'].each do | doi | %>
+              <strong>DOI:</strong>
+
+              <% upload['doi_tesim'].each do | doi | %>
               <%= doi %>
               <%= check_doi(doi) %>
               ;&nbsp;
           <% end %>
-          <% end %><br />
-          <strong>Links:</strong>
+              <br />
+          <% end %>
+
           <% unless upload['pure_link_tesim'].nil? %>
+              <strong>Links:</strong>
           <% upload['pure_link_tesim'].each do | link | %>
               <%= link %>;&nbsp;
           <% end %>
-          <% end %><br />
+              <br />
+          <% end %>
 
               <strong>Deposit URL:</strong><br />
           <%= link_to 'http://researchdata.york.ac.uk/deposits/' + upload['id'], 'deposits/' + upload['id'] %>
@@ -110,7 +116,7 @@
                   <%= @dip.id %><br />
                   requested by <%= @dip.requestor_email %> <br/>
                   <% if @dip.aip_status == 'UPLOADED' and @dip.dip_status.nil? %>
-                    <%= link_to 'Approve', 'http://localhost:3000/reingest/' + upload['id'] %>
+                    <%= link_to 'Approve', '/reingest/' + upload['id'] %>
                   <% elsif @dip.aip_status.nil? or @dip.aip_status != 'UPLOADED' %>
                     Waiting for AIP upload
                   <% elsif @dip.dip_status == 'UPLOADED' %>
