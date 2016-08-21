@@ -17,6 +17,8 @@ gem 'http_headers'
 gem 'rubyzip'
 # include Nokogiri for parsing XML
 gem 'nokogiri'
+# include the Google Drive API for browsing user's Google Drive files
+gem 'google-api-client'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
@@ -33,6 +35,8 @@ gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
+# and add the jquery UI libraries as well
+gem 'jquery-ui-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -77,3 +81,6 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'awesome_print', :require => 'ap' 
 end
+
+# hack - include a specific version of "stomp" (required by hydra gem) because the default (latest) version has buggy circular dependencies
+gem 'stomp', '1.4.1'
