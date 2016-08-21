@@ -32,11 +32,47 @@
     </div>
 
     <div class="field">
-      <%= f.label "Select Google Drive files to deposit" %>&nbsp;<br>
+      <%= f.label "Select Google Drive files to deposit (browse everything)" %>&nbsp;<br>
       <button type="button" data-toggle="browse-everything" data-route="<%=browse_everything_engine.root_path%>"
               data-target="#new_deposit" id="google_drive_btn" class="btn btn-large btn-success">Choose Files</button>
       <span id="google_drive_status">No file chosen</span>
     </div>
+
+    <div class="field">
+      <%= f.label "Select Google Drive files to deposit (local code)" %>&nbsp;<br>
+      <button type="button" class="btn btn-large btn-success" id="google-drive-btn2">Choose Files</button>
+      <span id="google_drive_status2">No file chosen</span>
+    </div>
+
+    <div id="googleDriveDialog" title="Select files from Google Drive">
+      <p>Loading Google Drive - please wait...</p>
+    </div>
+
+    <script>
+    $( function() {
+      dialog2 = $( "#googleDriveDialog" ).dialog({
+        autoOpen: false,
+        resizable: true,
+        height: 500,
+        width: 600,
+        modal: true,
+        buttons: {
+          "OK": function() {
+            $( this ).dialog( "close" );
+          },
+          Cancel: function() {
+            $( this ).dialog( "close" );
+          }
+        }
+      });
+      $( "#google-drive-btn2" ).button().on( "click", function() {
+        dialog2.dialog( "open" );
+        dialog2.load('/googledrive', function() {
+          // code here for on_success
+        });
+      });
+    } );
+    </script>
 
     <div class="actions">
       <%= f.submit 'Deposit' %>
