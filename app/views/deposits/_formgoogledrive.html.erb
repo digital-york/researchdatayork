@@ -1,8 +1,14 @@
 <div id="jstree_div" title="Select files from Google Drive">Loading Google Drive - please wait...</div>
 
-<div id="jstree_status"></div>
+<div id="jstree_status">
+  <div id="jstree_files_status" style="float:left"></div>
+  <div id="jstree_loading_status" style="float:left"></div>
+</div>
+<div style="clear:both"/>
 
 <script>
+  // take a count of how many folders are being opened so that I can print out a "still loading" message
+  var loading_counter = 0;
   $(function () { 
     $('#jstree_div').jstree({
       "plugins" : ["checkbox", "changed"],
@@ -17,40 +23,39 @@
         }
       },
       'checkbox': {
-        //tie_selection: false
         three_state: false,
-        //whole_node: false
       }
     }); 
   }); 
   $('#jstree_div').on("changed.jstree", function (e, data) {
-    //console.log(data.selected);
-    //console.log(data.instance.get_node(data.selected[0]));
-    //console.log(data.instance.get_path(data.selected[0], "/"));
-    //console.log(data.instance.get_top_selected(false));
     // if a folder is selected/checked, open it and automatically select all of its contents (recursively if there are subfolders)  
-    if (data.instance.is_parent(data.changed.selected[0])) {
-      data.instance.open_node(data.changed.selected[0], function (d2) {
-        // for each child in the selected and opened node, select it
-        //console.log(d2);
-        for (var i = 0; i < d2.children.length; i++) {
-          data.instance.select_node(data.instance.get_node(d2.children[i]));
-        }
-      });
-    }
-    // if a folder is deselected/unchecked, automatically deselect/uncheck all of its contents (recursively if there are subfolders)
-    if (data.instance.is_parent(data.changed.deselected[0])) {
-      var node = data.instance.get_node(data.changed.deselected[0]);
-      for (var k = 0; k < node.children.length; k++) {
-        data.instance.deselect_node(node.children[k]);
+    if (data.changed.selected[0]) {
+      if (data.instance.is_parent(data.changed.selected[0])) {
+        loading_counter++;
+        $("#jstree_loading_status").html("...still loading...");
+        data.instance.open_node(data.changed.selected[0], function (d2) {
+          // for each child in the selected and opened node, select it
+          for (var i = 0; i < d2.children.length; i++) {
+            data.instance.select_node(data.instance.get_node(d2.children[i]));
+          }
+          loading_counter--;
+          if (loading_counter === 0) {
+            $("#jstree_loading_status").html("");
+          }
+        });
       }
     }
-    //console.log(data.changed);
-    // update the "status" message of the dialog
-    $("#jstree_status").html(data.selected.length + " files selected");
-  });
-  $('#jstree_div').on("select_node.jstree", function (e, data) {
-    //console.log(data.node);
+    if (data.changed.deselected[0]) {
+      // if a folder is deselected/unchecked, automatically deselect/uncheck all of its contents (recursively if there are subfolders)
+      if (data.instance.is_parent(data.changed.deselected[0])) {
+        var node = data.instance.get_node(data.changed.deselected[0]);
+        for (var k = 0; k < node.children.length; k++) {
+          data.instance.deselect_node(node.children[k]);
+        }
+      }
+    }
+    // update the "status" message of the dialog with the number of selected files
+    $("#jstree_files_status").html(data.instance.get_bottom_selected(false).length + " files selected");
   });
 </script>
 
