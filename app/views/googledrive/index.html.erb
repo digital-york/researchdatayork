@@ -10,12 +10,12 @@
 <%# end %>
 -->
 
-<div id="jstree_demo_div"></div>
+<div id="jstree_div"></div>
 
 <script>
   $(function () { 
-    $('#jstree_demo_div').jstree({
-      "plugins" : ["checkbox"],
+    $('#jstree_div').jstree({
+      "plugins" : ["checkbox", "changed"],
       'core': {
         'data': {
           'url' : function (node) {
@@ -25,10 +25,39 @@
 
           }
         }
-      } 
+      },
+      'checkbox': {
+        //tie_selection: false
+        three_state: false,
+        whole_node: false
+      }
     }); 
   }); 
-  $('#jstree_demo_div').on("changed.jstree", function (e, data) {
-    console.log(data.selected);
+  $('#jstree_div').on("changed.jstree", function (e, data) {
+    //console.log(data.selected);
+    //console.log(data.instance.get_node(data.selected[0]));
+    //console.log(data.instance.get_path(data.selected[0], "/"));
+    //console.log(data.instance.get_top_selected(false));
+    // if a folder is selected/checked, open it and automatically select all of its contents (recursively if there are subfolders)  
+    if (data.instance.is_parent(data.changed.selected[0])) {
+      data.instance.open_node(data.changed.selected[0], function (d2) {
+        // for each child in the selected and opened node, select it
+        //console.log(d2);
+        for (var i = 0; i < d2.children.length; i++) {
+          data.instance.select_node(data.instance.get_node(d2.children[i]));
+        }
+      });
+    }
+    // if a folder is deselected/unchecked, automatically deselect/uncheck all of its contents (recursively if there are subfolders)
+    if (data.instance.is_parent(data.changed.deselected[0])) {
+      var node = data.instance.get_node(data.changed.deselected[0]);
+      for (var k = 0; k < node.children.length; k++) {
+        data.instance.deselect_node(node.children[k]);
+      }
+    }
+    //console.log(data.changed);
+  });
+  $('#jstree_div').on("select_node.jstree", function (e, data) {
+    //console.log(data.node);
   });
 </script>
