@@ -51,7 +51,6 @@ class GoogledriveController < ApplicationController
     #  puts "#{file.name} (#{file.id})"
     #end
     respond_to do |format|
-      format.html { render :index, :layout => false }
       format.json { render :index }
     end
   end

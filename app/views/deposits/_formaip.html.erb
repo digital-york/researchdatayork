@@ -44,35 +44,7 @@
       <span id="google_drive_status2">No file chosen</span>
     </div>
 
-    <div id="googleDriveDialog" title="Select files from Google Drive">
-      <p>Loading Google Drive - please wait...</p>
-    </div>
-
-    <script>
-    $( function() {
-      dialog2 = $( "#googleDriveDialog" ).dialog({
-        autoOpen: false,
-        resizable: true,
-        height: 500,
-        width: 600,
-        modal: true,
-        buttons: {
-          "OK": function() {
-            $( this ).dialog( "close" );
-          },
-          Cancel: function() {
-            $( this ).dialog( "close" );
-          }
-        }
-      });
-      $( "#google-drive-btn2" ).button().on( "click", function() {
-        dialog2.dialog( "open" );
-        dialog2.load('/googledrive', function() {
-          // code here for on_success
-        });
-      });
-    } );
-    </script>
+    <%= render "formgoogledrive" %>
 
     <div class="actions">
       <%= f.submit 'Deposit' %>

@@ -1,16 +1,6 @@
-<%# content_for :head do %>
-  <%#= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" %> 
-  <%#= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.2/jstree.min.js" %> 
-<%# end %>
+<div id="jstree_div" title="Select files from Google Drive">Loading Google Drive - please wait...</div>
 
-<!--
-<h1>hello</h1>
-<%# @response.files.each do |file| %>
-  <p><img src="<%#= file.icon_link %>"/> <%#= file.name %></p>
-<%# end %>
--->
-
-<div id="jstree_div"></div>
+<div id="jstree_status"></div>
 
 <script>
   $(function () { 
@@ -29,7 +19,7 @@
       'checkbox': {
         //tie_selection: false
         three_state: false,
-        whole_node: false
+        //whole_node: false
       }
     }); 
   }); 
@@ -56,8 +46,35 @@
       }
     }
     //console.log(data.changed);
+    // update the "status" message of the dialog
+    $("#jstree_status").html(data.selected.length + " files selected");
   });
   $('#jstree_div').on("select_node.jstree", function (e, data) {
     //console.log(data.node);
   });
 </script>
+
+<script>
+$( function() {
+  dialog = $( "#jstree_div" ).dialog({
+    autoOpen: false,
+    resizable: true,
+    height: 500,
+    width: 600,
+    modal: true,
+    buttons: {
+      "OK": function() {
+        $( this ).dialog( "close" );
+      },
+      Cancel: function() {
+        $( this ).dialog( "close" );
+      }
+    }
+  });
+  $("#jstree_status").appendTo(".ui-dialog-buttonpane");
+  $( "#google-drive-btn2" ).button().on( "click", function() {
+    dialog.dialog( "open" );
+  });
+});
+</script>
+
