@@ -83,8 +83,9 @@
       modal: true,
       buttons: {
         "OK": function() {
+          // attach the selected files to the form as hidden input params
           // get an array of selected nodes
-          selectedNodes = $("#jstree_div").jstree("get_bottom_selected");
+          selectedNodes = $("#jstree_div").jstree("get_bottom_selected", true);
           // get the form on this page
           form = document.getElementById("new_deposit");
           // remove any existing selections from the form
@@ -96,13 +97,17 @@
           while (oldPaths[0]) {
             form.removeChild(oldPaths[0]);
           }
+          oldMimeTypes = document.getElementsByName("selected_mimetypes[]");
+          while (oldMimeTypes[0]) {
+            form.removeChild(oldMimeTypes[0]);
+          }
           // for each selected file
           for (var i = 0; i < selectedNodes.length; i++) {
             // write it to the html form as a hidden input
             var input = document.createElement("input");
             input.type = "hidden";
             input.name = "selected_files[]";
-            input.value = selectedNodes[i];
+            input.value = selectedNodes[i].id;
             form.appendChild(input);
             // write the desired path of this file to a hidden input as well
             var input2 = document.createElement("input");
@@ -110,6 +115,12 @@
             input2.name = "selected_paths[]";
             input2.value = relpath_to_node($("#jstree_div").jstree(), selectedNodes[i]);
             form.appendChild(input2);
+            // write the mime type of this file to a hidden input as well
+            var input3 = document.createElement("input");
+            input3.type = "hidden";
+            input3.name = "selected_mimetypes[]";
+            input3.value = selectedNodes[i].data["mime_type"];
+            form.appendChild(input3);
           }
           $( this ).dialog( "close" );
         },
