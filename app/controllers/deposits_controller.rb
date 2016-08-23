@@ -10,6 +10,7 @@ class DepositsController < ApplicationController
   include DepositData
   include ReingestAip
   include CreateDip
+  include Googledrive
 
   #20ee85c3-f53c-4ab6-8e50-270b0ddd3686
   # there is a problem with project
@@ -80,8 +81,8 @@ class DepositsController < ApplicationController
         if params[:deposit][:file]
           deposit_files_from_client(params[:deposit][:file])
         end
-        if params[:selected_files]
-          deposit_files_from_cloud(params[:selected_files])
+        if params[:selected_files] and params[:selected_paths] and params[:selected_mimetypes]
+          deposit_files_from_cloud(params[:selected_files], params[:selected_paths], params[:selected_mimetypes])
         end
         # TODO write metadata.json
         # TODO add submission info
