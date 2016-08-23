@@ -9,6 +9,22 @@
 <script>
   // take a count of how many folders are being opened so that I can print out a "still loading" message
   var loading_counter = 0;
+  // given a tree node, work out whether its parent is selected and return its relative path accordingly
+  function relpath_to_node (jstree, node) {
+    var id_path = jstree.get_path(node, false, true);
+    var name_path = jstree.get_path(node, false, false);
+    // for each parent in the paths, if it's not selected, remove it and all its parents from the array
+    for (var i = id_path.length - 1; i >= 0; i--) {
+      if (!jstree.is_selected(id_path[i])) {
+        // remove this and all elements before this from arrays
+        id_path.splice(0, i+1);
+        name_path.splice(0, i+1);
+        break;
+      }
+    }
+    return name_path.join("/");
+  }
+  // initialise the jstree
   $(function () { 
     $('#jstree_div').jstree({
       "plugins" : ["checkbox", "changed"],
@@ -57,29 +73,55 @@
     // update the "status" message of the dialog with the number of selected files
     $("#jstree_files_status").html(data.instance.get_bottom_selected(false).length + " files selected");
   });
-</script>
 
-<script>
-$( function() {
-  dialog = $( "#jstree_div" ).dialog({
-    autoOpen: false,
-    resizable: true,
-    height: 500,
-    width: 600,
-    modal: true,
-    buttons: {
-      "OK": function() {
-        $( this ).dialog( "close" );
-      },
-      Cancel: function() {
-        $( this ).dialog( "close" );
+  $( function() {
+    dialog = $( "#jstree_div" ).dialog({
+      autoOpen: false,
+      resizable: true,
+      height: 500,
+      width: 600,
+      modal: true,
+      buttons: {
+        "OK": function() {
+          // get an array of selected nodes
+          selectedNodes = $("#jstree_div").jstree("get_bottom_selected");
+          // get the form on this page
+          form = document.getElementById("new_deposit");
+          // remove any existing selections from the form
+          oldSelections = document.getElementsByName("selected_files[]");
+          while (oldSelections[0]) {
+            form.removeChild(oldSelections[0]);
+          }
+          oldPaths = document.getElementsByName("selected_paths[]");
+          while (oldPaths[0]) {
+            form.removeChild(oldPaths[0]);
+          }
+          // for each selected file
+          for (var i = 0; i < selectedNodes.length; i++) {
+            // write it to the html form as a hidden input
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "selected_files[]";
+            input.value = selectedNodes[i];
+            form.appendChild(input);
+            // write the desired path of this file to a hidden input as well
+            var input2 = document.createElement("input");
+            input2.type = "hidden";
+            input2.name = "selected_paths[]";
+            input2.value = relpath_to_node($("#jstree_div").jstree(), selectedNodes[i]);
+            form.appendChild(input2);
+          }
+          $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
       }
-    }
+    });
+    $("#jstree_status").appendTo(".ui-dialog-buttonpane");
+    $( "#google-drive-btn2" ).button().on( "click", function() {
+      dialog.dialog( "open" );
+    });
   });
-  $("#jstree_status").appendTo(".ui-dialog-buttonpane");
-  $( "#google-drive-btn2" ).button().on( "click", function() {
-    dialog.dialog( "open" );
-  });
-});
 </script>
 
