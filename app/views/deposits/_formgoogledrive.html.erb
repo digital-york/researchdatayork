@@ -122,6 +122,8 @@
             input3.value = selectedNodes[i].data["mime_type"];
             form.appendChild(input3);
           }
+          // update the status message next to the "select google drive files"
+          $("#google_drive_status2").html(selectedNodes.length + " files selected");
           $( this ).dialog( "close" );
         },
         Cancel: function() {
