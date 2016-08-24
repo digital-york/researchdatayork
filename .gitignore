@@ -19,6 +19,7 @@
 *.log
 *~
 Gemfile.lock
+.DS_Store
 
 # Ignore fedora data
 /fcrepo4-data

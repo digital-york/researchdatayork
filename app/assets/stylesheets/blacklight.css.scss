@@ -3,3 +3,28 @@
 @import 'bootstrap';
 
 @import 'blacklight/blacklight';
+
+.navbar-header {
+  color: teal;
+  font-weight: bold;
+  font-size: 1.5em;
+  line-height: 100px;
+
+}
+
+#header-navbar {
+  .navbar-brand {  /* The main logo image for the Blacklight instance */
+    width: 200px;
+    height: 92px;
+  }
+}
+
+.check_box_true {
+  color: black;
+  font-weight: bold;
+  font-style: italic;
+}
+.check_box_false {
+  font-weight: normal;
+  font-style: normal;
+}

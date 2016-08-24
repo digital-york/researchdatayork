@@ -8,12 +8,12 @@ module DatasetsHelper
       else
         values = []
         d.aips.each do | a |
-          values << "#{a.id}: #{a.aip_status}"
+          values << "#{a.id} #{a.aip_status}"
         end
         return values
       end
     rescue
-      return ''
+      return []
     end
   end
 
@@ -25,12 +25,30 @@ module DatasetsHelper
       else
         values = []
         d.dips.each do | a |
-          values << a.id
+          values << a
         end
         return values
       end
     rescue
+      return []
+    end
+  end
+
+  def get_aip(dataset)
+    begin
+      d = Dlibhydra::Dataset.find(dataset).aips.first
+      d
+    rescue
       return ''
     end
   end
+  def get_dip(dataset)
+    begin
+      d = Dlibhydra::Dataset.find(dataset).dips.first
+      d
+    rescue
+      return ''
+    end
+  end
+
 end

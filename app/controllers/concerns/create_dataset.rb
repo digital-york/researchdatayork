@@ -20,16 +20,16 @@ module CreateDataset
   def set_metadata(d, puree_dataset)
     @d = d
     @d.for_indexing = puree_dataset.metadata.to_s
-    self.set_uuid(puree_dataset.uuid)
+    self.set_uuid(puree_dataset.metadata['uuid'])
     self.set_title(puree_dataset.title)
     self.set_access(puree_dataset.access)
-    self.set_available(puree_dataset.available)
-    self.set_pure_created(puree_dataset.created)
+    self.set_available(puree_dataset.metadata['available'])
+    self.set_pure_created(puree_dataset.metadata['created'])
     self.set_publisher(puree_dataset.publisher)
     self.set_doi(puree_dataset.doi)
     self.set_link(puree_dataset.link)
     self.set_pure_creator(puree_dataset.person)
-    self.set_pure_managing_org(puree_dataset.organisation)
+    self.set_pure_managing_org(puree_dataset.owner)
     @d.save
   end
 
@@ -89,6 +89,7 @@ module CreateDataset
   end
 
   def set_pure_managing_org(a)
+    puts a['uuid']
     r = solr_query_short('pure_uuid_tesim:' + a['uuid'], 'id', 1)
     if r['numFound'] == 1
       o = Dlibhydra::CurrentOrganisation.find(r['docs'][0]['id'])
@@ -108,7 +109,7 @@ module CreateDataset
   end
 
   def create_pure_person(p,type)
-    r = solr_query_short('pure_uuid_tesim:' + p['uuid'], 'id', 1)
+    r = solr_query_short('pure_uuid_tesim:' + p['uuid'].to_s, 'id', 1)
     if r['numFound'] == 1
       person = Dlibhydra::CurrentPerson.find(r['docs'][0]['id'])
     else
@@ -117,7 +118,7 @@ module CreateDataset
     person.pure_type = type
     person.family_name = p['name']['last']
     person.given_name = p['name']['first']
-    person.pure_uuid = p['uuid']
+    person.pure_uuid = p['uuid'].to_s
     person.preflabel = p['name']['first'] + ' ' + p['name']['last']
     person.save
     @d.creator << person

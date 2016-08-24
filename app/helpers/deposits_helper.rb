@@ -18,4 +18,16 @@ module DepositsHelper
       ''
     end
   end
+
+  def checked(term)
+    if @deposit.nil?
+      false
+    elsif @deposit.status.nil?
+      false
+    elsif @deposit.status.include? term
+      true
+    else
+      false
+    end
+  end
 end

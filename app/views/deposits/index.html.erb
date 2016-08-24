@@ -1,31 +1,6 @@
-
-<p><strong>TODO:</strong> Add login and display something for people who hit this page but don't have access.</p>
-
-<table class="table">
-  <tbody>
-  <tr>
-    <td>
-      <h3>Add a Dataset from PURE</h3>
-      <%= form_for @deposit, url: deposits_path do |f| %>
-          <div class="field">
-            <%= f.label 'Enter the PURE UUID' %><br>
-            <%= f.text_field :pure_uuid %>
-          </div>
-          <div class="actions">
-            <%= f.submit 'Add dataset' %>
-          </div>
-      <% end %>
-    </td>
-    <td>
-      <h3>Add a Dataset from elsewhere</h3>
-      <p><strong>To add a new dataset record from scratch</strong></p>
-      <%= button_to 'Add dataset', new_deposit_path, :method => :get %>
-    </td>
-  </tr>
-  </tbody>
-</table>
-
 <h1>Datasets</h1>
+
+<p><%= link_to("Add a Dataset", deposits_path(:anchor => 'add_dataset'))  %></p>
 
 <% unless @deposits == [] %>
   <p>Listing <%= @deposits['numFound']%> dataset<% unless @deposits['numFound'] == 1 %>s<% end %></p>
@@ -34,14 +9,15 @@
   <thead>
   <tr>
     <th style="width:20%">Dataset</th>
-    <th style="width:20%">Workflow Status</th>
-    <th style="width:10%">Access</th>
-    <th style="width:10%">Date Created in PURE</th>
-    <th style="width:10%">Date Available</th>
-    <th style="width:10%">Date of last access</th>
-    <th style="width:10%">Embargo</th>
-    <th style="width:20%">AIP</th>
-    <th style="width:20%">DIP</th>
+    <th style="width:5%">Access</th>
+    <th style="width:5%">Created (PURE)</th>
+    <th style="width:5%">Date Available</th>
+    <th style="width:15%">Status</th>
+    <th style="width:10%">AIP</th>
+    <th style="width:10%">DIP</th>
+    <!--
+    <th style="width:10%">Last access</th>
+    -->
   </tr>
   </thead>
 
@@ -81,48 +57,108 @@
           <% end %>
               <br />
           <% end %>
-
+          <% unless upload['wf_status_tesim'] and (upload['wf_status_tesim'].include? 'nodata-external' or upload['wf_status_tesim'].include? 'nodata-dept')  %>
               <strong>Deposit URL:</strong><br />
           <%= link_to 'http://researchdata.york.ac.uk/deposits/' + upload['id'], 'deposits/' + upload['id'] %>
           <br />
           <strong>Request URL: </strong><br />
           <%= link_to 'http://researchdata.york.ac.uk/datasets/' + upload['id'], 'datasets/' + upload['id'] %>
+          <% end %>
         </td>
-        <td>TODO</td>
-        <td><%= upload['access_rights_tesim'][0] %></td>
-        <td><%= upload['pure_creation_tesim'][0].split('T')[0] %></td>
-        <td><%= upload['date_available_tesim'][0] %></td>
-        <td>TODO</td>
-        <td>TODO</td>
         <td>
 
+          <%= upload['access_rights_tesim'][0] %>
+          <% if upload['access_rights_tesim'][0] == 'Embargoed' %>
+          <br /> (check PURE for embargo length)
+          <% end %>
+
+        </td>
+        <td><%= upload['pure_creation_tesim'][0].split('T')[0] %></td>
+        <td>
+          <% unless upload['date_available_tesim'].nil? %>
+                 <%= upload['date_available_tesim'][0] %>
+          <% end %>
+        </td>
+
         <% aip_list = aips(upload['id']) %>
-          <% if aip_list.class == Array %>
-            <%= aip_list.size %> aip<%unless aip_list.size < 2 %>s<%end%> deposited <br />
+        <% dip_list = dips(upload['id']) %>
+        <% aip = get_aip(upload['id']) %>
+        <% dip = get_dip(upload['id']) %>
+
+        <td>
+          <% if upload['wf_status_tesim'].nil?  and (aip.nil? or aip.aip_status.empty?) and (dip.nil? or dip.dip_status.empty?) %>
+              <%= render 'shared/alert' %>
+              New Dataset<br />
+          <% elsif (aip != nil and aip.aip_status == 'UPLOADED') or upload['wf_status_tesim'].include? 'nodata-dept' or upload['wf_status_tesim'].include? 'nodata-external' %>
+              <%= render 'shared/tick' %>
+              Upload Complete<br />
+          <% elsif upload['wf_status_tesim'] != nil and (aip.nil? or aip.aip_status.empty? or aip.aip_status != 'UPLOADED') %>
+              <%= render 'shared/alert' %>
+              In Progress<br />
+          <% end %>
+          <% if upload['doi_tesim'].nil? %>
+              <%= render 'shared/cross' %>
+              No DOI<br />
+              <% else %>
+              <%= render 'shared/tick' %>
+              DOI Created<br />
+          <% end %>
+          <%
+            @deposit = Deposit.new
+            @deposit.id = upload['id']
+            @deposit.status = upload['wf_status_tesim']
+          %>
+          <div id="<%= upload['id'] %>">
+            <%= render partial: 'status', object: @deposit %>
+          </div>
+        </td>
+        <td>
+          <% if aip_list.size != 0 %>
+              <%= render 'shared/tick' %> Deposited <br />
+              <% if aip.aip_status == 'UPLOADED' %>
+                  <%= render 'shared/tick' %> Stored <br />
+              <% elsif aip.aip_status == 'ERROR' or aip.aip_status == 'FAILED' %>
+                  <%= render 'shared/cross' %>
+                  <%= aip.aip_status %> <br />
+              <% else %>
+                  <%= render 'shared/cross' %> In Progress
+              <% end %>
+              <br />
+              <%= aip_list.size %> aip<%unless aip_list.size < 2 %>s<%end%> deposited <br />
               <% aip_list.each do |aip| %>
                   <%= aip %> <br />
               <% end %>
           <% else %>
-             <%= aip_list %>
+              <%= render 'shared/cross' %> Deposited <br /><br />
           <% end %>
+
         </td>
         <td>
-          <% dip_list = dips(upload['id']) %>
-          <% if dip_list.class == Array %>
-              <%= dip_list.size %> dip
-              <%unless dip_list.size < 2 %>s<%end%> <br />
-              <% dip_list.each do |dip| %>
-                  <% @dip = Dlibhydra::Package.find(dip) %>
-                  <%= @dip.id %><br />
-                  requested by <%= @dip.requestor_email %> <br/>
-                  <% if @dip.aip_status == 'UPLOADED' and @dip.dip_status.nil? %>
-                    <%= link_to 'Approve', '/reingest/' + upload['id'] %>
-                  <% elsif @dip.aip_status.nil? or @dip.aip_status != 'UPLOADED' %>
-                    Waiting for AIP upload
-                  <% elsif @dip.dip_status == 'UPLOADED' %>
-                      <%= @dip.dip_status %>
+          <% if dip_list.size > 0 %>
+              <% unless dip.requestor_email.size == 0 %>
+                  <%= render 'shared/tick' %> Requested </br>
+                  <% if dip.dip_status == 'APPROVE' %>
+                      <%= render 'shared/tick' %> Request Approved </br>
+                  <% elsif dip.dip_status == 'UPLOADED' %>
+                      <%= render 'shared/tick' %> Available </br>
                   <% else %>
-                    <%= @dip.dip_status %>
+                      <%= render 'shared/cross' %> Awaiting Approval </br>
+                  <% end%>
+              <% end %>
+              <br />
+              <%= dip_list.size %> dip
+              <%unless dip_list.size < 2 %>s<%end%> created<br />
+              <% dip_list.each do |dip| %>
+                  <%= dip.id %><br />
+                  requested by <%= dip.requestor_email.join %> <br/>
+                  <% if dip.aip_status == 'UPLOADED' and dip.dip_status.nil? %>
+                      <%= link_to 'Approve', '/reingest/' + upload['id'] %>
+                  <% elsif dip.aip_status.nil? or dip.aip_status != 'UPLOADED' %>
+                      Waiting for AIP upload
+                  <% elsif dip.dip_status == 'UPLOADED' %>
+                      <%= dip.dip_status %>
+                  <% else %>
+                      <%= dip.dip_status %>
                       <%= form_for @deposit, url: dipuuid_path do |f| %>
                           <%= f.hidden_field :id, :value =>upload['id'] %>
                           <div class="field">
@@ -136,13 +172,17 @@
                   <% end %>
               <% end %>
           <% else %>
-              <%= dip_list %>
+              <%= render 'shared/cross' %> Not Available <br /><br />
           <% end %>
         </td>
+        <!--
+        <td>TODO</td>
+        -->
       </tr>
   <% end %>
   </tbody>
 
 </table>
 <% end %>
-<br>
+
+<%= render 'add_dataset' %>

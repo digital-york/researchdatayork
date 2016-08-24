@@ -2,11 +2,12 @@ require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 
-# Require the gems listed in Gemfile, including any gems
-# you've limited to :test, :development, or :production.
-#TODO REMOVE THIS IN PRODUCTION APP!
+# TODO REMOVE THIS IN PRODUCTION APP!
 require 'openssl'
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 # Load as otherwise ENV['GOOGLE KEYS'] were being rendered as text rather than getting the variable

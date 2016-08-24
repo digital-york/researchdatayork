@@ -11,19 +11,26 @@
 
     <%= render 'datasets/dataset_metadata' %>
 
-    <%if @dataset.aips.size > 0 %>
+    <% if @dataset.aips.size > 0 %>
         <p>
           <strong><%= @dataset.aips.size %></strong> data deposit
-          <% if @dataset.aips.size > 1%>
-              <%=s%> have
-          <%else%>
+          <% if @dataset.aips.size > 1 %>
+              <%= s %> have
+          <% else %>
               has
-          <%end%>
+          <% end %>
           been added for this PURE dataset.
         </p>
-        <p>
-          If you need to add, remove or update the data, please contact Matthew (unless you are Matthew).
-        </p>
+        <% if current_user %>
+            <p>
+              If you need to add another AIP to this dataset.
+            </p>
+            <%= render 'formaip' %>
+        <% else %>
+            <p>
+              If you need to add, remove or update the data, please contact the RDM team.
+            </p>
+        <% end %>
     <% else %>
         <h1>Data Deposit</h1>
         <%= render 'formaip' %>

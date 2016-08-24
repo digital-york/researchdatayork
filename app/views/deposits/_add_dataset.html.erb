@@ -1,0 +1,28 @@
+<h2 id="add_dataset">Add a Dataset</h2>
+<table class="table-striped table-bordered table">
+  <tbody>
+  <tr>
+    <th style="width:50%">Add/Update a Dataset from PURE</th>
+    <th style="width:50%">Add a Dataset from elsewhere</th>
+  </tr>
+  <tr>
+    <td>
+      <%= form_for @deposit, url: deposits_path do |f| %>
+          <div class="field">
+            <%= f.label 'Enter the PURE ID or UUID:' %><br />
+            <%= f.text_field :pure_uuid %>
+          </div>
+          <div class="actions">
+            <%= f.submit 'Add dataset' %>
+          </div>
+      <% end %>
+    </td>
+    <td>
+      <p><strong>Add a new dataset record from scratch</strong></p>
+      <p>todo</p>
+      <%= button_to 'Add dataset', new_deposit_path, :method => :get %>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</table>

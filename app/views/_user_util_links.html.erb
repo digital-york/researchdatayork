@@ -1,0 +1,23 @@
+<div class="navbar-right">
+
+  <% if has_user_authentication_provider? %>
+      <ul class="nav navbar-nav">
+        <% if current_user %>
+            <% unless current_user.to_s.blank? -%>
+                <li>
+                  <%= link_to current_user  %>
+                </li>
+            <% end %>
+            <li>
+              <%= link_to t('blacklight.header_links.logout'), destroy_user_session_path %>
+            </li>
+        <% else %>
+            <% if controller_name == 'home' %>
+              <li>
+                <%= link_to t('blacklight.header_links.login'), new_user_session_path %>
+              </li>
+            <% end %>
+        <% end %>
+      </ul>
+  <% end %>
+</div>

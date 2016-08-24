@@ -1,0 +1,40 @@
+<%= form_for(@deposit, remote: true) do |f| %>
+    <div class="field" >
+      <%= hidden_field(:deposit, :id) %>
+    </div>
+
+    <div class="field">
+      <% is_checked = checked('awaiting-info') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "awaiting-info", nil) %>
+      <span class="check_box_<%= is_checked.to_s %>">Researcher Contacted - Awaiting Info</span> <br />
+
+      <% is_checked = checked('awaiting-data') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "awaiting-data", nil) %>
+      <span class="check_box_<%= is_checked.to_s %>">Researcher Contacted - Awaiting Data </span> <br />
+
+      <% is_checked = checked('nodata-external') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "nodata-external", nil) %>
+        <span class="check_box_<%= is_checked.to_s %>">Data Externally Held </span> <br />
+
+      <% is_checked = checked('nodata-dept') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "nodata-dept", nil) %>
+          <span class="check_box_<%= is_checked.to_s %>">Data Held By Dept </span> <br />
+
+      <% is_checked = checked('held-pub-meta') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "held-pub-meta", nil) %>
+            <span class="check_box_<%= is_checked.to_s %>">Metadata Held for Publication  </span> <br />
+
+      <% is_checked = checked('held-pub-data') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "held-pub-data", nil) %>
+              <span class="check_box_<%= is_checked.to_s %>">Data Held for Publication  </span> <br />
+
+      <% is_checked = checked('phd-data') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "phd-data", nil) %>
+                <span class="check_box_<%= is_checked.to_s %>">Data from PhD Student </span> <br />
+    </div>
+
+    <div class="actions">
+      <%= f.submit 'Save' %>
+    </div>
+<% end %>
+

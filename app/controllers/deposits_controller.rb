@@ -1,6 +1,10 @@
 class DepositsController < ApplicationController
   helper DepositsHelper
   before_action :set_deposit, only: [:show, :edit, :update, :destroy]
+
+  # only show page is visible
+  # TODO some kind of token based visibility
+  before_action :authenticate_user!, except: [:show]
   include Dlibhydra
   include Puree
   include SearchPure
@@ -27,32 +31,32 @@ class DepositsController < ApplicationController
     response = nil
     # Get all dataset records from Solr
     unless num_results == 0
-      response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"','pure_uuid_tesim',num_results)
+      response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"', 'pure_uuid_tesim', num_results)
     end
 
     if params[:refresh] == 'true'
       if params[:refresh_num]
         c = get_uuids(params[:refresh_num])
-        get_datasets_from_collection(c,response)
+        get_datasets_from_collection(c, response)
       elsif params[:refresh_date]
         c = get_uuids_created_from_tonow(params[:refresh_date])
-        get_datasets_from_collection(c,response)
+        get_datasets_from_collection(c, response)
         c = get_uuids_modified_from_tonow(params[:refresh_date])
-        get_datasets_from_collection(c,response)
+        get_datasets_from_collection(c, response)
       else
         c = get_uuids
-        get_datasets_from_collection(c,response)
+        get_datasets_from_collection(c, response)
       end
     end
 
     # check if we have it in solr, if not create a dataset
     num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
 
-    unless num_results  == 0
+    unless num_results == 0
       response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"',
                                   'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
                                     access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
-                                    pure_link_tesim,doi_tesim,pure_creation_tesim',
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim',
                                   num_results)
     end
 
@@ -72,8 +76,8 @@ class DepositsController < ApplicationController
     if params[:deposit]
       if params[:deposit][:file]
         @aip = new_aip
-        set_user_deposit(@dataset,params[:deposit][:readme])
-        new_deposit(@dataset.id,@aip.id)
+        set_user_deposit(@dataset, params[:deposit][:readme])
+        new_deposit(@dataset.id, @aip.id)
         add_metadata(@dataset.for_indexing)
         deposit_files(params[:deposit][:file])
         # TODO write metadata.json
@@ -106,38 +110,48 @@ class DepositsController < ApplicationController
   def create
 
     # If a pure uuid has been supplied
-    if params[:deposit][:pure_uuid]
+    if params[:deposit]
+      if params[:deposit][:pure_uuid]
 
-      # Check solr for a dataset object
-      uuid = params[:deposit][:pure_uuid]
-      query = 'pure_uuid_tesim:"' + uuid + '""'
-      response = solr_query_short(query,'id,pure_uuid_tesim',1)
+        # Check solr for a dataset object
+        uuid = params[:deposit][:pure_uuid]
+        d = get_pure_dataset(uuid)
 
-      # If there is no dataset, create one
-      # Otherwise use existing dataset object
-      if response['numFound'] == 0
-        notice = 'PURE data was successfully added.'
-        @dataset = new_dataset
+        query = 'pure_uuid_tesim:"' + d.metadata['uuid'] + '""'
+        response = solr_query_short(query, 'id,pure_uuid_tesim', 1)
+
+        # If there is no dataset, create one
+        # Otherwise use existing dataset object
+        if response['numFound'] == 0
+          notice = 'PURE data was successfully added.'
+          @dataset = new_dataset
+        else
+          notice = 'Dataset object already exists for this PURE UUID. Metadata updated.'
+          @dataset = find_dataset(response['docs'][0]['id'])
+        end
+
+        # Fetch metadata from pure and update the dataset
+
+        set_metadata(@dataset, d)
+
+        respond_to do |format|
+          format.html { redirect_to deposits_path, notice: notice }
+          # format.json { render :index, status: :created, location: @dataset }
+        end
       else
-        notice = 'Dataset object already exists for this PURE UUID. Metadata updated.'
-        @dataset = find_dataset(response['docs'][0]['id'])
-      end
-
-      # Fetch metadata from pure and update the dataset
-      d = get_pure_dataset(uuid)
-      set_metadata(@dataset,d)
-
-      respond_to do |format|
-        format.html { redirect_to deposits_path, notice: notice }
-        # format.json { render :index, status: :created, location: @dataset }
-      end
-    else
-      # TODO Create new dataset from scratch
-      notice = 'The deposit was successful.'
+        @deposit = Deposit.new
+        @deposit.id = params[:deposit][:id].to_s
+        @deposit.status = params[:deposit][:status]
+        @dataset_id = params[:deposit][:id].to_s
+        d = Dlibhydra::Dataset.find(@dataset_id)
+        d.wf_status = params[:deposit][:status]
+        d.save
 
       respond_to do |format|
-        format.html { render :show, notice: notice }
-        # format.json { render :show, status: :created, location: @deposit }
+        #format.html { render :show, notice: notice }
+        format.js {}
+        #format.json { render :show, status: :created, location: @deposit }
+      end
       end
     end
   end
@@ -175,7 +189,7 @@ class DepositsController < ApplicationController
 
   # Reingest
   def reingest
-    message = reingest_aip('objects',params[:id])
+    message = reingest_aip('objects', params[:id])
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message['message'] }
       format.json { head :no_content }
@@ -183,7 +197,7 @@ class DepositsController < ApplicationController
   end
 
   def dipuuid
-    message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
+    message = update_dip(params[:deposit][:id], params[:deposit][:dipuuid])
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message }
       format.json { head :no_content }
@@ -202,7 +216,7 @@ class DepositsController < ApplicationController
     params.permit(:deposit, :uuid, :file, :submission_doco,
                   :title, :refresh, :refresh_num,
                   :pure_uuid, :readme, :access,
-                  :embargo_end, :available, :dipuuid)
+                  :embargo_end, :available, :dipuuid, :status, :release)
   end
 
   private
@@ -211,18 +225,18 @@ class DepositsController < ApplicationController
   # Create a new Hydra dataset, or update an existing one
   # Ignore data not published by the given publisher
   def get_datasets_from_collection(c, response)
-    c.uuid.each do |uuid|
+    c.each do |uuid|
       d = get_pure_dataset(uuid)
       unless d.publisher.exclude? ENV['PUBLISHER']
         if response != nil and response.to_s.include? uuid
-          r = solr_query_short('pure_uuid_tesim:"' + uuid + '"','id',1)
+          r = solr_query_short('pure_uuid_tesim:"' + uuid + '"', 'id', 1)
           local_d = find_dataset(r['docs'][0]['id'])
         else
           local_d = new_dataset
         end
-        set_metadata(local_d,d)
+        set_metadata(local_d, d)
       end
     end
-    end
-
   end
+
+end

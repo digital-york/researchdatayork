@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   mount Qa::Engine => '/qa'
 
+  resources :home
+  root to: 'home#index'
 
   resources :datasets
   resources :deposits
@@ -23,12 +25,15 @@ Rails.application.routes.draw do
     end
   end
 
+  devise_for :users
+
+=begin
   mount Blacklight::Engine => '/'
 
   #root to: "catalog#index"
   concern :searchable, Blacklight::Routes::Searchable.new
 
-  root to: 'deposits#index'
+
 
   resource :catalog, only: [:index], as: 'catalog', path: '/catalog', controller: 'catalog' do
     concerns :searchable
@@ -48,6 +53,7 @@ Rails.application.routes.draw do
       delete 'clear'
     end
   end
+=end
 
   mount BrowseEverything::Engine => '/browse'
   # The priority is based upon order of creation: first created -> highest priority.
