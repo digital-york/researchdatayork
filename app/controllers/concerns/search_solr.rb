@@ -19,7 +19,8 @@ module SearchSolr
     response = solr_connect.get 'select', :params => {
         :q => q,
         :fl => fl,
-        :rows => rows
+        :rows => rows,
+        :sort => 'id asc'
     }
     response['response']
   end
@@ -29,7 +30,8 @@ module SearchSolr
         :q => q,
         :fq => fq,
         :fl => fl,
-        :rows => rows
+        :rows => rows,
+        :sort => 'id asc'
     }
     response['response']
   end

@@ -38,10 +38,10 @@ class DepositsController < ApplicationController
       if params[:refresh_num]
         c = get_uuids(params[:refresh_num])
         get_datasets_from_collection(c, response)
-      elsif params[:refresh_date]
-        c = get_uuids_created_from_tonow(params[:refresh_date])
+      elsif params[:refresh_from]
+        c = get_uuids_created_from_tonow(params[:refresh_from])
         get_datasets_from_collection(c, response)
-        c = get_uuids_modified_from_tonow(params[:refresh_date])
+        c = get_uuids_modified_from_tonow(params[:refresh_from])
         get_datasets_from_collection(c, response)
       else
         c = get_uuids
@@ -214,7 +214,7 @@ class DepositsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def deposit_params
     params.permit(:deposit, :uuid, :file, :submission_doco,
-                  :title, :refresh, :refresh_num,
+                  :title, :refresh, :refresh_num, :refresh_from,
                   :pure_uuid, :readme, :access,
                   :embargo_end, :available, :dipuuid, :status, :release)
   end
@@ -225,11 +225,10 @@ class DepositsController < ApplicationController
   # Create a new Hydra dataset, or update an existing one
   # Ignore data not published by the given publisher
   def get_datasets_from_collection(c, response)
-    c.each do |uuid|
-      d = get_pure_dataset(uuid)
+    c.each do |d|
       unless d.publisher.exclude? ENV['PUBLISHER']
-        if response != nil and response.to_s.include? uuid
-          r = solr_query_short('pure_uuid_tesim:"' + uuid + '"', 'id', 1)
+        if response != nil and response.to_s.include? d.metadata['uuid']
+          r = solr_query_short('pure_uuid_tesim:"' + d.metadata['uuid'] + '"', 'id', 1)
           local_d = find_dataset(r['docs'][0]['id'])
         else
           local_d = new_dataset

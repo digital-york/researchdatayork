@@ -16,6 +16,18 @@
             <%= f.submit 'Add dataset' %>
           </div>
       <% end %>
+      <%= form_tag("/deposits", method: "get") do%>
+          <div class="field">
+            <%= hidden_field_tag(:refresh, 'true') %>
+          </div>
+          <div class="field">
+            <%= label_tag 'Refresh items from the last x days:' %><br />
+            <%= text_field_tag :refresh_from %>
+          </div>
+          <div class="actions">
+            <%= submit_tag 'Refresh' %>
+          </div>
+      <% end %>
     </td>
     <td>
       <p><strong>Add a new dataset record from scratch</strong></p>
