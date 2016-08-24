@@ -28,3 +28,38 @@
   font-weight: normal;
   font-style: normal;
 }
+
+.search_box {
+  .q_div {
+    label {
+      font-weight: bold;
+      width: 10%;
+    }
+  }
+  #q {
+    width: 80%;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
+  }
+  label {
+    font-weight: normal;
+  }
+  table {
+    width: 80%;
+    margin-left: 10%
+  }
+  td {
+    padding: 5px 5px 5px 5px;
+  }
+  .actions {
+    margin-left: 10%;
+    input {
+      border-radius: 5px;
+      background-color: teal;
+      color: white;
+      font-weight: bold;
+      padding: 5px 5px 5px 5px;
+    }
+  }
+
+}

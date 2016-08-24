@@ -89,9 +89,12 @@
           <% if upload['wf_status_tesim'].nil?  and (aip.nil? or aip.aip_status.empty?) and (dip.nil? or dip.dip_status.empty?) %>
               <%= render 'shared/alert' %>
               New Dataset<br />
-          <% elsif (aip != nil and aip.aip_status == 'UPLOADED') or upload['wf_status_tesim'].include? 'nodata-dept' or upload['wf_status_tesim'].include? 'nodata-external' %>
+          <% elsif aip != nil and aip.aip_status == 'UPLOADED' %>
               <%= render 'shared/tick' %>
               Upload Complete<br />
+          <% elsif upload['wf_status_tesim'].include? 'nodata-dept' or upload['wf_status_tesim'].include? 'nodata-external' %>
+              <%= render 'shared/tick' %>
+              No Upload Needed<br />
           <% elsif upload['wf_status_tesim'] != nil and (aip.nil? or aip.aip_status.empty? or aip.aip_status != 'UPLOADED') %>
               <%= render 'shared/alert' %>
               In Progress<br />

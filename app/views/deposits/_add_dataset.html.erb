@@ -16,6 +16,7 @@
             <%= f.submit 'Add dataset' %>
           </div>
       <% end %>
+
       <%= form_tag("/deposits", method: "get") do%>
           <div class="field">
             <%= hidden_field_tag(:refresh, 'true') %>

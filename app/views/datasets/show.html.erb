@@ -1,34 +1,45 @@
 <p id="notice"><%= @notice %></p>
 
-<%= render 'dataset_metadata' %>
+<% if (@dataset.access_rights == 'Closed') or
+    (@dataset.wf_status.include? 'held-pub-data')
+%>
+    <% unless @dataset.wf_status.include? 'held-pub-meta' %>
+        <%= render 'dataset_metadata' %>
+    <% end %>
 
+    <p>This dataset is not available.</p>
 
-<% if @dataset.aips.size == 0 %>
-    <p>The researcher has not yet deposited the data.</p>
 <% else %>
-    <% if @dataset.dips.size == 0 %>
 
-        <p>We need to prepare this data for download. Please provide your email address below and we will contact
-          you as soon as the download is ready.</p>
-        <p>
-          <%= render 'form_email' %>
-        </p>
+    <%= render 'dataset_metadata' %>
+
+    <% if @dataset.aips.size == 0 %>
+        <p>The researcher has not yet deposited the data.</p>
     <% else %>
-        <% if @dataset.dips.first.dip_status != 'UPLOADED' %>
-            <p>We are preparing this data for download. Please provide your email address to be alerted once the
-              data becomes available.</p>
+        <% if @dataset.dips.size == 0 %>
+
+            <p>We need to prepare this data for download. Please provide your email address below and we will contact
+              you as soon as the download is ready.</p>
             <p>
               <%= render 'form_email' %>
             </p>
-
         <% else %>
-            <h3>Download the Data</h3>
-            <% @dataset.dips.first.works.each do |m|
-              m.members.each do |f| %>
-                    <%= link_to m.preflabel, f.files.first.uri.to_s %> <br/>
-                <% end
-                   end
-                %>
+            <% if @dataset.dips.first.dip_status != 'UPLOADED' %>
+                <p>We are preparing this data for download. Please provide your email address to be alerted once the
+                  data becomes available.</p>
+                <p>
+                  <%= render 'form_email' %>
+                </p>
+
+            <% else %>
+                <h3>Download the Data</h3>
+                <% @dataset.dips.first.works.each do |m|
+                  m.members.each do |f| %>
+                        <%= link_to m.preflabel, f.files.first.uri.to_s %> <br/>
+                    <% end
+                       end
+                    %>
+            <% end %>
         <% end %>
     <% end %>
 <% end %>

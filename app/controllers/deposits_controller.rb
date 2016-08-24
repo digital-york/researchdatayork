@@ -26,13 +26,91 @@ class DepositsController < ApplicationController
     # This is a basic ActiveRecord object. It is never saved.
     @deposit = Deposit.new
 
-    # Get number of results to return
-    num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
-    response = nil
-    # Get all dataset records from Solr
-    unless num_results == 0
-      response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"', 'pure_uuid_tesim', num_results)
+    # if this is a search
+    # check if we have it in solr, if not create a dataset
+    q = 'has_model_ssim:"Dlibhydra::Dataset"'
+    fq = []
+
+    unless params[:q].nil?
+      unless params[:q] == ''
+        q += ' and for_indexing_tesim:*' + params[:q] + '*'
+      end
+
+      unless params[:new].nil?
+        fq << '!wf_status_tesim:*'
+        fq << '!member_ids_ssim:*'
+      end
+
+      unless params[:doi].nil?
+        if params[:doi] == 'doi'
+          q += 'and doi_tesim:*'
+        elsif params[:doi] == 'nodoi'
+          fq << '!doi_tesim:*'
+        end
+      end
+
+      unless params[:status].nil?
+        params[:status].each do |s|
+          q += ' and wf_status_tesim:' + s + ''
+        end
+      end
+
+      unless params[:aip_status].nil?
+        params[:aip_status].each do |aipstatus|
+          if aipstatus == 'noaip'
+            fq << '!member_ids_ssim:*'
+          else
+            num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',)
+            r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',[],
+                              'id,member_ids_ssim',num_results)
+            r['docs'].each do |dataset|
+              dataset['member_ids_ssim'].each do |aip|
+                num_results = get_number_of_results('id:'+ aip +' and aip_status_tesim:UPLOADED')
+                if num_results == 0
+                  fq << '!id:' + dataset['id']
+                else
+                  q += ' and id:' + dataset['id']
+                end
+              end
+            end
+          end
+        end
+      end
     end
+
+    unless params[:dip_status].nil?
+      no_results = true
+      params[:dip_status].each do |dipstatus|
+          num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',)
+          r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',[],
+                                'id,member_ids_ssim',num_results)
+          r['docs'].each do |dataset|
+            dataset['member_ids_ssim'].each do |dip|
+              if dipstatus == 'APPROVE' or dipstatus == 'UPLOADED'
+                num_results = get_number_of_results('id:'+ dip +' and dip_status_tesim:' + dipstatus,[])
+                if num_results == 0
+                  # query should return 0
+                  fq << '!id:' + dataset['id']
+                else
+                  q += ' and id:' + dataset['id']
+                  no_results = false
+                end
+              else
+                num_results = get_number_of_results('id:'+ dip +' and dip_uuid_tesim:*')
+                unless num_results == 0
+                  no_results = false
+                  fq << '!id:' + dataset['id']
+                end
+              end
+            end
+        end
+      end
+    end
+    puts no_results
+
+
+    # otherwise get everything
+    # Get number of results to return
 
     if params[:refresh] == 'true'
       if params[:refresh_num]
@@ -50,15 +128,19 @@ class DepositsController < ApplicationController
     end
 
     # check if we have it in solr, if not create a dataset
-    num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
+    if no_results == true
+      response = nil
+    else
+      num_results = get_number_of_results(q,fq)
 
     unless num_results == 0
-      response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"',
+      response = solr_filter_query(q,fq,
                                   'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
                                     access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
                                     pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim',
                                   num_results)
     end
+      end
 
     if response.nil?
       @deposits = []
@@ -216,7 +298,7 @@ class DepositsController < ApplicationController
     params.permit(:deposit, :uuid, :file, :submission_doco,
                   :title, :refresh, :refresh_num, :refresh_from,
                   :pure_uuid, :readme, :access,
-                  :embargo_end, :available, :dipuuid, :status, :release)
+                  :embargo_end, :available, :dipuuid, :status, :release, :q, :aip_status, :dip_status, :doi)
   end
 
   private
