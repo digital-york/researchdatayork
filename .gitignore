@@ -21,6 +21,7 @@
 Gemfile.lock
 tags
 client_secret.json
+*.swp
 
 # Ignore fedora data
 /fcrepo4-data
