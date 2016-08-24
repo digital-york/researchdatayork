@@ -48,6 +48,25 @@ module Googledrive
                                    fields: "files(id, name, parents, iconLink, mimeType)")
     files
   end
+  
+  # return an array of google's export mime types and file extensions for google documents
+  # these values are documented at https://developers.google.com/drive/v3/web/manage-downloads
+  # and at https://developers.google.com/drive/v3/web/mime-types
+  def google_docs_mimetypes
+    types = Hash.new
+    types["application/vnd.google-apps.document"] = {"export_mimetype" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                     "export_extension" => ".docx"}
+    types["application/vnd.google-apps.spreadsheet"] = {"export_mimetype" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                                     "export_extension" => ".xlsx"}
+    types["application/vnd.google-apps.drawing"] = {"export_mimetype" => "image/jpeg",
+                                                     "export_extension" => ".jpg"}
+    types["application/vnd.google-apps.presentation"] = {"export_mimetype" => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                                                     "export_extension" => ".pptx"}
+    types["application/vnd.google-apps.script"] = {"export_mimetype" => "application/vnd.google-apps.script+json",
+                                                     "export_extension" => ".json"}
+    types
+  end
+         
 
   # given a google drive file id, download the file and return it
   def get_file_from_google (fileid, mime_type)
@@ -57,19 +76,7 @@ module Googledrive
     # if the mime type for this file is a google document
     if mime_type.starts_with?("application/vnd.google-apps")
       # find a suitable export mime type according to table at https://developers.google.com/drive/v3/web/manage-downloads
-      export_mime_type = ""
-      case mime_type
-      when /\.document$/
-        export_mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      when /\.spreadsheet$/
-        export_mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      when /\.drawing$/
-        export_mime_type = "image/jpeg"
-      when /\.presentation$/
-        export_mime_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-      when /\.script$/
-        export_mime_type = "application/vnd.google-apps.script+json"
-      end
+      export_mime_type = google_docs_mimetypes[mime_type]["export_mimetype"]
       # export the file from google drive
       file = service.export_file(fileid, export_mime_type, download_dest: file_contents)
     # otherwise it's a "normal" file - just download it

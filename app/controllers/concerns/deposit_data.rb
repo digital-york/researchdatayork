@@ -71,7 +71,10 @@ module DepositData
     files.zip(paths, mime_types).each do |file, path, mime_type|
       # download the file from Google
       f = get_file_from_google(file, mime_type)
-      puts f.read
+      # if the file was a google document it will have been exported to a specific format and may require an extra file extension
+      if google_docs_mimetypes.has_key?(mime_type)
+        path = path + google_docs_mimetypes[mime_type]["export_extension"] unless path.ends_with?(google_docs_mimetypes[mime_type]["export_extension"])
+      end
       # work out where this file should be uploaded to
       target_file = File.join(@dir_aip, path)
       target_dir = File.dirname(target_file)
