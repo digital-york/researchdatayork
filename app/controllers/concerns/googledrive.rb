@@ -74,7 +74,7 @@ module Googledrive
     # initialise the api
     service = initialise_api
     # if the mime type for this file is a google document
-    if mime_type.starts_with?("application/vnd.google-apps")
+    if google_docs_mimetypes.has_key?(mime_type)
       # find a suitable export mime type according to table at https://developers.google.com/drive/v3/web/manage-downloads
       export_mime_type = google_docs_mimetypes[mime_type]["export_mimetype"]
       # export the file from google drive
