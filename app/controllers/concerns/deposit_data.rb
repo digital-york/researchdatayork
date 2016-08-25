@@ -67,10 +67,12 @@ module DepositData
 #  end
 
   def deposit_files_from_cloud(files, paths, mime_types)
+    # initialise the google api
+    service = initialise_api
     # for each file (and path) selected by the user
     files.zip(paths, mime_types).each do |file, path, mime_type|
       # download the file from Google
-      f = get_file_from_google(file, mime_type)
+      f = get_file_from_google(service, file, mime_type)
       # if the file was a google document it will have been exported to a specific format and may require an extra file extension
       if google_docs_mimetypes.has_key?(mime_type)
         path = path + google_docs_mimetypes[mime_type]["export_extension"] unless path.ends_with?(google_docs_mimetypes[mime_type]["export_extension"])

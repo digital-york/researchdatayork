@@ -18,7 +18,7 @@ gem 'rubyzip'
 # include Nokogiri for parsing XML
 gem 'nokogiri'
 # include the Google Drive API for browsing user's Google Drive files
-gem 'google-api-client'
+gem 'google-api-client', require: 'google/apis/drive_v3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
