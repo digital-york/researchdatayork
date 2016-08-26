@@ -4,12 +4,13 @@ Rails.application.routes.draw do
 
   resources :datasets
   resources :deposits
-  resources :googledrive do
+  resources :googledrive, :except => [:index] do
     collection do
       # add a custom action to handle oauth2 callback
       get "oauth2callback"
     end
   end
+  resources :googledrive, :only => [:index], :defaults => { :format => :json }
 
   post '/deposits/:id', to: 'deposits#show'
   post '/datasets/:id', to: 'datasets#show'

@@ -34,22 +34,8 @@ module Googledrive
 #    credentials
 #  end
 
-  def redirect
-    client = Signet::OAuth2::Client.new({
-      client_id: ENV.fetch('GOOGLE_API_CLIENT_ID'),
-      client_secret: ENV.fetch('GOOGLE_API_CLIENT_SECRET'),
-      authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
-      scope: Google::Apis::DriveV3::AUTH_DRIVE_READONLY,
-      redirect_uri: url_for(:action => :oauth2callback)
-    })
-
-    redirect_to client.authorization_uri.to_s
-  end
-
-  def connect_to_google_api
-    redirect
-  end
-
+  # define a simple class for Google API access tokens, as described at
+  # https://github.com/google/google-api-ruby-client/issues/296
   class AccessToken
     attr_reader :token
     def initialize(token)
@@ -61,7 +47,35 @@ module Googledrive
     end
   end
 
+  # connect the the Google API and begin the process of authenticating
+  # (mostly taken from http://readysteadycode.com/howto-access-the-google-calendar-api-with-ruby)
+  def connect_to_google_api
+    client = Signet::OAuth2::Client.new({
+      client_id: ENV.fetch('GOOGLE_API_CLIENT_ID'),
+      client_secret: ENV.fetch('GOOGLE_API_CLIENT_SECRET'),
+      authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
+      scope: Google::Apis::DriveV3::AUTH_DRIVE_READONLY,
+      redirect_uri: oauth2callback_googledrive_index_url
+    })
+    redirect_to client.authorization_uri.to_s
+  end
+
+  # handle the callback from Google (it will respond to the above call) and grab the authorisation code
+  def handle_google_callback
+    client = Signet::OAuth2::Client.new({
+      client_id: ENV.fetch('GOOGLE_API_CLIENT_ID'),
+      client_secret: ENV.fetch('GOOGLE_API_CLIENT_SECRET'),
+      token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
+      redirect_uri: oauth2callback_googledrive_index_url,
+      #code: params[:code]
+    })
+    response = client.fetch_access_token!
+    session[:access_token] = response['access_token']
+    #redirect_to googledrive_index_url
+  end 
+
   def initialise_api
+    handle_google_callback
     access_token = AccessToken.new session[:access_token]
     service = Google::Apis::DriveV3::DriveService.new
     service.client_options.application_name = "Research Data York Google Drive Browser"
