@@ -7,8 +7,7 @@
 <div style="clear:both"/>
 
 <script>
-  // take a count of how many folders are being opened so that I can print out a "still loading" message
-  var loading_counter = 0;
+  var googleWindow;
   // given a tree node, work out whether its parent is selected and return its relative path accordingly
   function relpath_to_node (jstree, node) {
     var id_path = jstree.get_path(node, false, true);
@@ -24,26 +23,10 @@
     }
     return name_path.join("/");
   }
-  // initialise the jstree
-  $(function () { 
-    $('#jstree_div').jstree({
-      "plugins" : ["checkbox", "changed"],
-      'core': {
-        'data': {
-          'url' : function (node) {
-            return "/googledrive.json?folder=" + (node.id === "#" ? "root" : node.id)
-          },
-          'data' : function (node) {
 
-          }
-        }
-      },
-      'checkbox': {
-        three_state: false,
-      }
-    }); 
-  }); 
   $('#jstree_div').on("changed.jstree", function (e, data) {
+    // take a count of how many folders are being opened so that I can print out a "still loading" message
+    var loading_counter = 0;
     // if a folder is selected/checked, open it and automatically select all of its contents (recursively if there are subfolders)  
     if (data.changed.selected[0]) {
       if (data.instance.is_parent(data.changed.selected[0])) {
@@ -133,8 +116,34 @@
     });
     $("#jstree_status").appendTo(".ui-dialog-buttonpane");
     $( "#google-drive-btn2" ).button().on( "click", function() {
-      dialog.dialog( "open" );
+      // open a popup window for connecting to Google API
+      googleWindow = window.open("/googledrive/connect", "_googlewindow", "width=400,height=500,resizable");
     });
   });
+
+  // when the "connect to google API" process has finished, the following function will be called
+  function open_google_drive_browser () {
+    googleWindow.close();
+    dialog.dialog( "open" );
+    // initialise the jstree
+    $(function () { 
+      $('#jstree_div').jstree({
+        "plugins" : ["checkbox", "changed"],
+        'core': {
+          'data': {
+            'url' : function (node) {
+              return "/googledrive.json?folder=" + (node.id === "#" ? "root" : node.id)
+            },
+            'data' : function (node) {
+
+            }
+          }
+        },
+        'checkbox': {
+          three_state: false,
+        }
+      }); 
+    }); 
+  }
 </script>
 

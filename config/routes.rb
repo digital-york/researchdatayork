@@ -6,8 +6,12 @@ Rails.application.routes.draw do
   resources :deposits
   resources :googledrive, :except => [:index] do
     collection do
+      # add a custom action for connecting to google api
+      get "connect"
       # add a custom action to handle oauth2 callback
       get "oauth2callback"
+      # add a custom action for finishing off the connection process
+      get "finish"
     end
   end
   resources :googledrive, :only => [:index], :defaults => { :format => :json }
