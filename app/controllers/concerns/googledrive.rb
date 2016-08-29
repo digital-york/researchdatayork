@@ -4,24 +4,28 @@ module Googledrive
   require 'google/apis/drive_v3'
   require 'fileutils'
     
-  # define a simple class for Google API access tokens, as described at
-  # https://github.com/google/google-api-ruby-client/issues/296
-  class AccessToken
-    attr_reader :token
-    def initialize(token)
-      @token = token
-    end
-
-    def apply!(headers)
-      headers['Authorization'] = "Bearer #{@token}"
-    end
+  # create a new oauth2client with all the attributes that remain constant and return it
+  def oauth2client
+    # (mostly taken from http://readysteadycode.com/howto-access-the-google-calendar-api-with-ruby)
+    client = Signet::OAuth2::Client.new({
+      client_id: ENV.fetch('GOOGLE_API_CLIENT_ID'),
+      client_secret: ENV.fetch('GOOGLE_API_CLIENT_SECRET'),
+      authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
+      token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
+      scope: Google::Apis::DriveV3::AUTH_DRIVE_READONLY,
+      redirect_uri: oauth2callback_googledrive_index_url
+    })
+    client
   end
 
+  # create a Google Drive API object, authenticate and return it
   def initialise_api
-    access_token = AccessToken.new session[:access_token]
     service = Google::Apis::DriveV3::DriveService.new
     service.client_options.application_name = "Research Data York Google Drive Browser"
-    service.authorization = access_token
+    client = oauth2client
+    client.update!(:refresh_token => session[:refresh_token])
+    client.fetch_access_token!
+    service.authorization = client
     service
   end 
 
