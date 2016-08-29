@@ -3,6 +3,12 @@ module Googledrive
 
   require 'google/apis/drive_v3'
   require 'fileutils'
+
+  # are we connected/authenticated to the Google API?
+  def connected_to_google_api?
+    # if we have a refresh token stored then we're connected
+    return session.has_key?(:refresh_token)
+  end
     
   # create a new oauth2client with all the attributes that remain constant and return it
   def oauth2client

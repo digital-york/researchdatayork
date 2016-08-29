@@ -7,6 +7,8 @@
 <div style="clear:both"/>
 
 <script>
+  // initially, we may or may not be connected/authenticated to the Google API 
+  var googleApiAuthenticated = <%= connected_to_google_api? %>;
   var googleWindow;
   // given a tree node, work out whether its parent is selected and return its relative path accordingly
   function relpath_to_node (jstree, node) {
@@ -115,15 +117,26 @@
       }
     });
     $("#jstree_status").appendTo(".ui-dialog-buttonpane");
+    // when the user clicks the "Choose files..." button
     $( "#google-drive-btn2" ).button().on( "click", function() {
-      // open a popup window for connecting to Google API
-      googleWindow = window.open("/googledrive/connect", "_googlewindow", "width=500,height=500,resizable");
+      // if authenticated to Google API, show Google Drive browser, else, open a popup window for connecting to Google API
+      if (googleApiAuthenticated) {
+        open_google_drive_browser();
+      } else {
+        googleWindow = window.open("/googledrive/connect", "_googlewindow", "width=500,height=500,resizable");
+      }
     });
   });
 
   // when the "connect to google API" process has finished, the following function will be called
-  function open_google_drive_browser () {
+  function authentication_complete () {
+    googleApiAuthenticated = true;
     googleWindow.close();
+    open_google_drive_browser();
+  }
+
+  // open the dialog for the jstree and present it
+  function open_google_drive_browser () {
     dialog.dialog( "open" );
     // initialise the jstree
     $(function () { 

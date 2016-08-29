@@ -5,7 +5,7 @@ class GoogledriveController < ApplicationController
   # connect to the Google API and begin the process of autheticating
   def connect
     # if we're already connected to the API
-    if session[:refresh_token]
+    if connected_to_google_api? 
       # just redirect straight to the finish
       redirect_to finish_googledrive_index_url
     # otherwise, create a new oauth2 client and redirect to Google's authorisation page
