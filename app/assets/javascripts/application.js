@@ -12,9 +12,10 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery-ui
 //= require turbolinks//
 // Required by Blacklight
 //= require blacklight/blacklight
 
-//= require_tree .
 //= require browse_everything
+//= require_tree .

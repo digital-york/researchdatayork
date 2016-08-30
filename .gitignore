@@ -20,7 +20,11 @@
 *~
 Gemfile.lock
 .DS_Store
+tags
+client_secret.json
+*.swp
 
 # Ignore fedora data
 /fcrepo4-data
 /solr
+

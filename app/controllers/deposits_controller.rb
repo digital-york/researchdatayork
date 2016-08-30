@@ -14,6 +14,8 @@ class DepositsController < ApplicationController
   include DepositData
   include ReingestAip
   include CreateDip
+  include Googledrive
+  helper_method :connected_to_google_api?  # defined in Googledrive module so view can know whether or not to call google api
 
   #20ee85c3-f53c-4ab6-8e50-270b0ddd3686
   # there is a problem with project
@@ -156,12 +158,19 @@ class DepositsController < ApplicationController
     @notice = ''
 
     if params[:deposit]
-      if params[:deposit][:file]
+      # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]  
+      if params[:deposit][:file] or params[:selected_files]
         @aip = new_aip
         set_user_deposit(@dataset, params[:deposit][:readme])
         new_deposit(@dataset.id, @aip.id)
         add_metadata(@dataset.for_indexing)
-        deposit_files(params[:deposit][:file])
+        # handle upload of client side file(s)
+        if params[:deposit][:file]
+          deposit_files_from_client(params[:deposit][:file])
+        end
+        if params[:selected_files] and params[:selected_paths] and params[:selected_mimetypes]
+          deposit_files_from_cloud(params[:selected_files], params[:selected_paths], params[:selected_mimetypes])
+        end
         # TODO write metadata.json
         # TODO add submission info
         @notice = 'The deposit was successful.'

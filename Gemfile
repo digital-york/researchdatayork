@@ -5,13 +5,20 @@ gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 
 gem 'puree'
 gem 'active_fedora-noid'
 gem 'browse-everything'
-# use this for now
+#gem 'hydra', '9.1.0'
 gem 'hydra', :git => 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
-
 gem 'hydra-works', '0.7.0'
 gem 'dotenv-rails', :groups => [:development, :test, :production]
 gem 'faraday'
 gem 'qa'
+# include http_headers gem for parsing http headers
+gem 'http_headers'
+# include rubyzip to handle unzipping of uploaded zip files
+gem 'rubyzip'
+# include Nokogiri for parsing XML
+gem 'nokogiri'
+# include the Google Drive API for browsing user's Google Drive files
+gem 'google-api-client', require: 'google/apis/drive_v3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
@@ -28,6 +35,8 @@ gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
+# and add the jquery UI libraries as well
+gem 'jquery-ui-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -59,6 +68,7 @@ end
 
 
 group :development, :test do
+  #gem 'solr_wrapper', '>= 0.3'
   gem 'solr_wrapper', '>= 0.13.2'
 end
 
@@ -69,4 +79,8 @@ gem 'devise-guests', '~> 0.3'
 group :development, :test do
   gem 'fcrepo_wrapper'
   gem 'rspec-rails'
+  gem 'awesome_print', :require => 'ap' 
 end
+
+# hack - include a specific version of "stomp" (required by hydra gem) because the default (latest) version has buggy circular dependencies
+gem 'stomp', '1.4.1'

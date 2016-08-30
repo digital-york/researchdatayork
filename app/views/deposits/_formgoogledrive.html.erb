@@ -1,0 +1,162 @@
+<div id="jstree_div" title="Select files from Google Drive">Loading Google Drive - please wait...</div>
+
+<div id="jstree_status">
+  <div id="jstree_files_status" style="float:left"></div>
+  <div id="jstree_loading_status" style="float:left"></div>
+</div>
+<div style="clear:both"/>
+
+<script>
+  // initially, we may or may not be connected/authenticated to the Google API 
+  var googleApiAuthenticated = <%= connected_to_google_api? %>;
+  var googleWindow;
+  // given a tree node, work out whether its parent is selected and return its relative path accordingly
+  function relpath_to_node (jstree, node) {
+    var id_path = jstree.get_path(node, false, true);
+    var name_path = jstree.get_path(node, false, false);
+    // for each parent in the paths, if it's not selected, remove it and all its parents from the array
+    for (var i = id_path.length - 1; i >= 0; i--) {
+      if (!jstree.is_selected(id_path[i])) {
+        // remove this and all elements before this from arrays
+        id_path.splice(0, i+1);
+        name_path.splice(0, i+1);
+        break;
+      }
+    }
+    return name_path.join("/");
+  }
+
+  $('#jstree_div').on("changed.jstree", function (e, data) {
+    // take a count of how many folders are being opened so that I can print out a "still loading" message
+    var loading_counter = 0;
+    // if a folder is selected/checked, open it and automatically select all of its contents (recursively if there are subfolders)  
+    if (data.changed.selected[0]) {
+      if (data.instance.is_parent(data.changed.selected[0])) {
+        loading_counter++;
+        $("#jstree_loading_status").html("...still loading...");
+        data.instance.open_node(data.changed.selected[0], function (d2) {
+          // for each child in the selected and opened node, select it
+          for (var i = 0; i < d2.children.length; i++) {
+            data.instance.select_node(data.instance.get_node(d2.children[i]));
+          }
+          loading_counter--;
+          if (loading_counter === 0) {
+            $("#jstree_loading_status").html("");
+          }
+        });
+      }
+    }
+    if (data.changed.deselected[0]) {
+      // if a folder is deselected/unchecked, automatically deselect/uncheck all of its contents (recursively if there are subfolders)
+      if (data.instance.is_parent(data.changed.deselected[0])) {
+        var node = data.instance.get_node(data.changed.deselected[0]);
+        for (var k = 0; k < node.children.length; k++) {
+          data.instance.deselect_node(node.children[k]);
+        }
+      }
+    }
+    // update the "status" message of the dialog with the number of selected files
+    $("#jstree_files_status").html(data.instance.get_bottom_selected(false).length + " files selected");
+  });
+
+  $( function() {
+    dialog = $( "#jstree_div" ).dialog({
+      autoOpen: false,
+      resizable: true,
+      height: 500,
+      width: 600,
+      modal: true,
+      buttons: {
+        "OK": function() {
+          // attach the selected files to the form as hidden input params
+          // get an array of selected nodes
+          selectedNodes = $("#jstree_div").jstree("get_bottom_selected", true);
+          // get the form on this page
+          form = document.getElementById("new_deposit");
+          // remove any existing selections from the form
+          oldSelections = document.getElementsByName("selected_files[]");
+          while (oldSelections[0]) {
+            form.removeChild(oldSelections[0]);
+          }
+          oldPaths = document.getElementsByName("selected_paths[]");
+          while (oldPaths[0]) {
+            form.removeChild(oldPaths[0]);
+          }
+          oldMimeTypes = document.getElementsByName("selected_mimetypes[]");
+          while (oldMimeTypes[0]) {
+            form.removeChild(oldMimeTypes[0]);
+          }
+          // for each selected file
+          for (var i = 0; i < selectedNodes.length; i++) {
+            // write it to the html form as a hidden input
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "selected_files[]";
+            input.value = selectedNodes[i].id;
+            form.appendChild(input);
+            // write the desired path of this file to a hidden input as well
+            var input2 = document.createElement("input");
+            input2.type = "hidden";
+            input2.name = "selected_paths[]";
+            input2.value = relpath_to_node($("#jstree_div").jstree(), selectedNodes[i]);
+            form.appendChild(input2);
+            // write the mime type of this file to a hidden input as well
+            var input3 = document.createElement("input");
+            input3.type = "hidden";
+            input3.name = "selected_mimetypes[]";
+            input3.value = selectedNodes[i].data["mime_type"];
+            form.appendChild(input3);
+          }
+          // update the status message next to the "select google drive files"
+          $("#google_drive_status2").html(selectedNodes.length + " files selected");
+          $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      }
+    });
+    $("#jstree_status").appendTo(".ui-dialog-buttonpane");
+    // when the user clicks the "Choose files..." button
+    $( "#google-drive-btn2" ).button().on( "click", function() {
+      // if authenticated to Google API, show Google Drive browser, else, open a popup window for connecting to Google API
+      if (googleApiAuthenticated) {
+        open_google_drive_browser();
+      } else {
+        googleWindow = window.open("/googledrive/connect", "_googlewindow", "width=500,height=500,resizable");
+      }
+    });
+  });
+
+  // when the "connect to google API" process has finished, the following function will be called
+  function authentication_complete () {
+    googleApiAuthenticated = true;
+    googleWindow.close();
+    open_google_drive_browser();
+  }
+
+  // open the dialog for the jstree and present it
+  function open_google_drive_browser () {
+    dialog.dialog( "open" );
+    // initialise the jstree
+    $(function () { 
+      $('#jstree_div').jstree({
+        "plugins" : ["checkbox", "changed"],
+        'core': {
+          'data': {
+            'url' : function (node) {
+              return "/googledrive.json?folder=" + (node.id === "#" ? "root" : node.id)
+            },
+            'data' : function (node) {
+
+            }
+          }
+        },
+        'checkbox': {
+          three_state: false,
+        }
+      }); 
+    }); 
+  }
+</script>
+

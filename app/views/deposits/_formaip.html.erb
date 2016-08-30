@@ -18,11 +18,36 @@
     </div>
 
     <div class="field">
-      <%= f.label "Select a file to deposit" %>&nbsp;
-      <%= f.file_field :file %>
+      <%= f.label "Select local files to deposit" %>&nbsp;
+      <%= f.file_field :file, id: "real_file_btn", style: "display: none", multiple: true %><br>
+      <button type="button" class="btn btn-large btn-success" id="file_upload_btn">Choose Files</button>
+      <span id="file_upload_status">No file chosen</span>
     </div>
+
+    <div class="field">
+      <%= f.label "Select a local directory to deposit" %>&nbsp;
+      <%= f.file_field :file, id: "real_dir_btn", style: "display: none", multiple: true, directory: true, webkitdirectory: true, mozdirectory: true %><br>
+      <button type="button" class="btn btn-large btn-success" id="dir_upload_btn">Choose Directory</button>
+      <span id="dir_upload_status">No directory chosen</span>
+    </div>
+
+    <div class="field">
+      <%= f.label "Select Google Drive files to deposit (browse everything)" %>&nbsp;<br>
+      <button type="button" data-toggle="browse-everything" data-route="<%=browse_everything_engine.root_path%>"
+              data-target="#new_deposit" id="google_drive_btn" class="btn btn-large btn-success">Choose Files</button>
+      <span id="google_drive_status">No file chosen</span>
+    </div>
+
+    <div class="field">
+      <%= f.label "Select Google Drive files to deposit (local code)" %>&nbsp;<br>
+      <button type="button" class="btn btn-large btn-success" id="google-drive-btn2">Choose Files</button>
+      <span id="google_drive_status2">No file chosen</span>
+    </div>
+
+    <%= render "formgoogledrive" %>
 
     <div class="actions">
       <%= f.submit 'Deposit' %>
     </div>
+
 <% end %>

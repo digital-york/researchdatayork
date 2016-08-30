@@ -35,9 +35,11 @@
               <br />
           <% end %>
           <strong>Managing Org:</strong>
-          <% upload['pureManagingUnit_ssim'].each do | i |%>
+          <% unless upload['pureManagingUnit_ssim'].nil? %>
+            <% upload['pureManagingUnit_ssim'].each do | i |%>
               <%= get_preflabel(i) %>
-              <% end %>
+            <% end %>
+          <% end %>
           <br />
           <% unless upload['doi_tesim'].nil? %>
               <strong>DOI:</strong>
