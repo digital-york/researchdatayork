@@ -10,6 +10,8 @@
   // initially, we may or may not be connected/authenticated to the Google API 
   var googleApiAuthenticated = <%= connected_to_google_api? %>;
   var googleWindow;
+  // take a count of how many folders are being opened so that I can print out a "still loading" message
+  var loading_counter = 0;
   // given a tree node, work out whether its parent is selected and return its relative path accordingly
   function relpath_to_node (jstree, node) {
     var id_path = jstree.get_path(node, false, true);
@@ -27,8 +29,6 @@
   }
 
   $('#jstree_div').on("changed.jstree", function (e, data) {
-    // take a count of how many folders are being opened so that I can print out a "still loading" message
-    var loading_counter = 0;
     // if a folder is selected/checked, open it and automatically select all of its contents (recursively if there are subfolders)  
     if (data.changed.selected[0]) {
       if (data.instance.is_parent(data.changed.selected[0])) {
@@ -149,6 +149,9 @@
             },
             'data' : function (node) {
 
+            },
+            "error": function (jqXHR, textStatus, errorThrown) { 
+              $('#jstree_div').html("<h3>Error</h3><p>There was an error while connecting to your Google Drive. Please try closing your browser and re-opening it.</p>"); 
             }
           }
         },
