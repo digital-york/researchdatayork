@@ -4,7 +4,8 @@ Rails.application.routes.draw do
 
   resources :datasets
   resources :deposits
-  resources :googledrive, :except => [:index] do
+  # set up a resource for Google Drive API calls, with custom actions
+  resources :googledrive, :only => [] do
     collection do
       # add a custom action for connecting to google api
       get "connect"
