@@ -21,7 +21,7 @@ module CreateDip
     @dip = dataset.aips[0]
     dip_info = get_dip_details(uuid)
     # TODO some error handling here
-    ingest_dip(dip_info['current_path'])
+    ingest_dip(dip_info['current_path'],id)
     set_dip_current_path(dip_info['current_path'])
     set_dip_uuid(dip_info['uuid'])
     set_dip_status(dip_info['status'])

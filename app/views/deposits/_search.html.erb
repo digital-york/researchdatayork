@@ -26,6 +26,8 @@
 
             <%= check_box_tag(:doi,"nodoi") %>
             <%= label_tag(:doi, "DOI Not Yet Created " ) %><br/>
+            <%= check_box_tag('status[]',"phd-data") %>
+            <%= label_tag('status[]', "PhD Student Deposit" ) %><br/>
             </td>
             <td>
            
@@ -36,15 +38,17 @@
             <%= check_box_tag('status[]',"nodata-dept") %>
             <%= label_tag('status[]', "Data Held By Dept " ) %><br/>
 
-             
-              <%= check_box_tag('aip_status[]', "UPLOADED") %>
+              <%= check_box_tag('aip_status[]', "inprogress") %>
+              <%= label_tag('aip_status[]', "Upload in Progress" ) %><br/>
+
+              <%= check_box_tag('aip_status[]', "uploaded") %>
               <%= label_tag('aip_status[]', "Data Uploaded" ) %><br/>
+
+              <%= check_box_tag('aip_status[]', "problem") %>
+              <%= label_tag('aip_status[]', "Upload Problem" ) %><br/>
 
               <%= check_box_tag('aip_status[]', "noaip") %>
               <%= label_tag('aip_status[]', "Data Not Uploaded" ) %><br/>
-             
-              <%= check_box_tag('status[]',"phd-data") %>
-              <%= label_tag('status[]', "Data from PhD Student" ) %><br/>
 
             </td>
           <td>
@@ -57,8 +61,11 @@
             <%= check_box_tag('dip_status[]', "UPLOADED") %>
             <%= label_tag('dip_status[]', "Data Available" ) %><br/>
 
+            <%= check_box_tag('dip_status[]', "waiting") %>
+            <%= label_tag('dip_status[]', "Wating for Approval" ) %><br/>
+
             <%= check_box_tag('dip_status[]', "APPROVE") %>
-            <%= label_tag('dip_status[]', "Data Awaiting Approval" ) %><br/>
+            <%= label_tag('dip_status[]', "Request Approved, Data In Progress" ) %><br/>
 
             <%= check_box_tag('dip_status[]', "nodip") %>
             <%= label_tag('dip_status[]', "Data Not Available" ) %><br/>

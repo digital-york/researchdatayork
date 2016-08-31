@@ -94,7 +94,7 @@
           <% elsif aip != nil and aip.aip_status == 'UPLOADED' %>
               <%= render 'shared/tick' %>
               Upload Complete<br />
-          <% elsif upload['wf_status_tesim'].include? 'nodata-dept' or upload['wf_status_tesim'].include? 'nodata-external' %>
+          <% elsif upload['wf_status_tesim'] != nil and (upload['wf_status_tesim'].include? 'nodata-dept' or upload['wf_status_tesim'].include? 'nodata-external') %>
               <%= render 'shared/tick' %>
               No Upload Needed<br />
           <% elsif upload['wf_status_tesim'] != nil and (aip.nil? or aip.aip_status.empty? or aip.aip_status != 'UPLOADED') %>
@@ -126,7 +126,8 @@
                   <%= render 'shared/cross' %>
                   <%= aip.aip_status %> <br />
               <% else %>
-                  <%= render 'shared/cross' %> In Progress
+                  <%= render 'shared/alert' %>
+                  In Progress
               <% end %>
               <br />
               <%= aip_list.size %> aip<%unless aip_list.size < 2 %>s<%end%> deposited <br />
@@ -144,10 +145,11 @@
                   <%= render 'shared/tick' %> Requested </br>
                   <% if dip.dip_status == 'APPROVE' %>
                       <%= render 'shared/tick' %> Request Approved </br>
+                      <%= render 'shared/cross' %> Not  Available </br>
                   <% elsif dip.dip_status == 'UPLOADED' %>
                       <%= render 'shared/tick' %> Available </br>
                   <% else %>
-                      <%= render 'shared/cross' %> Awaiting Approval </br>
+                      <%= render 'shared/alert' %> Awaiting Approval </br>
                   <% end%>
               <% end %>
               <br />

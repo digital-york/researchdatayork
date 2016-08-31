@@ -15,7 +15,7 @@ class DepositsController < ApplicationController
   include ReingestAip
   include CreateDip
   include Googledrive
-  helper_method :connected_to_google_api?  # defined in Googledrive module so view can know whether or not to call google api
+  helper_method :connected_to_google_api? # defined in Googledrive module so view can know whether or not to call google api
 
   #20ee85c3-f53c-4ab6-8e50-270b0ddd3686
   # there is a problem with project
@@ -31,11 +31,12 @@ class DepositsController < ApplicationController
     # if this is a search
     # check if we have it in solr, if not create a dataset
     q = 'has_model_ssim:"Dlibhydra::Dataset"'
+    ids = []
     fq = []
 
     unless params[:q].nil?
       unless params[:q] == ''
-        q += ' and for_indexing_tesim:*' + params[:q] + '*'
+        q += ' and for_indexing_tesim:' + params[:q]
       end
 
       unless params[:new].nil?
@@ -59,19 +60,32 @@ class DepositsController < ApplicationController
 
       unless params[:aip_status].nil?
         params[:aip_status].each do |aipstatus|
+
           if aipstatus == 'noaip'
             fq << '!member_ids_ssim:*'
           else
+            fq << 'member_ids_ssim:*'
             num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',)
-            r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',[],
-                              'id,member_ids_ssim',num_results)
-            r['docs'].each do |dataset|
-              dataset['member_ids_ssim'].each do |aip|
-                num_results = get_number_of_results('id:'+ aip +' and aip_status_tesim:UPLOADED')
-                if num_results == 0
-                  fq << '!id:' + dataset['id']
-                else
-                  q += ' and id:' + dataset['id']
+            if num_results == 0
+              fq << 'member_ids_ssim:*'
+            else
+              r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*', [],
+                                    'id,member_ids_ssim', num_results)
+              if aipstatus == 'uploaded'
+                status_query = 'aip_status_tesim:UPLOADED'
+              elsif aipstatus == 'inprogress'
+                status_query = 'aip_status_tesim:(COMPLETE or PROCESSING or "Not Yet Processed")'
+              elsif aipstatus == 'problem'
+                status_query = 'aip_status_tesim:(ERROR or FAILED or USER_INPUT)'
+              end
+              r['docs'].each do |dataset|
+                dataset['member_ids_ssim'].each do |aip|
+                  num_results = get_number_of_results('id:'+ aip,status_query)
+                  if num_results == 0
+                    fq << '!id:' + dataset['id']
+                  else
+                    ids << dataset['id']
+                  end
                 end
               end
             end
@@ -83,18 +97,28 @@ class DepositsController < ApplicationController
     unless params[:dip_status].nil?
       no_results = true
       params[:dip_status].each do |dipstatus|
-          num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',)
-          r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',[],
-                                'id,member_ids_ssim',num_results)
+        num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',)
+        if num_results == 0
+          fq << 'member_ids_ssim:*'
+        else
+          r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*', [],
+                                'id,member_ids_ssim', num_results)
           r['docs'].each do |dataset|
             dataset['member_ids_ssim'].each do |dip|
               if dipstatus == 'APPROVE' or dipstatus == 'UPLOADED'
-                num_results = get_number_of_results('id:'+ dip +' and dip_status_tesim:' + dipstatus,[])
+                num_results = get_number_of_results('id:'+ dip +' and dip_status_tesim:' + dipstatus, [])
                 if num_results == 0
-                  # query should return 0
                   fq << '!id:' + dataset['id']
                 else
-                  q += ' and id:' + dataset['id']
+                  ids << dataset['id']
+                  no_results = false
+                end
+              elsif dipstatus == 'waiting'
+                num_results = get_number_of_results('id:'+ dip, ['requestor_email_tesim:*','!dip_status_tesim:*'])
+                if num_results == 0
+                  fq << '!id:' + dataset['id']
+                else
+                  ids << dataset['id']
                   no_results = false
                 end
               else
@@ -105,14 +129,38 @@ class DepositsController < ApplicationController
                 end
               end
             end
+          end
         end
       end
     end
-    puts no_results
 
+    unless ids.empty?
+      extra_fq = 'id:('
+      ids.each_with_index do |i, index|
+        if index == ids.length - 1
+          extra_fq += "#{i}"
+        else
+          extra_fq += "#{i} or "
+        end
 
-    # otherwise get everything
-    # Get number of results to return
+      end
+      extra_fq += ')'
+      fq << extra_fq
+    end
+
+    if no_results == true
+      response = nil
+    else
+      num_results = get_number_of_results(q, fq)
+
+      unless num_results == 0
+        response = solr_filter_query(q, fq,
+                                     'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
+                                    access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim',
+                                     num_results)
+      end
+    end
 
     if params[:refresh] == 'true'
       if params[:refresh_num]
@@ -128,21 +176,6 @@ class DepositsController < ApplicationController
         get_datasets_from_collection(c, response)
       end
     end
-
-    # check if we have it in solr, if not create a dataset
-    if no_results == true
-      response = nil
-    else
-      num_results = get_number_of_results(q,fq)
-
-    unless num_results == 0
-      response = solr_filter_query(q,fq,
-                                  'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
-                                    access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
-                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim',
-                                  num_results)
-    end
-      end
 
     if response.nil?
       @deposits = []
@@ -238,11 +271,11 @@ class DepositsController < ApplicationController
         d.wf_status = params[:deposit][:status]
         d.save
 
-      respond_to do |format|
-        #format.html { render :show, notice: notice }
-        format.js {}
-        #format.json { render :show, status: :created, location: @deposit }
-      end
+        respond_to do |format|
+          #format.html { render :show, notice: notice }
+          format.js {}
+          #format.json { render :show, status: :created, location: @deposit }
+        end
       end
     end
   end

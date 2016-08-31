@@ -7,7 +7,12 @@
       <% is_checked = checked('awaiting-info') %>
       <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "awaiting-info", nil) %>
       <span class="check_box_<%= is_checked.to_s %>">Researcher Contacted - Awaiting Info</span> <br />
-
+      <% is_checked = checked('phd-data') %>
+      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "phd-data", nil) %>
+      <span class="check_box_<%= is_checked.to_s %>">Data from PhD Student </span> <br />
+      <br />
+      <span>DATA</span>
+      <br />
       <% is_checked = checked('awaiting-data') %>
       <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "awaiting-data", nil) %>
       <span class="check_box_<%= is_checked.to_s %>">Researcher Contacted - Awaiting Data </span> <br />
@@ -20,6 +25,9 @@
       <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "nodata-dept", nil) %>
           <span class="check_box_<%= is_checked.to_s %>">Data Held By Dept </span> <br />
 
+      <br />
+      <span>ACCESS</span>
+      <br />
       <% is_checked = checked('held-pub-meta') %>
       <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "held-pub-meta", nil) %>
             <span class="check_box_<%= is_checked.to_s %>">Metadata Held for Publication  </span> <br />
@@ -28,9 +36,6 @@
       <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "held-pub-data", nil) %>
               <span class="check_box_<%= is_checked.to_s %>">Data Held for Publication  </span> <br />
 
-      <% is_checked = checked('phd-data') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "phd-data", nil) %>
-                <span class="check_box_<%= is_checked.to_s %>">Data from PhD Student </span> <br />
     </div>
 
     <div class="actions">
