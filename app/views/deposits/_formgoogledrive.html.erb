@@ -118,7 +118,7 @@
     });
     $("#jstree_status").appendTo(".ui-dialog-buttonpane");
     // when the user clicks the "Choose files..." button
-    $( "#google-drive-btn2" ).button().on( "click", function() {
+    $( "#google-drive-btn" ).button().on( "click", function() {
       // if authenticated to Google API, show Google Drive browser, else, open a popup window for connecting to Google API
       if (googleApiAuthenticated) {
         open_google_drive_browser();

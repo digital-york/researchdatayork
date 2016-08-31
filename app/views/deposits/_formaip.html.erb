@@ -32,15 +32,8 @@
     </div>
 
     <div class="field">
-      <%= f.label "Select Google Drive files to deposit (browse everything)" %>&nbsp;<br>
-      <button type="button" data-toggle="browse-everything" data-route="<%=browse_everything_engine.root_path%>"
-              data-target="#new_deposit" id="google_drive_btn" class="btn btn-large btn-success">Choose Files</button>
-      <span id="google_drive_status">No file chosen</span>
-    </div>
-
-    <div class="field">
-      <%= f.label "Select Google Drive files to deposit (local code)" %>&nbsp;<br>
-      <button type="button" class="btn btn-large btn-success" id="google-drive-btn2">Choose Files</button>
+      <%= f.label "Select Google Drive files to deposit" %>&nbsp;<br>
+      <button type="button" class="btn btn-large btn-success" id="google-drive-btn">Choose Files</button>
       <span id="google_drive_status2">No file chosen</span>
     </div>
 
