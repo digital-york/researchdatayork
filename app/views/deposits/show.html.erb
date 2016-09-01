@@ -1,7 +1,7 @@
-<%# include javascript and css libraries for jstree which will help user browse google drive files %>
+<%# include javascript and css libraries for jstree (in /vendor/assets) which will help user browse google drive files %>
 <% content_for :head do %>
-  <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" %> 
-  <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.2/jstree.min.js" %> 
+  <%= stylesheet_link_tag "jstree.min.css" %> 
+  <%= javascript_include_tag "jstree.min.js" %> 
 <% end %>
 
 <% if @dataset.nil? %>
