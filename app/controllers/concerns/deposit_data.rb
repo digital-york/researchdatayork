@@ -87,6 +87,13 @@ module DepositData
     end
   end
 
+  # delete all files deposited in the AIP - this will be called to clean things up if there was a problem during file upload
+  def delete_deposited_files
+    if @dir_aip
+      FileUtils.rm_rf(@dir_aip)
+    end
+  end
+
   def add_metadata(metadata)
     require 'json'
     # TODO eval is a bit dodgy, consider replacing
