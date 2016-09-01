@@ -71,7 +71,6 @@ module CreateDip
     end
   end
   
-  # TODO capture folder structure
   # inside the dip location folder, there will be:
   # - a folder called "objects" containing the actual files of the dip
   # - a folder called "thumbnails" containing thumbnails for each file in the dip
@@ -79,10 +78,10 @@ module CreateDip
   # - a file called "ProcessingMCP.xml"
   # Need to create a FileSet for METS.xxxx.xml, a FileSet for Processing.MCP.xml, and a FileSet for each actual file in the dip
   # (which will consist of a primary file (in "objects") and an additional file (in "thumbnails"))
-  def ingest_dip(dip_location, dataset_id)
-    # temp code to set up vars so this procedure can be called standalone
-    dataset = Dlibhydra::Dataset.find(dataset_id)
-    @dip = dataset.aips[0]
+  def ingest_dip(dip_location)
+    # uncomment the next 2 lines, and add 2nd parameter "dataset_id" to the function spec in order to call this method standalone
+    #dataset = Dlibhydra::Dataset.find(dataset_id)
+    #@dip = dataset.aips[0]
     location = File.join(ENV['DIP_LOCATION'], dip_location)
     # for each file/folder in the dip location
     Dir.foreach(location) do |item|

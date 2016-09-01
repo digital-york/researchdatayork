@@ -1,6 +1,7 @@
 class GoogledriveController < ApplicationController
 
   include Googledrive
+  helper_method :connected_to_google_api?  # defined in Googledrive module so view can know whether or not to call google api
 
   # connect to the Google API and begin the process of autheticating
   def connect
@@ -18,19 +19,26 @@ class GoogledriveController < ApplicationController
   # handle the callback from Google (it will respond to the above call) and grab the authorisation code
   def oauth2callback
     client = oauth2client
-    # update the oauth2 client with the authorisation code that Google just gave us
-    client.update!(:code => params[:code])
-    # get the access and refresh tokens
-    response = client.fetch_access_token!
-    # persist the refresh tokens - it can be used to obtain access_tokens in future
-    session[:refresh_token] = response['refresh_token']
+    if params[:code]
+      # update the oauth2 client with the authorisation code that Google just gave us
+      client.update!(:code => params[:code])
+      # get the access and refresh tokens
+      response = client.fetch_access_token!
+      # persist the refresh tokens - it can be used to obtain access_tokens in future
+      session[:refresh_token] = response['refresh_token']
+    end
     redirect_to finish_googledrive_index_url
   end 
 
   # finish off the connection process
   def finish
     respond_to do |format|
-      format.html { render :finish, :layout => false }
+      # if connection was successful, no need for layout as we'll just be closing the window, otherwise display an error message
+      if connected_to_google_api? 
+        format.html { render :finish, :layout => false }
+      else
+        format.html { render :finish }
+      end
     end
   end
 
