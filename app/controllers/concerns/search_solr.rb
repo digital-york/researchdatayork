@@ -7,8 +7,6 @@ module SearchSolr
   end
 
   def get_number_of_results(q='*:*',fq='')
-    puts q
-    puts fq
     response = solr_connect.get 'select', :params => {
         :q => q,
         :fq => fq,

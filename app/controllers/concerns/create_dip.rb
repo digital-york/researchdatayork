@@ -151,7 +151,6 @@ module CreateDip
           obj_fs.preflabel = object
           label = object
           path = location + '/objects/' + object
-          puts path
           file1 = open(path)
           # this is the service file but doesn't appear to be supported in
           # https://github.com/projecthydra/hydra-works/blob/master/lib/hydra/works/models/concerns/file_set/contained_files.rb
@@ -172,7 +171,6 @@ module CreateDip
         Dir.foreach(location + '/thumbnails') do |thumb|
           next if thumb == '.' or thumb == '..' or thumb == '.DS_Store'
           th_id = thumb.sub! '.jpg', ''
-          puts th_id
           if label.include? th_id
             path = location + '/thumbnails/' + thumb + '.jpg'
             file = open(path)
@@ -184,13 +182,10 @@ module CreateDip
         Dir.foreach(location + '/OCRfiles') do |ocr|
           next if ocr == '.' or ocr == '..' or ocr == '.DS_Store'
           ocr_id = ocr.sub! '.txt', ''
-          puts label
-          puts ocr_id
           if label.include? ocr_id
             path = location + '/OCRfiles/' + ocr + '.txt'
             file = open(path)
-            puts path
-#            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:extracted_text,update_existing: false)
+             Hydra::Works::AddFileToFileSet.call(obj_fs, file,:extracted_text,update_existing: false)
 #            obj_fs.save
           end
         end

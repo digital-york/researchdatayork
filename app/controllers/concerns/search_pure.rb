@@ -11,31 +11,32 @@ module SearchPure
       c.basic_auth = true
     end
     c = Puree::Collection.new resource: :dataset
+
+    puts c_from
+    puts c_to
+    puts m_from
+    puts m_to
     metadata = c.find limit: limit,
-          offset: nil,
-          created_start:  c_from, # optional
-          created_end:    c_to, # optional
-          modified_start: m_from, # optional
-          modified_end:   m_to,  # optional
-          instance: true
+                      offset: 0,
+                      created_start:  c_from, # optional
+                      created_end:    c_to, # optional
+                      modified_start: m_from, # optional
+                      modified_end:   m_to#,  # optional
     metadata
   end
 
   def get_uuids_created_from_tonow(from_no)
     d = DateTime.now
     from = d - Integer(from_no)
-    puts d
-    puts from
     c = get_uuids(nil,c_from=from.strftime("%Y-%m-%d"),c_to=d.tomorrow.strftime("%Y-%m-%d"))
     c
 
   end
 
+  # TODO only update the ones that weren't in the created set
   def get_uuids_modified_from_tonow(from_no)
     d = DateTime.now
     from = d - Integer(from_no)
-    puts d
-    puts from
     c = get_uuids(nil,nil,nil,m_from=from.strftime("%Y-%m-%d"),m_to=d.tomorrow.strftime("%Y-%m-%d"))
     c
   end
@@ -54,7 +55,7 @@ module SearchPure
     else
       d.find id: uuid
     end
-    d
+    d.metadata
   end
 
 end

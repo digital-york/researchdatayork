@@ -22,41 +22,40 @@ module CreateDataset
     # bug in puree 0.16.0 where the uuid is a Nokogiri XML attribute object
     # temporary fix here is to replace it with the value
     # fixed in 0.16.1
-#=begin
-    puts puree_dataset.metadata
-    unless puree_dataset.metadata['person']['internal'].nil?
-      puree_dataset.metadata['person']['internal'].each_with_index do | p,index|
-        if puree_dataset.metadata['person']['internal'][index]['uuid'].class == Nokogiri::XML::Attr
-          puree_dataset.metadata['person']['internal'][index]['uuid'] = p['uuid'].content
+=begin
+    unless puree_dataset['person']['internal'].nil?
+      puree_dataset['person']['internal'].each_with_index do | p,index|
+        if puree_dataset['person']['internal'][index]['uuid'].class == Nokogiri::XML::Attr
+          puree_dataset['person']['internal'][index]['uuid'] = p['uuid'].content
         end
       end
     end
-    unless puree_dataset.metadata['person']['external'].nil?
-      puree_dataset.metadata['person']['external'].each_with_index do | p,index|
-        if puree_dataset.metadata['person']['external'][index]['uuid'].class == Nokogiri::XML::Attr
-          puree_dataset.metadata['person']['external'][index]['uuid'] = p['uuid'].content
+    unless puree_dataset['person']['external'].nil?
+      puree_dataset['person']['external'].each_with_index do | p,index|
+        if puree_dataset['person']['external'][index]['uuid'].class == Nokogiri::XML::Attr
+          puree_dataset['person']['external'][index]['uuid'] = p['uuid'].content
         end
       end
     end
-    unless puree_dataset.metadata['person']['other'].nil?
-      puree_dataset.metadata['person']['other'].each_with_index do | p,index|
-        if puree_dataset.metadata['person']['other'][index]['uuid'].class == Nokogiri::XML::Attr
-          puree_dataset.metadata['person']['other'][index]['uuid'] = p['uuid'].content
+    unless puree_dataset['person']['other'].nil?
+      puree_dataset['person']['other'].each_with_index do | p,index|
+        if puree_dataset['person']['other'][index]['uuid'].class == Nokogiri::XML::Attr
+          puree_dataset['person']['other'][index]['uuid'] = p['uuid'].content
         end
       end
     end
-#=end
-    @d.for_indexing = puree_dataset.metadata.to_s
-    self.set_uuid(puree_dataset.metadata['uuid'])
-    self.set_title(puree_dataset.title)
-    self.set_access(puree_dataset.access)
-    self.set_available(puree_dataset.metadata['available'])
-    self.set_pure_created(puree_dataset.metadata['created'])
-    self.set_publisher(puree_dataset.publisher)
-    self.set_doi(puree_dataset.doi)
-    self.set_link(puree_dataset.link)
-    self.set_pure_creator(puree_dataset.person)
-    self.set_pure_managing_org(puree_dataset.owner)
+=end
+    @d.for_indexing = puree_dataset.to_s
+    self.set_uuid(puree_dataset['uuid'])
+    self.set_title(puree_dataset['title'])
+    self.set_access(puree_dataset['access'])
+    self.set_available(puree_dataset['available'])
+    self.set_pure_created(puree_dataset['created'])
+    self.set_publisher(puree_dataset['publisher'])
+    self.set_doi(puree_dataset['doi'])
+    self.set_link(puree_dataset['link'])
+    self.set_pure_creator(puree_dataset['person'])
+    self.set_pure_managing_org(puree_dataset['owner'])
     @d.save
   end
 
@@ -116,7 +115,6 @@ module CreateDataset
   end
 
   def set_pure_managing_org(a)
-    puts a['uuid']
     r = solr_query_short('pure_uuid_tesim:' + a['uuid'], 'id', 1)
     if r['numFound'] == 1
       o = Dlibhydra::CurrentOrganisation.find(r['docs'][0]['id'])

@@ -25,23 +25,24 @@ class DepositsController < ApplicationController
   # GET /deposits.json
   def index
 
-    # This is a basic ActiveRecord object. It is never saved.
+    # This is an empty ActiveRecord object. It is never saved.
     @deposit = Deposit.new
 
-    # if this is a search
-    # check if we have it in solr, if not create a dataset
+    # setup base query parameters
     q = 'has_model_ssim:"Dlibhydra::Dataset"'
     ids = []
     fq = []
+    no_results = false
 
     unless params[:q].nil?
+      # TODO or search for multiple words etc.
       unless params[:q] == ''
         q += ' and for_indexing_tesim:' + params[:q]
       end
 
       unless params[:new].nil?
-        fq << '!wf_status_tesim:*'
-        fq << '!member_ids_ssim:*'
+        fq << '!wf_status_tesim:*' # no workflow statuses
+        fq << '!member_ids_ssim:*' # no packages
       end
 
       unless params[:doi].nil?
@@ -80,7 +81,7 @@ class DepositsController < ApplicationController
               end
               r['docs'].each do |dataset|
                 dataset['member_ids_ssim'].each do |aip|
-                  num_results = get_number_of_results('id:'+ aip,status_query)
+                  num_results = get_number_of_results('id:'+ aip, status_query)
                   if num_results == 0
                     fq << '!id:' + dataset['id']
                   else
@@ -114,7 +115,7 @@ class DepositsController < ApplicationController
                   no_results = false
                 end
               elsif dipstatus == 'waiting'
-                num_results = get_number_of_results('id:'+ dip, ['requestor_email_tesim:*','!dip_status_tesim:*'])
+                num_results = get_number_of_results('id:'+ dip, ['requestor_email_tesim:*', '!dip_status_tesim:*'])
                 if num_results == 0
                   fq << '!id:' + dataset['id']
                 else
@@ -148,11 +149,10 @@ class DepositsController < ApplicationController
       fq << extra_fq
     end
 
-    if no_results == true
+    if no_results
       response = nil
     else
       num_results = get_number_of_results(q, fq)
-
       unless num_results == 0
         response = solr_filter_query(q, fq,
                                      'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
@@ -181,6 +181,10 @@ class DepositsController < ApplicationController
       @deposits = []
     else
       @deposits = response
+    end
+    respond_to do |format|
+      format.html { render :index }
+      # format.json { render :index, status: :created, location: @dataset }
     end
   end
 
@@ -241,22 +245,24 @@ class DepositsController < ApplicationController
         uuid = params[:deposit][:pure_uuid]
         d = get_pure_dataset(uuid)
 
-        query = 'pure_uuid_tesim:"' + d.metadata['uuid'] + '""'
-        response = solr_query_short(query, 'id,pure_uuid_tesim', 1)
+        unless d.nil?
+          query = 'pure_uuid_tesim:"' + d['uuid'] + '""'
+          response = solr_query_short(query, 'id,pure_uuid_tesim', 1)
 
-        # If there is no dataset, create one
-        # Otherwise use existing dataset object
-        if response['numFound'] == 0
-          notice = 'PURE data was successfully added.'
-          @dataset = new_dataset
-        else
-          notice = 'Dataset object already exists for this PURE UUID. Metadata updated.'
-          @dataset = find_dataset(response['docs'][0]['id'])
+          # If there is no dataset, create one
+          # Otherwise use existing dataset object
+          if response['numFound'] == 0
+            notice = 'PURE data was successfully added.'
+            @dataset = new_dataset
+          else
+            notice = 'Dataset object already exists for this PURE UUID. Metadata updated.'
+            @dataset = find_dataset(response['docs'][0]['id'])
+          end
+
+          # Fetch metadata from pure and update the dataset
+
+          set_metadata(@dataset, d)
         end
-
-        # Fetch metadata from pure and update the dataset
-
-        set_metadata(@dataset, d)
 
         respond_to do |format|
           format.html { redirect_to deposits_path, notice: notice }
@@ -345,14 +351,14 @@ class DepositsController < ApplicationController
 
   private
 
-  # Given a Puree collection, get each dataset
+  # Given a Puree collection (ana array), get each dataset
   # Create a new Hydra dataset, or update an existing one
   # Ignore data not published by the given publisher
   def get_datasets_from_collection(c, response)
     c.each do |d|
-      unless d.publisher.exclude? ENV['PUBLISHER']
-        if response != nil and response.to_s.include? d.metadata['uuid']
-          r = solr_query_short('pure_uuid_tesim:"' + d.metadata['uuid'] + '"', 'id', 1)
+      unless d['publisher'].exclude? ENV['PUBLISHER']
+        if response != nil and response.to_s.include? d['uuid']
+          r = solr_query_short('pure_uuid_tesim:"' + d['uuid'] + '"', 'id', 1)
           local_d = find_dataset(r['docs'][0]['id'])
         else
           local_d = new_dataset
