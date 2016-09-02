@@ -16,4 +16,16 @@ class RdMailer < ApplicationMailer
     # send them an email telling them that the data is ready to download
     mail(to: to, subject: 'Data available for dataset "' + @dataset.preflabel + '"') unless to.empty?
   end
+
+  # send an email to the RDM team to tell them that someone has requested data
+  def notify_rdm_team_about_request(dataset_id, requester_email)
+    # get the dataset
+    @dataset = Dlibhydra::Dataset.find(dataset_id)
+    # get the email address(es)
+    @requester_email = requester_email
+    # get the RDM team email address
+    to = ENV["RDM_EMAIL"]
+    # send email
+    mail(to: to, subject: "Data requested for dataset " + @dataset.id) unless to.empty?
+  end
 end
