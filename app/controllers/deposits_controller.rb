@@ -202,6 +202,8 @@ class DepositsController < ApplicationController
 
   def dipuuid
     message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
+    # data (DIP) is now available so send an email to anyone who requested the data
+    RdMailer.notify_requester(params[:deposit][:id]).deliver_now 
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message }
       format.json { head :no_content }
