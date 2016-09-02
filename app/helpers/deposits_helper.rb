@@ -13,7 +13,7 @@ module DepositsHelper
   # Check if this is a York DOI
   def check_doi(doi)
     if doi.include? ENV['DOI_ROOT']
-      return 'York DOI'
+      return true
     else
       ''
     end

@@ -45,8 +45,11 @@
               <strong>DOI:</strong>
 
               <% upload['doi_tesim'].each do | doi | %>
+                  <% if check_doi(doi) %>
+                      <%= render 'shared/tick' %>
+                  <% end %>
               <%= doi %>
-              <%= check_doi(doi) %>
+
               ;&nbsp;
           <% end %>
               <br />

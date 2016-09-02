@@ -26,5 +26,3 @@ client_secret.json
 
 # Ignore fedora data
 /fcrepo4-data
-/solr
-

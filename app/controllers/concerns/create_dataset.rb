@@ -22,7 +22,8 @@ module CreateDataset
     # bug in puree 0.16.0 where the uuid is a Nokogiri XML attribute object
     # temporary fix here is to replace it with the value
     # fixed in 0.16.1
-=begin
+#=begin
+    puts puree_dataset.metadata
     unless puree_dataset.metadata['person']['internal'].nil?
       puree_dataset.metadata['person']['internal'].each_with_index do | p,index|
         if puree_dataset.metadata['person']['internal'][index]['uuid'].class == Nokogiri::XML::Attr
@@ -32,19 +33,19 @@ module CreateDataset
     end
     unless puree_dataset.metadata['person']['external'].nil?
       puree_dataset.metadata['person']['external'].each_with_index do | p,index|
-        if puree_dataset.metadata['person']['internal'][index]['uuid'].class == Nokogiri::XML::Attr
+        if puree_dataset.metadata['person']['external'][index]['uuid'].class == Nokogiri::XML::Attr
           puree_dataset.metadata['person']['external'][index]['uuid'] = p['uuid'].content
         end
       end
     end
     unless puree_dataset.metadata['person']['other'].nil?
       puree_dataset.metadata['person']['other'].each_with_index do | p,index|
-        if puree_dataset.metadata['person']['internal'][index]['uuid'].class == Nokogiri::XML::Attr
+        if puree_dataset.metadata['person']['other'][index]['uuid'].class == Nokogiri::XML::Attr
           puree_dataset.metadata['person']['other'][index]['uuid'] = p['uuid'].content
         end
       end
     end
-=end
+#=end
     @d.for_indexing = puree_dataset.metadata.to_s
     self.set_uuid(puree_dataset.metadata['uuid'])
     self.set_title(puree_dataset.title)

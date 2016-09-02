@@ -89,7 +89,8 @@ module DepositData
 
   def add_metadata(metadata)
     require 'json'
-    json = JSON.parse(metadata.gsub('=>',':'))
+    json = JSON.generate(JSON.parse metadata.gsub('=>', ':'))
+    puts json
     File.write(@dir_aip + 'metadata.json', json)
   end
 
