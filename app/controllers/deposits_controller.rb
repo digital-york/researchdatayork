@@ -164,13 +164,20 @@ class DepositsController < ApplicationController
 
     if params[:refresh] == 'true'
       if params[:refresh_num]
+
         c = get_uuids(params[:refresh_num])
         get_datasets_from_collection(c, response)
+
       elsif params[:refresh_from]
+
         c = get_uuids_created_from_tonow(params[:refresh_from])
-        get_datasets_from_collection(c, response)
+        uuids = get_datasets_from_collection(c, response)
+
+        # uuids is a list of new datasets created after the solr query
+        # these are used to ensure we don't create duplicates
         c = get_uuids_modified_from_tonow(params[:refresh_from])
-        get_datasets_from_collection(c, response)
+        get_datasets_from_collection(c, response, uuids)
+
       else
         c = get_uuids
         get_datasets_from_collection(c, response)
@@ -351,21 +358,25 @@ class DepositsController < ApplicationController
 
   private
 
-  # Given a Puree collection (ana array), get each dataset
+  # Given a Puree collection (an array of hashes), get each dataset
   # Create a new Hydra dataset, or update an existing one
   # Ignore data not published by the given publisher
-  def get_datasets_from_collection(c, response)
+  def get_datasets_from_collection(c, response, new_uuids=[])
+
     c.each do |d|
       unless d['publisher'].exclude? ENV['PUBLISHER']
-        if response != nil and response.to_s.include? d['uuid']
+        if response != nil and (new_uuids.include? d['uuid'] or response.to_s.include? d['uuid'])
           r = solr_query_short('pure_uuid_tesim:"' + d['uuid'] + '"', 'id', 1)
           local_d = find_dataset(r['docs'][0]['id'])
         else
+          new_uuids << d['uuid']
           local_d = new_dataset
         end
+
         set_metadata(local_d, d)
       end
     end
+    new_uuids
   end
 
 end
