@@ -208,17 +208,26 @@ class DepositsController < ApplicationController
         set_user_deposit(@dataset, params[:deposit][:readme])
         new_deposit(@dataset.id, @aip.id)
         add_metadata(@dataset.for_indexing)
-        # handle upload of client side file(s)
-        if params[:deposit][:file]
-          deposit_files_from_client(params[:deposit][:file])
+        begin
+          # handle upload of client side file(s)
+          if params[:deposit][:file]
+            deposit_files_from_client(params[:deposit][:file])
+          end
+          # handle upload of google drive file(s)
+          if params[:selected_files] and params[:selected_paths] and params[:selected_mimetypes]
+            deposit_files_from_cloud(params[:selected_files], params[:selected_paths], params[:selected_mimetypes])
+          end
+        # if there was problem uploading files, delete the new AIP and delete any files that did get uploaded
+        rescue => e
+          @dataset.aips.delete(@dataset.aips.last)
+          delete_deposited_files
+          @notice = 'Failed to deposit selected files: ' + e.message
+        else
+          # TODO write metadata.json
+          # TODO add submission info
+          @notice = 'The deposit was successful.'
+          @dataset = nil
         end
-        if params[:selected_files] and params[:selected_paths] and params[:selected_mimetypes]
-          deposit_files_from_cloud(params[:selected_files], params[:selected_paths], params[:selected_mimetypes])
-        end
-        # TODO write metadata.json
-        # TODO add submission info
-        @notice = 'The deposit was successful.'
-        @dataset = nil
       else
         @notice = "You didn't deposit any data!"
       end
@@ -334,7 +343,9 @@ class DepositsController < ApplicationController
   end
 
   def dipuuid
-    message = update_dip(params[:deposit][:id], params[:deposit][:dipuuid])
+    message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
+    # data (DIP) is now available so send an email to anyone who requested the data
+    RdMailer.notify_requester(params[:deposit][:id]).deliver_now
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message }
       format.json { head :no_content }

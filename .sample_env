@@ -20,3 +20,6 @@ ARCHIVEMATICA_SS_USER= # archivematica storage service user
 ARCHIVEMATICA_SS_API_KEY= # archivematica storage service user api key
 DOI_ROOT= # doi minting prefix, used to distinguish between locally minted and external dois
 SECRET_KEY_BASE= # for devise
+HOST=locahost:3000
+EMAIL_FROM=do-not-reply@york.ac.uk
+RDM_EMAIL=

@@ -29,6 +29,8 @@ class DatasetsController < ApplicationController
         create_dip(@dataset)
         set_requestor_email(params[:request][:email])
         save_dip
+        # send an email to RDM team to tell them that data has been requested
+        RdMailer.notify_rdm_team_about_request(params[:id], params[:request][:email]).deliver_now
       # handle case where user hasn't provided an email address
       else
         @notice = 'Please provide a full email address.'

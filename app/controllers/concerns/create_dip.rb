@@ -70,7 +70,7 @@ module CreateDip
       @dip.requestor_email = emails
     end
   end
-  
+
   # inside the dip location folder, there will be:
   # - a folder called "objects" containing the actual files of the dip
   # - a folder called "thumbnails" containing thumbnails for each file in the dip
@@ -99,7 +99,7 @@ module CreateDip
           f = open(path)
           Hydra::Works::UploadFileToFileSet.call(obj_fs, f)
           # get the first 36 characters of the filename - the "thumbnail" and "ocr text" corresponding to this file will have this prefix
-          prefix = object[0..35] 
+          prefix = object[0..35]
           # find the "thumbnail" that corresponds to this file (it'll have the same filename prefix) if it exists and add it to the FileSet
           thumbnail_file = prefix + ".jpg"
           thumbnail_path = File.join(location, "thumbnails", thumbnail_file)
@@ -119,7 +119,7 @@ module CreateDip
           @dip.members << obj_fs
           save_dip
         end
-      # otherwise, if it's a file (not a folder)
+        # otherwise, if it's a file (not a folder)
       elsif File.file?(File.join(location, item))
         # create a new FileSet
         obj_fs = Dlibhydra::FileSet.new
@@ -133,79 +133,6 @@ module CreateDip
         save_dip
       end
     end
-  end
-
-  def ingest_dip_orig(dip_location)
-    location = ENV['DIP_LOCATION'] + '/' + dip_location
-    gw = Dlibhydra::GenericWork.new
-    #obj_fs = Dlibhydra::FileSet.new
-    label = ''
-    Dir.foreach(location) do |item|
-      next if item == '.' or item == '..' or item == '.DS_Store'
-      if item == 'objects'
-        Dir.foreach(location + '/objects') do |object|
-          # TODO is there more here I should exclude?
-          next if object == '.' or object == '..' or object == '.DS_Store'
-          obj_fs = Dlibhydra::FileSet.new
-          gw.preflabel = object
-          obj_fs.preflabel = object
-          label = object
-          path = location + '/objects/' + object
-          file1 = open(path)
-          # this is the service file but doesn't appear to be supported in
-          # https://github.com/projecthydra/hydra-works/blob/master/lib/hydra/works/models/concerns/file_set/contained_files.rb
-          Hydra::Works::UploadFileToFileSet.call(obj_fs, file1)
-          obj_fs.save
-          Rails.logger.debug("obj_fs: #{obj_fs.files.inspect}") # FAM DEBUG
-          gw.members << obj_fs
-          gw.save
-          @dip.members << gw
-          save_dip
-        end
-      end
-    end
-    Rails.logger.debug("gw = #{gw.members.inspect}")
-    Dir.foreach(location) do |item|
-      next if item == '.' or item == '..' or item == '.DS_Store'
-      if item == 'thumbnails'
-        Dir.foreach(location + '/thumbnails') do |thumb|
-          next if thumb == '.' or thumb == '..' or thumb == '.DS_Store'
-          th_id = thumb.sub! '.jpg', ''
-          if label.include? th_id
-            path = location + '/thumbnails/' + thumb + '.jpg'
-            file = open(path)
-#            Hydra::Works::AddFileToFileSet.call(obj_fs, file,:thumbnail,update_existing: false)
-#            obj_fs.save
-          end
-        end
-      elsif item == 'OCRfiles'
-        Dir.foreach(location + '/OCRfiles') do |ocr|
-          next if ocr == '.' or ocr == '..' or ocr == '.DS_Store'
-          ocr_id = ocr.sub! '.txt', ''
-          if label.include? ocr_id
-            path = location + '/OCRfiles/' + ocr + '.txt'
-            file = open(path)
-             Hydra::Works::AddFileToFileSet.call(obj_fs, file,:extracted_text,update_existing: false)
-#            obj_fs.save
-          end
-        end
-      else
-        next if item == '.' or item == '..' or item == '.DS_Store'
-        begin
-          fs = Dlibhydra::FileSet.new
-          fs.preflabel = item
-          fs.save
-          @dip.members << fs
-          file = open(location + '/' + item)
-          Hydra::Works::UploadFileToFileSet.call(fs, file)
-          save_dip
-          fs.save
-        rescue
-          # TODO log errors
-        end
-      end
-    end
-
   end
 
   def get_dip_details(uuid)

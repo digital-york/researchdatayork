@@ -71,41 +71,18 @@
           // attach the selected files to the form as hidden input params
           // get an array of selected nodes
           selectedNodes = $("#jstree_div").jstree("get_bottom_selected", true);
-          // get the form on this page
-          form = document.getElementById("new_deposit");
           // remove any existing selections from the form
-          oldSelections = document.getElementsByName("selected_files[]");
-          while (oldSelections[0]) {
-            form.removeChild(oldSelections[0]);
-          }
-          oldPaths = document.getElementsByName("selected_paths[]");
-          while (oldPaths[0]) {
-            form.removeChild(oldPaths[0]);
-          }
-          oldMimeTypes = document.getElementsByName("selected_mimetypes[]");
-          while (oldMimeTypes[0]) {
-            form.removeChild(oldMimeTypes[0]);
-          }
+          $("input").remove("[name='selected_files[]']");
+          $("input").remove("[name='selected_paths[]']");
+          $("input").remove("[name='selected_mimetypes[]']");
           // for each selected file
           for (var i = 0; i < selectedNodes.length; i++) {
             // write it to the html form as a hidden input
-            var input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "selected_files[]";
-            input.value = selectedNodes[i].id;
-            form.appendChild(input);
+            $("<input type='hidden'>").attr('name', 'selected_files[]').attr('value', selectedNodes[i].id).appendTo("#new_deposit");
             // write the desired path of this file to a hidden input as well
-            var input2 = document.createElement("input");
-            input2.type = "hidden";
-            input2.name = "selected_paths[]";
-            input2.value = relpath_to_node($("#jstree_div").jstree(), selectedNodes[i]);
-            form.appendChild(input2);
+            $("<input type='hidden'>").attr('name', 'selected_paths[]').attr('value', relpath_to_node($("#jstree_div").jstree(), selectedNodes[i])).appendTo("#new_deposit");
             // write the mime type of this file to a hidden input as well
-            var input3 = document.createElement("input");
-            input3.type = "hidden";
-            input3.name = "selected_mimetypes[]";
-            input3.value = selectedNodes[i].data["mime_type"];
-            form.appendChild(input3);
+            $("<input type='hidden'>").attr('name', 'selected_mimetypes[]').attr('value', selectedNodes[i].data["mime_type"]).appendTo("#new_deposit");
           }
           // update the status message next to the "select google drive files"
           $("#google_drive_status2").html(selectedNodes.length + " files selected");
