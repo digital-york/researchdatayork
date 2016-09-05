@@ -1,20 +1,30 @@
 <p id="notice"><%= @notice %></p>
 
-<% if (@dataset.access_rights == 'Closed') or
-    (@dataset.wf_status.include? 'held-pub-data')
+
+
+<% if (@dataset.access_rights != 'Open' or
+    @dataset.wf_status.include? 'held-pub-data') and current_user.nil?
 %>
-    <% unless @dataset.wf_status.include? 'held-pub-meta' %>
+    <% unless @dataset.wf_status.include? 'held-pub-meta' or @dataset.access_rights != 'Closed' %>
         <%= render 'dataset_metadata' %>
     <% end %>
 
-    <p>This dataset is not available.</p>
+    <%= render 'contact' %>
 
 <% else %>
+
+    <% unless current_user.nil? %>
+        <%= render 'contact' %>
+    <% end %>
 
     <%= render 'dataset_metadata' %>
 
     <% if @dataset.aips.size == 0 %>
-        <p>The researcher has not yet deposited the data.</p>
+        <p>The researcher has not yet deposited the data. Please provide your email address below and we will contact
+          you as soon as the download is ready.</p>
+        <p>
+          <%= render 'form_email' %>
+        </p>
     <% else %>
         <% if @dataset.dips.size == 0 %>
 

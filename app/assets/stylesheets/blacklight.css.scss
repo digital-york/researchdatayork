@@ -20,9 +20,18 @@
 }
 
 .check_box_true {
-  font-weight: bold;
-  font-style: italic;
+  position:relative;
+  padding-right: 15px
 }
+.check_box_true:before {
+  content: "\f0c7"; /* fa-floppy-o */
+  font-family: FontAwesome;
+  position:absolute;
+  top:0;
+  padding-right: -10px;
+  color: green
+}
+
 .check_box_false {
   font-weight: normal;
   font-style: normal;
@@ -61,4 +70,9 @@
     }
   }
 
+}
+
+a {
+  color: teal !important;
+  text-decoration: underline !important;
 }

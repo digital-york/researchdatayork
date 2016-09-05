@@ -30,4 +30,16 @@ module DepositsHelper
       false
     end
   end
+
+  def selected(term)
+    if @deposit.nil?
+      false
+    elsif @deposit.retention_policy.nil?
+      false
+    elsif @deposit.retention_policy.include? term
+      true
+    else
+      false
+    end
+  end
 end

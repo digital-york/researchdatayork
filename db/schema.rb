@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160824075400) do
+ActiveRecord::Schema.define(version: 20160905182025) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -38,11 +38,12 @@ ActiveRecord::Schema.define(version: 20160824075400) do
     t.string   "available"
     t.string   "embargo_end"
     t.string   "access"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
     t.string   "dipuuid"
     t.string   "status"
     t.string   "release"
+    t.string   "retention_policy"
   end
 
   create_table "reingests", force: :cascade do |t|

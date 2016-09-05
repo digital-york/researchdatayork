@@ -3,8 +3,8 @@ require File.expand_path('../boot', __FILE__)
 require 'rails/all'
 
 # TODO REMOVE THIS IN PRODUCTION APP!
-require 'openssl'
-OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+#require 'openssl'
+#OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.

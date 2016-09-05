@@ -17,10 +17,6 @@ class DepositsController < ApplicationController
   include Googledrive
   helper_method :connected_to_google_api? # defined in Googledrive module so view can know whether or not to call google api
 
-  #20ee85c3-f53c-4ab6-8e50-270b0ddd3686
-  # there is a problem with project
-  #e3f87d05-ab3c-49ef-a69d-0a9805b77d2f - live object with project
-
   # GET /deposits
   # GET /deposits.json
   def index
@@ -157,7 +153,7 @@ class DepositsController < ApplicationController
         response = solr_filter_query(q, fq,
                                      'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
                                     access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
-                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim',
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,retention_policy_tesim',
                                      num_results)
       end
     end
@@ -288,9 +284,11 @@ class DepositsController < ApplicationController
         @deposit = Deposit.new
         @deposit.id = params[:deposit][:id].to_s
         @deposit.status = params[:deposit][:status]
+        @deposit.retention_policy = params[:deposit][:retention_policy]
         @dataset_id = params[:deposit][:id].to_s
         d = Dlibhydra::Dataset.find(@dataset_id)
         d.wf_status = params[:deposit][:status]
+        d.retention_policy = params[:deposit][:retention_policy]
         d.save
 
         respond_to do |format|
@@ -364,7 +362,7 @@ class DepositsController < ApplicationController
     params.permit(:deposit, :uuid, :file, :submission_doco,
                   :title, :refresh, :refresh_num, :refresh_from,
                   :pure_uuid, :readme, :access,
-                  :embargo_end, :available, :dipuuid, :status, :release, :q, :aip_status, :dip_status, :doi)
+                  :embargo_end, :available, :dipuuid, :status, :release, :q, :aip_status, :dip_status, :doi,:retention_policy)
   end
 
   private

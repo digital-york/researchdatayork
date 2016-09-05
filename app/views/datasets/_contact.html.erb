@@ -1,0 +1,32 @@
+<% if (@dataset.access_rights != 'Open' or
+    @dataset.wf_status.include? 'held-pub-data')
+%>
+
+    <% unless current_user.nil? %>
+        <h3>Record Status:</h3>
+        <% if @dataset.wf_status.include? 'held-pub-meta' %>
+            <p>Metadata held until publication. The metadata is not currently visible to users.</p>
+        <% end %>
+        <% if @dataset.wf_status.include? 'held-pub-data' %>
+            <p>Data held until publication. The data (or option to reqiest data) is not currently visible to users.</p>
+        <% end %>
+        <p>Users see the following message:</p>
+        <hr>
+    <% end %>
+
+    <p>This dataset is currently
+
+      <% if @dataset.access_rights != 'Open' and @dataset.access_rights != 'not set' %>
+          <%= @dataset.access_rights %>.
+      <% else %>
+          not available.
+      <% end %>
+
+      Please email <%= mail_to 'library-research-support@york.ac.uk','Library Research Support' %> for further
+      information.</p>
+
+    <% unless current_user.nil? %>
+        <hr>
+    <% end %>
+
+<% end %>

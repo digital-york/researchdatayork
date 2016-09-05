@@ -1,0 +1,14 @@
+<%= form_for(@deposit, remote: true) do |f| %>
+    <div class="field" >
+      <%= hidden_field(:deposit, :id) %>
+    </div>
+
+    <div class="field">
+
+    </div>
+
+    <div class="actions">
+      <%= f.submit 'Save' %>
+    </div>
+<% end %>
+

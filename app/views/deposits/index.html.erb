@@ -113,6 +113,9 @@
                 @deposit = Deposit.new
                 @deposit.id = upload['id']
                 @deposit.status = upload['wf_status_tesim']
+                unless upload['retention_policy_tesim'].nil?
+                  @deposit.retention_policy = upload['retention_policy_tesim'][0]
+                end
               %>
               <div id="<%= upload['id'] %>">
                 <%= render partial: 'status', object: @deposit %>
