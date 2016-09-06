@@ -1,0 +1,25 @@
+<% unless @deposit.notes.nil? or @deposit.notes.empty? %>
+    <% @deposit.notes.gsub('[','').gsub(']','').gsub('"','').split(',').each do | note | %>
+          <p><%= note %></p>
+  <% end %>
+<% end %>
+
+
+<%= form_for(@deposit, remote: true) do |f| %>
+    <div class="field" >
+      <%= hidden_field(:deposit, :id) %>
+    </div>
+
+    <div class="field">
+      <label>Add Notes</label>
+      <div class="field">
+        <%= text_area_tag :notes %>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <%= f.submit 'Save' %>
+    </div>
+<% end %>
+

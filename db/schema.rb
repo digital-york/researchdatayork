@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160905182025) do
+ActiveRecord::Schema.define(version: 20160906100225) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 20160905182025) do
     t.string   "status"
     t.string   "release"
     t.string   "retention_policy"
+    t.string   "notes"
   end
 
   create_table "reingests", force: :cascade do |t|

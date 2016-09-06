@@ -15,9 +15,9 @@
         <th style="width:15%">Status</th>
         <th style="width:10%">AIP</th>
         <th style="width:10%">DIP</th>
-        <!--
-        <th style="width:10%">Last access</th>
-        -->
+
+        <th style="width:20%">Notes</th>
+
       </tr>
       </thead>
 
@@ -116,12 +116,18 @@
                 unless upload['retention_policy_tesim'].nil?
                   @deposit.retention_policy = upload['retention_policy_tesim'][0]
                 end
+                unless upload['restriction_note_tesim'].nil?
+                  @deposit.notes = upload['restriction_note_tesim']
+                end
               %>
               <div id="<%= upload['id'] %>">
                 <%= render partial: 'status', object: @deposit %>
               </div>
             </td>
             <td>
+              <% if upload['wf_status_tesim'] != nil and (upload['wf_status_tesim'].include? 'nodata-external' or upload['wf_status_tesim'].include? 'nodata-deptl') %>
+                  N/A
+              <% else %>
               <% if aip_list.size != 0 %>
                   <%= render 'shared/tick' %> Deposited <br/>
                   <% if aip.aip_status == 'UPLOADED' %>
@@ -143,9 +149,13 @@
               <% else %>
                   <%= render 'shared/cross' %> Deposited <br/><br/>
               <% end %>
-
+              <% end %>
             </td>
             <td>
+              <% if upload['wf_status_tesim'] != nil and (upload['wf_status_tesim'].include? 'nodata-external' or upload['wf_status_tesim'].include? 'nodata-deptl') %>
+                N/A
+              <% else %>
+
               <% if dip_list.size > 0 %>
                   <% unless dip.requestor_email.size == 0 %>
                       <%= render 'shared/tick' %> Requested </br>
@@ -188,10 +198,13 @@
               <% else %>
                   <%= render 'shared/cross' %> Not Available <br/><br/>
               <% end %>
+              <% end %>
             </td>
-            <!--
-            <td>TODO</td>
-            -->
+            <td>
+              <div id="<%= upload['id'] %>-notes">
+                <%= render partial: 'notes', object: @deposit %>
+              </div>
+            </td>
           </tr>
       <% end %>
       </tbody>

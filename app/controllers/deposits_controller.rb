@@ -33,7 +33,7 @@ class DepositsController < ApplicationController
     unless params[:q].nil?
       # TODO or search for multiple words etc.
       unless params[:q] == ''
-        q += ' and for_indexing_tesim:' + params[:q]
+        fq << 'for_indexing_tesim:' + params[:q] + ' OR restriction_note_tesim:' + params[:q]
       end
 
       unless params[:new].nil?
@@ -153,7 +153,8 @@ class DepositsController < ApplicationController
         response = solr_filter_query(q, fq,
                                      'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
                                     access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
-                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,retention_policy_tesim',
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,retention_policy_tesim,
+                                    restriction_note_tesim',
                                      num_results)
       end
     end
@@ -283,17 +284,28 @@ class DepositsController < ApplicationController
       else
         @deposit = Deposit.new
         @deposit.id = params[:deposit][:id].to_s
-        @deposit.status = params[:deposit][:status]
-        @deposit.retention_policy = params[:deposit][:retention_policy]
         @dataset_id = params[:deposit][:id].to_s
         d = Dlibhydra::Dataset.find(@dataset_id)
-        d.wf_status = params[:deposit][:status]
-        d.retention_policy = params[:deposit][:retention_policy]
+        if params[:deposit][:status]
+          d.wf_status = params[:deposit][:status]
+        end
+        if params[:deposit][:retention_policy]
+
+          d.retention_policy = params[:deposit][:retention_policy]
+        end
+        if params[:notes]
+          notes = d.restriction_note.to_a
+          notes << params[:notes]
+          d.restriction_note = notes
+        end
         d.save
+        @deposit.status = d.wf_status
+        @deposit.retention_policy = d.retention_policy
+        @deposit.notes = d.restriction_note
 
         respond_to do |format|
           #format.html { render :show, notice: notice }
-          format.js {}
+          format.js
           #format.json { render :show, status: :created, location: @deposit }
         end
       end
@@ -331,6 +343,15 @@ class DepositsController < ApplicationController
     # TODO
   end
 
+  # Notes
+  def notes
+    respond_to do |format|
+      #format.html { render :show, notice: notice }
+      format.js {}
+      #format.json { render :show, status: :created, location: @deposit }
+    end
+  end
+
   # Reingest
   def reingest
     message = reingest_aip('objects', params[:id])
@@ -362,7 +383,7 @@ class DepositsController < ApplicationController
     params.permit(:deposit, :uuid, :file, :submission_doco,
                   :title, :refresh, :refresh_num, :refresh_from,
                   :pure_uuid, :readme, :access,
-                  :embargo_end, :available, :dipuuid, :status, :release, :q, :aip_status, :dip_status, :doi,:retention_policy)
+                  :embargo_end, :available, :dipuuid, :status, :release, :q, :aip_status, :dip_status, :doi,:retention_policy, :notes)
   end
 
   private
