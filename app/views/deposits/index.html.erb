@@ -76,10 +76,10 @@
               <% end %>
 
             </td>
-            <td><%= upload['pure_creation_tesim'][0].split('T')[0] %></td>
+            <td><%= DateTime.parse(upload['pure_creation_tesim'][0]).strftime("%d/%m/%Y") %></td>
             <td>
               <% unless upload['date_available_tesim'].nil? %>
-                  <%= upload['date_available_tesim'][0] %>
+                  <%= DateTime.parse(upload['date_available_tesim'][0]).strftime("%d/%m/%Y") %>
               <% end %>
             </td>
 
