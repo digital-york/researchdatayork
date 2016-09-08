@@ -5,13 +5,19 @@
 <% unless @deposits == [] %>
     <p>Listing <%= @deposits['numFound'] %> dataset<% unless @deposits['numFound'] == 1 %>s<% end %></p>
 
+    <% down_arrow = "&#9660;"
+       up_arrow = "&#9650;"
+       access_arrow = if params[:sort] == "access" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end 
+       created_arrow = if params[:sort] == "created" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end
+       available_arrow = if params[:sort] == "available" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end
+    %>
     <table class="table-striped table-bordered table">
       <thead>
       <tr>
         <th style="width:20%">Dataset</th>
-        <th style="width:5%">Access</th>
-        <th style="width:5%">Created (PURE)</th>
-        <th style="width:5%">Date Available</th>
+        <th style="width:5%"><%= link_to "Access", params.merge(:sort => "access").merge(:sort_order => if params[:sort] == "access" and params[:sort_order] == "asc" then "desc" else "asc" end) %>&nbsp;<%= access_arrow.html_safe %></th>
+        <th style="width:5%"><%= link_to "Created (PURE)", params.merge(:sort => "created").merge(:sort_order => if params[:sort] == "created" and params[:sort_order] == "asc" then "desc" else "asc" end) %>&nbsp;<%= created_arrow.html_safe %></th>
+        <th style="width:5%"><%= link_to "Date Available", params.merge(:sort => "available").merge(:sort_order => if params[:sort] == "available" and params[:sort_order] == "asc" then "desc" else "asc" end) %>&nbsp;<%= available_arrow.html_safe %></th>
         <th style="width:15%">Status</th>
         <th style="width:10%">AIP</th>
         <th style="width:10%">DIP</th>

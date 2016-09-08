@@ -145,6 +145,25 @@ class DepositsController < ApplicationController
       fq << extra_fq
     end
 
+    solr_sort = ''
+    # if a valid sort parameter was given
+    if params[:sort] and ["access", "created", "available"].include?(params[:sort])
+      # set up the appropriate solr sort field
+      if params[:sort] == 'access'
+        solr_sort = 'access_rights_tesi'
+      elsif params[:sort] == 'created'
+        solr_sort = 'pure_creation_ssi'
+      elsif params[:sort] == 'available'
+        solr_sort = 'date_available_ssi' 
+      end
+      # if a valid sort direction was given, include that in the sort clause
+      if params[:sort_order] and ["asc","desc"].include?(params[:sort_order]) then
+        solr_sort += ' ' + params[:sort_order]
+      else
+        solr_sort += ' asc'
+      end
+    end
+
     if no_results
       response = nil
     else
@@ -155,7 +174,7 @@ class DepositsController < ApplicationController
                                     access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
                                     pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,retention_policy_tesim,
                                     restriction_note_tesim',
-                                     num_results)
+                                     num_results, solr_sort)
       end
     end
 
