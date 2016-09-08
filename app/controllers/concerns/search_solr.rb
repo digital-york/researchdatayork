@@ -26,13 +26,13 @@ module SearchSolr
     response['response']
   end
 
-  def solr_filter_query(q='*:*',fq='',fl='id',rows=0)
+  def solr_filter_query(q='*:*', fq='', fl='id', rows=0, sort="id asc")
     response = solr_connect.get 'select', :params => {
         :q => q,
         :fq => fq,
         :fl => fl,
         :rows => rows,
-        :sort => 'id asc'
+        :sort => sort
     }
     response['response']
   end
