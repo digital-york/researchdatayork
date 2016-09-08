@@ -22,40 +22,38 @@ module CreateDataset
     # bug in puree 0.16.0 where the uuid is a Nokogiri XML attribute object
     # temporary fix here is to replace it with the value
     # fixed in 0.16.1
-=begin
-    unless puree_dataset['person']['internal'].nil?
-      puree_dataset['person']['internal'].each_with_index do | p,index|
-        if puree_dataset['person']['internal'][index]['uuid'].class == Nokogiri::XML::Attr
-          puree_dataset['person']['internal'][index]['uuid'] = p['uuid'].content
-        end
-      end
-    end
-    unless puree_dataset['person']['external'].nil?
-      puree_dataset['person']['external'].each_with_index do | p,index|
-        if puree_dataset['person']['external'][index]['uuid'].class == Nokogiri::XML::Attr
-          puree_dataset['person']['external'][index]['uuid'] = p['uuid'].content
-        end
-      end
-    end
-    unless puree_dataset['person']['other'].nil?
-      puree_dataset['person']['other'].each_with_index do | p,index|
-        if puree_dataset['person']['other'][index]['uuid'].class == Nokogiri::XML::Attr
-          puree_dataset['person']['other'][index]['uuid'] = p['uuid'].content
-        end
-      end
-    end
-=end
+    #     unless puree_dataset['person']['internal'].nil?
+    #       puree_dataset['person']['internal'].each_with_index do | p,index|
+    #         if puree_dataset['person']['internal'][index]['uuid'].class == Nokogiri::XML::Attr
+    #           puree_dataset['person']['internal'][index]['uuid'] = p['uuid'].content
+    #         end
+    #       end
+    #     end
+    #     unless puree_dataset['person']['external'].nil?
+    #       puree_dataset['person']['external'].each_with_index do | p,index|
+    #         if puree_dataset['person']['external'][index]['uuid'].class == Nokogiri::XML::Attr
+    #           puree_dataset['person']['external'][index]['uuid'] = p['uuid'].content
+    #         end
+    #       end
+    #     end
+    #     unless puree_dataset['person']['other'].nil?
+    #       puree_dataset['person']['other'].each_with_index do | p,index|
+    #         if puree_dataset['person']['other'][index]['uuid'].class == Nokogiri::XML::Attr
+    #           puree_dataset['person']['other'][index]['uuid'] = p['uuid'].content
+    #         end
+    #       end
+    #     end
     @d.for_indexing = puree_dataset.to_s
-    self.set_uuid(puree_dataset['uuid'])
-    self.set_title(puree_dataset['title'])
-    self.set_access(puree_dataset['access'])
-    self.set_available(puree_dataset['available'])
-    self.set_pure_created(puree_dataset['created'])
-    self.set_publisher(puree_dataset['publisher'])
-    self.set_doi(puree_dataset['doi'])
-    self.set_link(puree_dataset['link'])
-    self.set_pure_creator(puree_dataset['person'])
-    self.set_pure_managing_org(puree_dataset['owner'])
+    set_uuid(puree_dataset['uuid'])
+    set_title(puree_dataset['title'])
+    set_access(puree_dataset['access'])
+    set_available(puree_dataset['available'])
+    set_pure_created(puree_dataset['created'])
+    set_publisher(puree_dataset['publisher'])
+    set_doi(puree_dataset['doi'])
+    set_link(puree_dataset['link'])
+    set_pure_creator(puree_dataset['person'])
+    set_pure_managing_org(puree_dataset['owner'])
     @d.save
   end
 
@@ -68,11 +66,11 @@ module CreateDataset
   end
 
   def set_access(access)
-    if access == ''
-      @d.access_rights = 'not set'
-    else
-      @d.access_rights = access
-    end
+    @d.access_rights = if access == ''
+                         'not set'
+                       else
+                         access
+                       end
   end
 
   def set_available(a)
@@ -100,31 +98,27 @@ module CreateDataset
   def set_pure_creator(a)
     if a['internal'] != []
       a['internal'].each do |internal|
-        if internal['role'] == 'Creator'
-          create_pure_person(internal,'internal')
-        end
+        create_pure_person(internal, 'internal') if internal['role'] == 'Creator'
       end
     end
     if a['external'] != []
       a['external'].each do |external|
-        if external['role'] == 'Creator'
-          create_pure_person(external,'external')
-        end
+        create_pure_person(external, 'external') if external['role'] == 'Creator'
       end
     end
   end
 
   def set_pure_managing_org(a)
     r = solr_query_short('pure_uuid_tesim:' + a['uuid'], 'id', 1)
-    if r['numFound'] == 1
-      o = Dlibhydra::CurrentOrganisation.find(r['docs'][0]['id'])
-    else
-      o = Dlibhydra::CurrentOrganisation.new
-    end
-    create_pure_org(o,a)
+    o = if r['numFound'] == 1
+          Dlibhydra::CurrentOrganisation.find(r['docs'][0]['id'])
+        else
+          Dlibhydra::CurrentOrganisation.new
+        end
+    create_pure_org(o, a)
   end
 
-  def create_pure_org(o,a)
+  def create_pure_org(o, a)
     o.pure_type = a['type']
     o.pure_uuid = a['uuid']
     o.name = a['name']
@@ -133,13 +127,13 @@ module CreateDataset
     @d.managing_organisation << o
   end
 
-  def create_pure_person(p,type)
+  def create_pure_person(p, type)
     r = solr_query_short('pure_uuid_tesim:' + p['uuid'].to_s, 'id', 1)
-    if r['numFound'] == 1
-      person = Dlibhydra::CurrentPerson.find(r['docs'][0]['id'])
-    else
-      person = Dlibhydra::CurrentPerson.new
-    end
+    person = if r['numFound'] == 1
+               Dlibhydra::CurrentPerson.find(r['docs'][0]['id'])
+             else
+               Dlibhydra::CurrentPerson.new
+             end
     person.pure_type = type
     person.family_name = p['name']['last']
     person.given_name = p['name']['first']
@@ -148,5 +142,4 @@ module CreateDataset
     person.save
     @d.creator << person
   end
-
 end

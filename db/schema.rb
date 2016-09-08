@@ -11,81 +11,79 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160906100225) do
-
-  create_table "bookmarks", force: :cascade do |t|
-    t.integer  "user_id",       null: false
-    t.string   "user_type"
-    t.string   "document_id"
-    t.string   "title"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.string   "document_type"
+ActiveRecord::Schema.define(version: 20_160_906_100_225) do
+  create_table 'bookmarks', force: :cascade do |t|
+    t.integer  'user_id', null: false
+    t.string   'user_type'
+    t.string   'document_id'
+    t.string   'title'
+    t.datetime 'created_at',    null: false
+    t.datetime 'updated_at',    null: false
+    t.string   'document_type'
   end
 
-  add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id"
+  add_index 'bookmarks', ['user_id'], name: 'index_bookmarks_on_user_id'
 
-  create_table "datasets", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table 'datasets', force: :cascade do |t|
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
   end
 
-  create_table "deposits", force: :cascade do |t|
-    t.string   "uuid"
-    t.string   "title"
-    t.string   "pure_uuid"
-    t.string   "readme"
-    t.string   "available"
-    t.string   "embargo_end"
-    t.string   "access"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-    t.string   "dipuuid"
-    t.string   "status"
-    t.string   "release"
-    t.string   "retention_policy"
-    t.string   "notes"
+  create_table 'deposits', force: :cascade do |t|
+    t.string   'uuid'
+    t.string   'title'
+    t.string   'pure_uuid'
+    t.string   'readme'
+    t.string   'available'
+    t.string   'embargo_end'
+    t.string   'access'
+    t.datetime 'created_at',       null: false
+    t.datetime 'updated_at',       null: false
+    t.string   'dipuuid'
+    t.string   'status'
+    t.string   'release'
+    t.string   'retention_policy'
+    t.string   'notes'
   end
 
-  create_table "reingests", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table 'reingests', force: :cascade do |t|
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
   end
 
-  create_table "requests", force: :cascade do |t|
-    t.string   "email"
-    t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table 'requests', force: :cascade do |t|
+    t.string   'email'
+    t.string   'name'
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
   end
 
-  create_table "searches", force: :cascade do |t|
-    t.text     "query_params"
-    t.integer  "user_id"
-    t.string   "user_type"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+  create_table 'searches', force: :cascade do |t|
+    t.text     'query_params'
+    t.integer  'user_id'
+    t.string   'user_type'
+    t.datetime 'created_at',   null: false
+    t.datetime 'updated_at',   null: false
   end
 
-  add_index "searches", ["user_id"], name: "index_searches_on_user_id"
+  add_index 'searches', ['user_id'], name: 'index_searches_on_user_id'
 
-  create_table "users", force: :cascade do |t|
-    t.string   "email",                  default: "",    null: false
-    t.string   "encrypted_password",     default: "",    null: false
-    t.string   "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,     null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.boolean  "guest",                  default: false
+  create_table 'users', force: :cascade do |t|
+    t.string   'email',                  default: '',    null: false
+    t.string   'encrypted_password',     default: '',    null: false
+    t.string   'reset_password_token'
+    t.datetime 'reset_password_sent_at'
+    t.datetime 'remember_created_at'
+    t.integer  'sign_in_count', default: 0, null: false
+    t.datetime 'current_sign_in_at'
+    t.datetime 'last_sign_in_at'
+    t.string   'current_sign_in_ip'
+    t.string   'last_sign_in_ip'
+    t.datetime 'created_at',                             null: false
+    t.datetime 'updated_at',                             null: false
+    t.boolean  'guest', default: false
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-
+  add_index 'users', ['email'], name: 'index_users_on_email', unique: true
+  add_index 'users', ['reset_password_token'], name: 'index_users_on_reset_password_token', unique: true
 end

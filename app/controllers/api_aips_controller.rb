@@ -3,7 +3,7 @@ class ApiAipsController < BaseApiController
   # avoid 'Can't verify CSRF token authenticity'
   # TODO look at whether using devise might be better?
   protect_from_forgery with: :null_session,
-                       if: Proc.new { |c| c.request.format =~ %r{application/json} }
+                       if: proc { |c| c.request.format =~ %r{application/json} }
   include Dlibhydra
   include CreateAip
 
@@ -11,18 +11,14 @@ class ApiAipsController < BaseApiController
 
   before_filter only: :update do |c|
     meth = c.method(:validate_json)
-    meth.call (@json.has_key?('aip'))
+    meth.call @json.key?('aip')
   end
 
   def update
     # update status
-    unless @json['aip']['aip_uuid'].nil?
-      set_aip_uuid(@json['aip']['aip_uuid'])
-    end
+    set_aip_uuid(@json['aip']['aip_uuid']) unless @json['aip']['aip_uuid'].nil?
     # update uuid
-    unless @json['aip']['status'].nil?
-      set_aip_status(@json['aip']['status'])
-    end
+    set_aip_status(@json['aip']['status']) unless @json['aip']['status'].nil?
     # update current path
     unless @json['aip']['current_path'].nil?
       set_aip_current_path(@json['aip']['current_path'])
@@ -44,10 +40,10 @@ class ApiAipsController < BaseApiController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def find_aip
-      @aip = Dlibhydra::Package.find(params[:id])
-      render nothing: true, status: :not_found unless @aip.present? #&& @aip.user == @user
-    end
 
+  # Use callbacks to share common setup or constraints between actions.
+  def find_aip
+    @aip = Dlibhydra::Package.find(params[:id])
+    render nothing: true, status: :not_found unless @aip.present? # && @aip.user == @user
+  end
 end

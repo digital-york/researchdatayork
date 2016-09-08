@@ -20,7 +20,7 @@ module CreateDip
     dataset = Dlibhydra::Dataset.find(id)
     @dip = dataset.aips[0]
     dip_info = get_dip_details(uuid)
-    # TODO some error handling here
+    # TODO: some error handling here
     ingest_dip(dip_info['current_path'])
     set_dip_current_path(dip_info['current_path'])
     set_dip_uuid(dip_info['uuid'])
@@ -80,13 +80,13 @@ module CreateDip
   # (which will consist of a primary file (in "objects") and an additional file (in "thumbnails"))
   def ingest_dip(dip_location)
     # uncomment the next 2 lines, and add 2nd parameter "dataset_id" to the function spec in order to call this method standalone
-    #dataset = Dlibhydra::Dataset.find(dataset_id)
-    #@dip = dataset.aips[0]
+    # dataset = Dlibhydra::Dataset.find(dataset_id)
+    # @dip = dataset.aips[0]
     location = File.join(ENV['DIP_LOCATION'], dip_location)
     # for each file/folder in the dip location
     Dir.foreach(location) do |item|
       # if it's the "objects" folder
-      if File.directory?(File.join(location, item)) and item == "objects"
+      if File.directory?(File.join(location, item)) && item == 'objects'
         # for each file in the "objects" folder
         Dir.foreach(File.join(location, item)) do |object|
           # skip any directories inside the objects folder
@@ -101,15 +101,15 @@ module CreateDip
           # get the first 36 characters of the filename - the "thumbnail" and "ocr text" corresponding to this file will have this prefix
           prefix = object[0..35]
           # find the "thumbnail" that corresponds to this file (it'll have the same filename prefix) if it exists and add it to the FileSet
-          thumbnail_file = prefix + ".jpg"
-          thumbnail_path = File.join(location, "thumbnails", thumbnail_file)
+          thumbnail_file = prefix + '.jpg'
+          thumbnail_path = File.join(location, 'thumbnails', thumbnail_file)
           if File.file?(thumbnail_path)
             f2 = open(thumbnail_path)
             Hydra::Works::AddFileToFileSet.call(obj_fs, f2, :thumbnail, update_existing: false)
           end
           # find the OCR file that corresponds to this file if it exists and add it to the FileSet
-          ocrfile = prefix + ".txt"
-          ocrfile_path = File.join(location, "OCRfiles", ocrfile)
+          ocrfile = prefix + '.txt'
+          ocrfile_path = File.join(location, 'OCRfiles', ocrfile)
           if File.file?(ocrfile_path)
             f3 = open(ocrfile_path)
             Hydra::Works::AddFileToFileSet.call(obj_fs, f3, :extracted_text, update_existing: false)
@@ -136,17 +136,16 @@ module CreateDip
   end
 
   def get_dip_details(uuid)
-
     url = ENV['ARCHIVEMATICA_SS_URL']
-    conn = Faraday.new(:url => url) do |faraday|
+    conn = Faraday.new(url: url) do |faraday|
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger # log requests to STDOUT
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end
 
     params = {
-        'username' => ENV['ARCHIVEMATICA_SS_USER'] ,
-        'api_key' => ENV['ARCHIVEMATICA_SS_API_KEY']
+      'username' => ENV['ARCHIVEMATICA_SS_USER'],
+      'api_key' => ENV['ARCHIVEMATICA_SS_API_KEY']
     }
 
     response = conn.get do |req|
@@ -155,7 +154,5 @@ module CreateDip
       req.params = params
     end
     JSON.parse(response.body)
-
   end
-
 end

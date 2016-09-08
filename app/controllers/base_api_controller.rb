@@ -2,20 +2,17 @@ class BaseApiController < ApplicationController
   before_filter :parse_request, :verify_key!
 
   def validate_json(condition)
-    unless condition
-      render nothing: true, status: :bad_request
-    end
+    render nothing: true, status: :bad_request unless condition
   end
 
   # not using
   def update_values(ivar, attributes)
     # assign attributes won't work
-    attributes.map.each do | k,v|
+    attributes.map.each do |k, _v|
       # check key is valid for this object
-      check_existence(ivar,k)
+      check_existence(ivar, k)
       # set
     end
-
   end
 
   def check_existence(ivar, key)
@@ -23,6 +20,7 @@ class BaseApiController < ApplicationController
   end
 
   private
+
   def verify_key!
     if !@json['aip']['api-key']
       render nothing: true, status: :unauthorized
