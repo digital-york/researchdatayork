@@ -255,7 +255,7 @@ class DepositsController < ApplicationController
         uuid = params[:deposit][:pure_uuid]
         d = get_pure_dataset(uuid)
 
-        unless d.nil?
+        unless d.nil? or d['uuid'].nil?
           query = 'pure_uuid_tesim:"' + d['uuid'] + '""'
           response = solr_query_short(query, 'id,pure_uuid_tesim', 1)
 
