@@ -285,9 +285,8 @@ class DepositsController < ApplicationController
         @deposit.id = params[:deposit][:id].to_s
         @dataset_id = params[:deposit][:id].to_s
         d = Dlibhydra::Dataset.find(@dataset_id)
-        d.wf_status = params[:deposit][:status] if params[:deposit][:status]
+        d.wf_status = params[:deposit][:status]
         if params[:deposit][:retention_policy]
-
           d.retention_policy = params[:deposit][:retention_policy]
         end
         if params[:notes]
