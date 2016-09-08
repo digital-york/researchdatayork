@@ -76,12 +76,8 @@
               <% end %>
 
             </td>
-            <td><%= DateTime.parse(upload['pure_creation_tesim'][0]).strftime("%d/%m/%Y") %></td>
-            <td>
-              <% unless upload['date_available_tesim'].nil? %>
-                  <%= DateTime.parse(upload['date_available_tesim'][0]).strftime("%d/%m/%Y") %>
-              <% end %>
-            </td>
+            <td><%= DateTime.parse(upload['pure_creation_tesim'][0]).strftime("%d/%m/%Y") rescue upload['pure_creation_tesim'][0] rescue nil %></td>
+            <td><%= DateTime.parse(upload['date_available_tesim'][0]).strftime("%d/%m/%Y") rescue upload['date_available_tesim'][0] rescue nil %></td>
 
             <% aip_list = aips(upload['id']) %>
             <% dip_list = dips(upload['id']) %>
