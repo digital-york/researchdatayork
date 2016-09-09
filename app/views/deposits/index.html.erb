@@ -3,7 +3,19 @@
 <p><%= link_to("Add a Dataset", deposits_path(:anchor => 'add_dataset')) %></p>
 
 <% unless @deposits == [] %>
-    <p>Listing <%= @deposits['numFound'] %> dataset<% unless @deposits['numFound'] == 1 %>s<% end %></p>
+    <p>Listing <%= @deposits['docs'].length %> dataset<% unless @deposits['docs'].length == 1 %>s<% end %> (<%= @deposits['numFound'] %> in total)
+    <% # present pagination links to each page of results
+       if (@deposits['numFound']/@results_per_page.to_f).ceil > 1 then %>
+         Pages: 
+    <%   for i in 1..(@deposits['numFound']/@results_per_page.to_f).ceil
+           if @current_page != i %>
+             <%= link_to i, params.merge(:page => i) %>
+    <%     else %>
+             <strong><%= i %></strong>
+    <%     end 
+         end      
+       end %>
+    </p>
 
     <% down_arrow = "&#9660;"
        up_arrow = "&#9650;"
@@ -15,9 +27,9 @@
       <thead>
       <tr>
         <th style="width:20%">Dataset</th>
-        <th style="width:5%"><%= link_to "Access", params.merge(:sort => "access").merge(:sort_order => if params[:sort] == "access" and params[:sort_order] == "asc" then "desc" else "asc" end) %>&nbsp;<%= access_arrow.html_safe %></th>
-        <th style="width:5%"><%= link_to "Created (PURE)", params.merge(:sort => "created").merge(:sort_order => if params[:sort] == "created" and params[:sort_order] == "asc" then "desc" else "asc" end) %>&nbsp;<%= created_arrow.html_safe %></th>
-        <th style="width:5%"><%= link_to "Date Available", params.merge(:sort => "available").merge(:sort_order => if params[:sort] == "available" and params[:sort_order] == "asc" then "desc" else "asc" end) %>&nbsp;<%= available_arrow.html_safe %></th>
+        <th style="width:5%"><%= link_to "Access", params.merge(:sort => "access").merge(:sort_order => if params[:sort] == "access" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page) %>&nbsp;<%= access_arrow.html_safe %></th>
+        <th style="width:5%"><%= link_to "Created (PURE)", params.merge(:sort => "created").merge(:sort_order => if params[:sort] == "created" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page) %>&nbsp;<%= created_arrow.html_safe %></th>
+        <th style="width:5%"><%= link_to "Date Available", params.merge(:sort => "available").merge(:sort_order => if params[:sort] == "available" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page) %>&nbsp;<%= available_arrow.html_safe %></th>
         <th style="width:15%">Status</th>
         <th style="width:10%">AIP</th>
         <th style="width:10%">DIP</th>

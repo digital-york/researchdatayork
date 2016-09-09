@@ -26,13 +26,15 @@ module SearchSolr
     response['response']
   end
 
-  def solr_filter_query(q='*:*', fq='', fl='id', rows=0, sort="id asc")
+  # execute a solr query with the option of paginating results (using 'start' and 'rows')
+  def solr_filter_query(q='*:*', fq='', fl='id', rows=0, sort="id asc", start=0)
     response = solr_connect.get 'select', :params => {
         :q => q,
         :fq => fq,
         :fl => fl,
         :rows => rows,
-        :sort => sort
+        :sort => sort,
+        :start => start
     }
     response['response']
   end

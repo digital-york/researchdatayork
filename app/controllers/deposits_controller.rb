@@ -145,9 +145,13 @@ class DepositsController < ApplicationController
       fq << extra_fq
     end
 
-    solr_sort = ''
+    # SORTING AND PAGING
+    @results_per_page = 10
+    # set up an array for holding the sort clause - default to sorting on id
+    solr_sort_fields = ["id asc"]
     # if a valid sort parameter was given
     if params[:sort] and ["access", "created", "available"].include?(params[:sort])
+      solr_sort = ''
       # set up the appropriate solr sort field
       if params[:sort] == 'access'
         solr_sort = 'access_rights_tesi'
@@ -162,6 +166,15 @@ class DepositsController < ApplicationController
       else
         solr_sort += ' asc'
       end
+      # prepend it to the sort clause array
+      solr_sort_fields = solr_sort_fields.unshift(solr_sort)
+    end
+    # handle paging - default to the first page of results
+    @current_page = 1
+    # if a valid paging parameter was given
+    if params[:page] and params[:page].match(/^\d+$/)
+      # use it to get the next page
+      @current_page = params[:page].to_i
     end
 
     if no_results
@@ -174,7 +187,8 @@ class DepositsController < ApplicationController
                                     access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
                                     pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,retention_policy_tesim,
                                     restriction_note_tesim',
-                                     num_results, solr_sort)
+                                     @results_per_page, solr_sort_fields.join(","), (@current_page - 1) * @results_per_page)
+                                     #num_results, solr_sort_fields.join(","))
       end
     end
 
