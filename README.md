@@ -18,7 +18,7 @@ being added to PURE.
 * A research data administration interface.
 * A deposit form for the upload of research data. The form supports single files, multiple files, folders and
 files/folder from Google drive.
-# An automated process for transferring data to Archivematica for archival storage,
+* An automated process for transferring data to Archivematica for archival storage,
 and for requesting dissemination copies on demand.
 * A form for requesting access to a dataset that is not yet available.
 * A download interface for downloading individual files or the whole dataset.
