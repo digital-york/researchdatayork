@@ -21,5 +21,5 @@ ARCHIVEMATICA_SS_API_KEY= # archivematica storage service user api key
 DOI_ROOT= # doi minting prefix, used to distinguish between locally minted and external dois
 SECRET_KEY_BASE= # for devise
 HOST= # application base url, eg. locahost:3000
-EMAIL_FROM= # eg. do-not-reply@york.ac.uk
-RDM_EMAIL= # email for the RDM team
+EMAIL_FROM= # eg. do-not-reply@myinstitution.ac.uk
+RDM_EMAIL= # email for the admin emails to be sent to

@@ -6,7 +6,22 @@
 University of York research data deposit, access and management application. This application is a prototype built for
 phase three of the 'Filling the Digital Preservation Gap' project of the Jisc Research Data Spring.
 
-This application is currently in development.
+## About the prototype
+
+This prototype provides a deposit, request and administration front end for research data. It integrates with the PURE
+research information systems to retrieve metadata for datasets and with the Archivematica digital preservation system to
+send research data for long-term preservation. The prototype assumes that only metadata (ie. not files themselves) are
+being added to PURE.
+
+### Features
+
+* A research data administration interface.
+* A deposit form for the upload of research data. The form supports single files, multiple files, folders and
+files/folder from Google drive.
+# An automated process for transferring data to Archivematica for archival storage,
+and for requesting dissemination copies on demand.
+* A form for requesting access to a dataset that is not yet available.
+* A download interface for downloading individual files or the whole dataset.
 
 ## Pre-requisites
 
