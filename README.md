@@ -49,10 +49,6 @@ rake db:migrate
 ```
 
 ```ruby
-git checkout https://github.com/digital-york/researchdatayork
-```
-
-```ruby
 rails server
 ```
 
