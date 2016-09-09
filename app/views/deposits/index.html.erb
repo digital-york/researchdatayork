@@ -17,7 +17,8 @@
        end %>
     </p>
 
-    <% down_arrow = "&#9660;"
+    <% # present an up/down arrow next to column name when column is sorted
+       down_arrow = "&#9660;"
        up_arrow = "&#9650;"
        access_arrow = if params[:sort] == "access" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end 
        created_arrow = if params[:sort] == "created" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end

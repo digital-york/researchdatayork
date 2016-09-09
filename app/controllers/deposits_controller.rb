@@ -173,7 +173,7 @@ class DepositsController < ApplicationController
     @current_page = 1
     # if a valid paging parameter was given
     if params[:page] and params[:page].match(/^\d+$/)
-      # use it to get the next page
+      # use it to get the requested page
       @current_page = params[:page].to_i
     end
 
@@ -188,7 +188,6 @@ class DepositsController < ApplicationController
                                     pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,retention_policy_tesim,
                                     restriction_note_tesim',
                                      @results_per_page, solr_sort_fields.join(","), (@current_page - 1) * @results_per_page)
-                                     #num_results, solr_sort_fields.join(","))
       end
     end
 
