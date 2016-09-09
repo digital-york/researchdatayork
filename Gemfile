@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 'datasetsv2_ferg20160907'
+gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 'datasetsv2'
 gem 'puree'
 gem 'active_fedora-noid'
 gem 'browse-everything'
