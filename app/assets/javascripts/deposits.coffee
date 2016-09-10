@@ -7,7 +7,7 @@
   returnStr = num + " " + str + " selected"
   
 
-$(document).ready ->
+ready = ->
   # bind the "choose files" buttons to the actual file upload button elements (this is a workaround so that the file upload button can be styled)
   $('#file_upload_btn').click ->
     $('#real_file_btn').click()
@@ -18,9 +18,9 @@ $(document).ready ->
     $('#file_upload_status').html(plural($(@)[0].files.length)) 
   $('#real_dir_btn').change ->
     $('#dir_upload_status').html(plural($(@)[0].files.length))
-  # update the "browse_everything_status" element after browse_everything has finished
-  $('#google_drive_btn').browseEverything().done( 
-    (data) -> 
-      $('#google_drive_status').html(plural(data.length))
-  )
-    
+
+# call "ready" when document is loaded - includes workaround for turbolinks
+# (http://stackoverflow.com/questions/20252530/coffeescript-jquery-on-click-only-working-when-page-is-refreshed)
+$(document).ready(ready)
+$(document).on('page:load', ready)
+$(document).on('turbolinks:load', ready);     
