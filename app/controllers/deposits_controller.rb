@@ -238,6 +238,10 @@ class DepositsController < ApplicationController
         new_deposit(@dataset.id, @aip.id)
         add_metadata(@dataset.for_indexing)
         begin
+          # handle readme (submission documentation)
+          if params[:deposit][:readme]
+            deposit_submission_documentation(params[:deposit][:readme])
+          end
           # handle upload of client side file(s)
           if params[:deposit][:file]
             deposit_files_from_client(params[:deposit][:file])

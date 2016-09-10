@@ -22,5 +22,4 @@ ready = ->
 # call "ready" when document is loaded - includes workaround for turbolinks
 # (http://stackoverflow.com/questions/20252530/coffeescript-jquery-on-click-only-working-when-page-is-refreshed)
 $(document).ready(ready)
-$(document).on('page:load', ready)
 $(document).on('turbolinks:load', ready);     

@@ -23,6 +23,17 @@ module DepositData
       FileUtils.mkdir(@dir_aip)
     end
   end
+  
+  # given a string of text, write it to a readme.txt file in the submission documentation folder
+  def deposit_submission_documentation(text)
+    # the text should be written to @dir_aip/submissionDocumentation/readme.txt
+    target_dir = File.join(@dir_aip, "submissionDocumentation")
+    target_file = File.join(target_dir, "readme.txt")
+    FileUtils.mkdir_p(target_dir)
+    File.open(target_file, "w") do |output|
+      output.write text
+    end 
+  end
 
   # given an array of files on the user's client machine, upload them, unzip them if they're zipped, and store them in the AIP folder 
   def deposit_files_from_client(files)
