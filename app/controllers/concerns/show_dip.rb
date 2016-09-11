@@ -34,7 +34,7 @@ module ShowDip
             # get the file id as a string (need to parse out the "file-" prefix)
             file_id = f.to_s[/^file-(.*)$/, 1]
             # get the file path/name (parse out everything in the path before the DIP package id)
-            file_path = dip_file_paths[filecounter].to_s[/\/[a-z0-9]{9}\/(.*)$/, 1]
+            file_path = dip_file_paths[filecounter].to_s.sub(/^.*?objects\/([a-z0-9]{9}\/)?/, "") 
             # add these to the return array
             dip_structure[file_id] = {:file_path => file_path}
             filecounter = filecounter + 1
