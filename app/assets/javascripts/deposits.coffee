@@ -23,6 +23,5 @@ $(document).on 'turbolinks:load', ->
 # kick off deletion of a note (RH column of datasets table) when a 'delete note' link is clicked
 $(document).on 'click', 'a.delete', (event)->
   event.preventDefault()
-  console.log("deleteing note " + $(this).attr('data-noteidx'))
   $("#delete_note_"+$(this).attr('data-dataset')+"_"+$(this).attr('data-noteidx')).submit()
   
