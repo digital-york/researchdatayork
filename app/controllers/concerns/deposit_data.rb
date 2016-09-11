@@ -36,7 +36,8 @@ module DepositData
     end 
   end
 
-  # given an array of files on the user's client machine, upload them, unzip them if they're zipped, and store them in the AIP folder 
+  # given an array of files on the user's client machine, upload them, unzip them if they're zipped, 
+  # and store them in the transfer folder 
   def deposit_files_from_client(files)
     # handle each of the uploaded files
     files.each do |f|
@@ -56,7 +57,7 @@ module DepositData
       # otherwise, not a zip file, just bung this file in the @dir_aip folder
       else
         # work out where this uploaded file should go (in order to preserve the structure of the upload)
-        target_file = File.join(@dir_aip, uploaded_filename)
+        target_file = File.join(@dir_aip, "objects", uploaded_filename)
         target_dir = File.dirname(target_file)
         # create any directories in target_dir that don't already exist
         FileUtils.mkdir_p(target_dir)
@@ -90,7 +91,7 @@ module DepositData
         path = path + google_docs_mimetypes[mime_type]["export_extension"] unless path.ends_with?(google_docs_mimetypes[mime_type]["export_extension"])
       end
       # work out where this file should be uploaded to
-      target_file = File.join(@dir_aip, path)
+      target_file = File.join(@dir_aip, "objects", path)
       target_dir = File.dirname(target_file)
       FileUtils.mkdir_p(target_dir)
       File.open(target_file, "wb") do |output|
