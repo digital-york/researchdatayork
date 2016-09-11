@@ -46,6 +46,16 @@ class DatasetsController < ApplicationController
     end
   end
 
+  # GET /datasets/1/documentation
+  # return the submission documentation (probably readme.txt) for the given dataset if it exists
+  def documentation
+    dataset = find_dataset(params[:id])
+    @readme = dataset.aips.first.readme rescue ""
+    respond_to do |format|
+      format.text
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_dataset
