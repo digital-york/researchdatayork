@@ -213,6 +213,7 @@
             </td>
             <td>
               <div id="<%= upload['id'] %>-notes">
+                <% @dataset_id = upload['id'] %>
                 <%= render partial: 'notes', object: @deposit %>
               </div>
             </td>

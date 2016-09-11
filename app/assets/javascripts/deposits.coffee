@@ -20,4 +20,12 @@ $(document).on 'turbolinks:load', ->
   $('#real_dir_btn').change ->
     $('#dir_upload_status').html(plural($(@)[0].files.length))
 
-
+#$(document).on 'page:change', ->
+#$ ->
+# kick off deletion of a note (RH column of datasets table) when a 'delete note' link is clicked
+$(document).on 'click', 'a.delete', (event)->
+#$("a.delete").on 'click', (event)->
+  event.preventDefault()
+  console.log("deleteing note " + $(this).attr('data-noteidx'))
+  $("#delete_note_"+$(this).attr('data-dataset')+"_"+$(this).attr('data-noteidx')).submit()
+  

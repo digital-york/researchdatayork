@@ -334,6 +334,11 @@ class DepositsController < ApplicationController
           notes << params[:notes]
           d.restriction_note = notes
         end
+        if params[:delete_note_at_index] and params[:delete_note_at_index].match(/^\d+$/)
+          notes = d.restriction_note.to_a
+          notes.delete_at(params[:delete_note_at_index].to_i)
+          d.restriction_note = notes
+        end
         d.save
         @deposit.status = d.wf_status
         @deposit.retention_policy = d.retention_policy

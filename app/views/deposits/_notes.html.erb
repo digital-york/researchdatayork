@@ -1,6 +1,10 @@
 <% unless @deposit.notes.nil? or @deposit.notes.empty? %>
-    <% @deposit.notes.gsub('[','').gsub(']','').gsub('"','').split(',').each do | note | %>
-          <p><%= note %></p>
+    <% @deposit.notes.gsub('[','').gsub(']','').gsub('"','').split(',').each_with_index do | note, index | %>
+        <p class="note" id="note_<%= index %>"><%= note %> <a href="#" class="delete" data-dataset="<%= @dataset_id %>" data-noteidx="<%= index %>" title="Delete note">x</a></p>
+        <%= form_for(@deposit, remote: true, :html => { :id => "delete_note_#{@dataset_id}_#{index}" }) do |f| %>
+            <%= hidden_field(:deposit, :id) %>
+            <%= hidden_field_tag "delete_note_at_index", index %>
+        <% end %>        
   <% end %>
 <% end %>
 

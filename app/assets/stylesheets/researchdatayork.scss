@@ -71,3 +71,11 @@ a, a:hover, a:visited, .navbar-inverse .navbar-nav > li > a, .navbar-inverse .na
   color: teal;
   text-decoration: underline;
 }
+
+/* some special css for the notes column of the main datasets table */
+a.delete {
+  display: none
+}
+p.note:hover a.delete {
+  display: inline
+}
