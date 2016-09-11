@@ -155,9 +155,7 @@
                       In Progress
                   <% end %>
                   <br/>
-                  <%= aip_list.size %> aip
-                  <% unless aip_list.size < 2 %>s
-                  <% end %> deposited <br/>
+                  <%= aip_list.size %> aip<% unless aip_list.size < 2 %>s<% end %> deposited <br/>
                   <% aip_list.each do |aip| %>
                       <%= aip %> <br/>
                   <% end %>
