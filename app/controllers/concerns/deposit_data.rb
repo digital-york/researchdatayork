@@ -68,17 +68,6 @@ module DepositData
     end
   end
 
-  # given a hash of Google Drive files selected by the user, download them to the AIP folder
-#  def deposit_files_from_cloud(files)
-#    retriever = BrowseEverything::Retriever.new
-#    files.each do |index, file|
-#      target_file = File.join(@dir_aip, file['file_name'])
-#      retriever.download(file, target_file) do |filename, retrieved, total|
-#        # could potentially output download progess here
-#      end
-#    end
-#  end
-
   def deposit_files_from_cloud(files, paths, mime_types)
     # initialise the google api
     service = initialise_api
