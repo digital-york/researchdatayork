@@ -182,9 +182,7 @@
                       <% end %>
                   <% end %>
                   <br/>
-                  <%= dip_list.size %> dip
-                  <% unless dip_list.size < 2 %>s
-                  <% end %> created<br/>
+                  <%= dip_list.size %> dip<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
                       <%= dip.id %><br/>
                       requested by <%= dip.requestor_email.join %> <br/>
