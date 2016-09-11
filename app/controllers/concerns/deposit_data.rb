@@ -26,8 +26,9 @@ module DepositData
   
   # given a string of text, write it to a readme.txt file in the submission documentation folder
   def deposit_submission_documentation(text)
-    # the text should be written to @dir_aip/submissionDocumentation/readme.txt
-    target_dir = File.join(@dir_aip, "submissionDocumentation")
+    # the text should be written to @dir_aip/metadata/submissionDocumentation/readme.txt
+    # according to https://www.archivematica.org/en/docs/archivematica-1.4/user-manual/transfer/transfer/#create-submission
+    target_dir = File.join(@dir_aip, "metadata", "submissionDocumentation")
     target_file = File.join(target_dir, "readme.txt")
     FileUtils.mkdir_p(target_dir)
     File.open(target_file, "w") do |output|
@@ -108,7 +109,11 @@ module DepositData
   def add_metadata(metadata)
     require 'json'
     json = JSON.generate(JSON.parse metadata.gsub('=>', ':'))
-    File.write(@dir_aip + 'metadata.json', json)
+    # metadata.json needs to go in metadata/submissionDocumentation
+    target_dir = File.join(@dir_aip, "metadata", "submissionDocumentation")
+    FileUtils.mkdir_p(target_dir)
+    target_file = File.join(target_dir, "metadata.json")
+    File.write(target_file, json)
   end
 
   def add_submission_documentation
