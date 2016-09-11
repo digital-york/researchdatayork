@@ -239,7 +239,7 @@ class DepositsController < ApplicationController
         add_metadata(@dataset.for_indexing)
         begin
           # handle readme (submission documentation)
-          if params[:deposit][:readme]
+          if params[:deposit][:readme] and !params[:deposit][:readme].empty?
             deposit_submission_documentation(params[:deposit][:readme])
           end
           # handle upload of client side file(s)
