@@ -6,8 +6,9 @@
     str = "files"
   returnStr = num + " " + str + " selected"
   
-
-ready = ->
+# when document is loaded - includes workaround for turbolinks
+# (http://stackoverflow.com/questions/20252530/coffeescript-jquery-on-click-only-working-when-page-is-refreshed)
+$(document).on 'turbolinks:load', ->
   # bind the "choose files" buttons to the actual file upload button elements (this is a workaround so that the file upload button can be styled)
   $('#file_upload_btn').click ->
     $('#real_file_btn').click()
@@ -19,7 +20,4 @@ ready = ->
   $('#real_dir_btn').change ->
     $('#dir_upload_status').html(plural($(@)[0].files.length))
 
-# call "ready" when document is loaded - includes workaround for turbolinks
-# (http://stackoverflow.com/questions/20252530/coffeescript-jquery-on-click-only-working-when-page-is-refreshed)
-$(document).ready(ready)
-$(document).on('turbolinks:load', ready);     
+
