@@ -42,6 +42,10 @@
                 </p>
 
             <% else %>
+                <% if @dataset.aips and @dataset.aips.first and @dataset.aips.first.readme and !@dataset.readme.to_s.empty? %>
+                    <h3>View Submission Documentation</h3>
+                    <p><%= link_to "readme.txt", documentation_url(@dataset.id) %></p>
+                <% end %>
                 <h3>Download the Data</h3>
                 <% if @dip_files.length > 0 %>
                     <h4>As a zip file</h4>

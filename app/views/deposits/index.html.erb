@@ -3,15 +3,34 @@
 <p><%= link_to("Add a Dataset", deposits_path(:anchor => 'add_dataset')) %></p>
 
 <% unless @deposits == [] %>
-    <p>Listing <%= @deposits['numFound'] %> dataset<% unless @deposits['numFound'] == 1 %>s<% end %></p>
+    <p>Listing <%= @deposits['docs'].length %> dataset<% unless @deposits['docs'].length == 1 %>s<% end %> (<%= @deposits['numFound'] %> in total)
+    <% # present pagination links to each page of results
+       if (@deposits['numFound']/@results_per_page.to_f).ceil > 1 then %>
+         Pages: 
+    <%   for i in 1..(@deposits['numFound']/@results_per_page.to_f).ceil
+           if @current_page != i %>
+             <%= link_to i, params.merge(:page => i) %>
+    <%     else %>
+             <strong><%= i %></strong>
+    <%     end 
+         end      
+       end %>
+    </p>
 
+    <% # present an up/down arrow next to column name when column is sorted
+       down_arrow = "&#9660;"
+       up_arrow = "&#9650;"
+       access_arrow = if params[:sort] == "access" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end 
+       created_arrow = if params[:sort] == "created" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end
+       available_arrow = if params[:sort] == "available" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end
+    %>
     <table class="table-striped table-bordered table">
       <thead>
       <tr>
         <th style="width:20%">Dataset</th>
-        <th style="width:5%">Access</th>
-        <th style="width:5%">Created (PURE)</th>
-        <th style="width:5%">Date Available</th>
+        <th style="width:5%"><%= link_to "Access", params.merge(:sort => "access").merge(:sort_order => if params[:sort] == "access" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page) %>&nbsp;<%= access_arrow.html_safe %></th>
+        <th style="width:5%"><%= link_to "Created (PURE)", params.merge(:sort => "created").merge(:sort_order => if params[:sort] == "created" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page) %>&nbsp;<%= created_arrow.html_safe %></th>
+        <th style="width:5%"><%= link_to "Date Available", params.merge(:sort => "available").merge(:sort_order => if params[:sort] == "available" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page) %>&nbsp;<%= available_arrow.html_safe %></th>
         <th style="width:15%">Status</th>
         <th style="width:10%">AIP</th>
         <th style="width:10%">DIP</th>
@@ -76,12 +95,8 @@
               <% end %>
 
             </td>
-            <td><%= upload['pure_creation_tesim'][0].split('T')[0] %></td>
-            <td>
-              <% unless upload['date_available_tesim'].nil? %>
-                  <%= upload['date_available_tesim'][0] %>
-              <% end %>
-            </td>
+            <td><%= DateTime.parse(upload['pure_creation_tesim'][0]).strftime("%d/%m/%Y") rescue upload['pure_creation_tesim'][0] rescue nil %></td>
+            <td><%= DateTime.parse(upload['date_available_tesim'][0]).strftime("%d/%m/%Y") rescue upload['date_available_tesim'][0] rescue nil %></td>
 
             <% aip_list = aips(upload['id']) %>
             <% dip_list = dips(upload['id']) %>
@@ -140,8 +155,7 @@
                       In Progress
                   <% end %>
                   <br/>
-                  <%= aip_list.size %> aip<% unless aip_list.size < 2 %>s<% end %>
-                      deposited <br/>
+                  <%= aip_list.size %> aip<% unless aip_list.size < 2 %>s<% end %> deposited <br/>
                   <% aip_list.each do |aip| %>
                       <%= aip %> <br/>
                   <% end %>
@@ -168,9 +182,7 @@
                       <% end %>
                   <% end %>
                   <br/>
-                  <%= dip_list.size %> dip
-                  <% unless dip_list.size < 2 %>s
-                  <% end %> created<br/>
+                  <%= dip_list.size %> dip<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
                       <%= dip.id %><br/>
                       requested by <%= dip.requestor_email.join %> <br/>
@@ -201,6 +213,7 @@
             </td>
             <td>
               <div id="<%= upload['id'] %>-notes">
+                <% @dataset_id = upload['id'] %>
                 <%= render partial: 'notes', object: @deposit %>
               </div>
             </td>

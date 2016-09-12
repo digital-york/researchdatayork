@@ -11,8 +11,14 @@
  * file per style scope.
  *
  *= require jquery-ui
- *= require_tree .
+ * require_tree . // this line is commented out (by removing the "=" sign) so that the ordering (hence priority) of css can be specified
  *= require_self
+ *= require browse_everything
+ *= require blacklight
+ *= require scaffolds
+ *= require datasets
+ *= require deposits
+ *= require researchdatayork
  */
 
 /* @import "browse_everything";
