@@ -18,7 +18,7 @@ module CreateDataset
   end
 
   def set_metadata(d, puree_dataset)
-    @d = d
+    @d = dgit merge merged20160831
     # bug in puree 0.16.0 where the uuid is a Nokogiri XML attribute object
     # temporary fix here is to replace it with the value
     # fixed in 0.16.1
