@@ -1,40 +1,38 @@
 class ApiAipsController < BaseApiController
-  before_action :find_aip, only: [:update, :show]
+  before_action :find_aip, only: [:update]
   # avoid 'Can't verify CSRF token authenticity'
   # TODO look at whether using devise might be better?
   protect_from_forgery with: :null_session,
-                       if: Proc.new { |c| c.request.format =~ %r{application/json} }
+                       if: proc { |c| c.request.format =~ %r{application/json} }
   include Dlibhydra
   include CreateAip
 
   # https://www.airpair.com/ruby-on-rails/posts/building-a-restful-api-in-a-rails-application
 
-  before_filter only: :update do |c|
+  before_filter only: [:update] do |c|
     meth = c.method(:validate_json)
-    meth.call (@json.has_key?('aip'))
+    meth.call @json.key?('package')
   end
 
   def update
+    puts 'CALLED'
+    puts @json
     # update status
-    unless @json['aip']['aip_uuid'].nil?
-      set_aip_uuid(@json['aip']['aip_uuid'])
-    end
+    aip_uuid(@json['package']['aip_uuid']) unless @json['package']['aip_uuid'].nil?
     # update uuid
-    unless @json['aip']['status'].nil?
-      set_aip_status(@json['aip']['status'])
-    end
+    aip_status(@json['package']['status']) unless @json['package']['status'].nil?
     # update current path
-    unless @json['aip']['current_path'].nil?
-      set_aip_current_path(@json['aip']['current_path'])
+    unless @json['package']['current_path'].nil?
+      aip_current_path(@json['package']['current_path'])
     end
-    unless @json['aip']['resource_uri'].nil?
-      set_aip_resource_uri(@json['aip']['resource_uri'])
+    unless @json['package']['resource_uri'].nil?
+      aip_resource_uri(@json['package']['resource_uri'])
     end
-    unless @json['aip']['current_location'].nil?
-      set_aip_current_location(@json['aip']['current_location'])
+    unless @json['package']['current_location'].nil?
+      aip_current_location(@json['package']['current_location'])
     end
-    unless @json['aip']['origin_pipeline'].nil?
-      set_aip_origin_pipeline(@json['aip']['origin_pipeline'])
+    unless @json['package']['origin_pipeline'].nil?
+      aip_origin_pipeline(@json['package']['origin_pipeline'])
     end
     if @aip.save
       render json:  @aip.to_json, status: :ok
@@ -44,10 +42,10 @@ class ApiAipsController < BaseApiController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def find_aip
-      @aip = Dlibhydra::Package.find(params[:id])
-      render nothing: true, status: :not_found unless @aip.present? #&& @aip.user == @user
-    end
 
+  # Use callbacks to share common setup or constraints between actions.
+  def find_aip
+    @aip = Dlibhydra::Package.find(params[:id])
+    render nothing: true, status: :not_found unless @aip.present? # && @aip.user == @user
+  end
 end

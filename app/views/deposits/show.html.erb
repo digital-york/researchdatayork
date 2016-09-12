@@ -19,9 +19,8 @@
 
     <% if @dataset.aips.size > 0 %>
         <p>
-          <strong><%= @dataset.aips.size %></strong> data
-          <% if @dataset.aips.size > 1 %>
-              deposits have
+          <strong><%= @dataset.aips.size %></strong>
+          data deposit<% if @dataset.aips.size > 1 %>s have
           <% else %>
               deposit has
           <% end %>

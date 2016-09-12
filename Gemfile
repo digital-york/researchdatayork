@@ -1,13 +1,13 @@
 source 'https://rubygems.org'
 
-gem 'dlibhydra', :git => 'git://github.com/digital-york/dlibhydra.git', branch: 'datasetsv2'
+gem 'dlibhydra', git: 'git://github.com/digital-york/dlibhydra.git'
 gem 'puree'
 gem 'active_fedora-noid'
 gem 'browse-everything'
-#gem 'hydra', '9.1.0'
-gem 'hydra', :git => 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
+# gem 'hydra', '9.1.0'
+gem 'hydra', git: 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
 gem 'hydra-works', '0.7.0'
-gem 'dotenv-rails', :groups => [:development, :test, :production]
+gem 'dotenv-rails', groups: [:development, :test, :production]
 gem 'faraday'
 gem 'qa'
 # include http_headers gem for parsing http headers
@@ -62,12 +62,11 @@ group :development do
   gem 'web-console', '~> 2.0'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
+  # gem 'spring'
 end
 
-
 group :development, :test do
-  #gem 'solr_wrapper', '>= 0.3'
+  # gem 'solr_wrapper', '>= 0.3'
   gem 'solr_wrapper', '>= 0.13.2'
 end
 
@@ -78,8 +77,8 @@ gem 'devise-guests', '~> 0.3'
 group :development, :test do
   gem 'fcrepo_wrapper'
   gem 'rspec-rails'
-  gem 'awesome_print', :require => 'ap' 
+  gem 'awesome_print', require: 'ap'
 end
 
-# hack - include a specific version of "stomp" (required by hydra gem) because the default (latest) version has buggy circular dependencies
+# HACK: - include a specific version of "stomp" (required by hydra gem) because the default (latest) version has buggy circular dependencies
 gem 'stomp', '1.4.1'

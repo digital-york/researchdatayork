@@ -1,7 +1,6 @@
 class RdMailer < ApplicationMailer
-
   # send an email to the people who requested the data for a particular dataset
-  def notify_requester(dataset_id) 
+  def notify_requester(dataset_id)
     # get the dataset
     @dataset = Dlibhydra::Dataset.find(dataset_id)
     # set up a recipient list
@@ -9,7 +8,7 @@ class RdMailer < ApplicationMailer
     # for each DIP in the dataset
     @dataset.dips.each do |dip|
       # add the recipients for this dip to the recipient list
-      to = to + dip.requestor_email
+      to += dip.requestor_email
     end
     # remove any duplicates from the recipient list
     to.uniq!
@@ -24,8 +23,8 @@ class RdMailer < ApplicationMailer
     # get the email address(es)
     @requester_email = requester_email
     # get the RDM team email address
-    to = ENV["RDM_EMAIL"]
+    to = ENV['RDM_EMAIL']
     # send email
-    mail(to: to, subject: "Data requested for dataset " + @dataset.id) unless to.empty?
+    mail(to: to, subject: 'Data requested for dataset ' + @dataset.id) unless to.empty?
   end
 end

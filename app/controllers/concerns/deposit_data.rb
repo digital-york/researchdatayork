@@ -23,7 +23,7 @@ module DepositData
       FileUtils.mkdir(@dir_aip)
     end
   end
-  
+
   # given a string of text, write it to a readme.txt file in the submission documentation folder
   def deposit_submission_documentation(text)
     # the text should be written to @dir_aip/metadata/submissionDocumentation/readme.txt
@@ -33,17 +33,17 @@ module DepositData
     FileUtils.mkdir_p(target_dir)
     File.open(target_file, "w") do |output|
       output.write text
-    end 
+    end
   end
 
-  # given an array of files on the user's client machine, upload them, unzip them if they're zipped, 
-  # and store them in the transfer folder 
+  # given an array of files on the user's client machine, upload them, unzip them if they're zipped,
+  # and store them in the transfer folder
   def deposit_files_from_client(files)
     # handle each of the uploaded files
     files.each do |f|
       # get the uploaded filename (including its path in the case of directory upload)
       h = HttpHeaders.new(f.headers)
-      uploaded_filename = h.content_disposition.match(/filename=(\"?)(.+)\1/)[2] 
+      uploaded_filename = h.content_disposition.match(/filename=(\"?)(.+)\1/)[2]
       # if it's a .zip file, extract its contents to @dir_aip
       if File.extname(uploaded_filename) == '.zip' then
         Zip::File.open(f.tempfile) do |zip_file|
@@ -54,7 +54,7 @@ module DepositData
             end
           end
         end
-      # otherwise, not a zip file, just bung this file in the @dir_aip folder
+        # otherwise, not a zip file, just bung this file in the @dir_aip folder
       else
         # work out where this uploaded file should go (in order to preserve the structure of the upload)
         target_file = File.join(@dir_aip, "objects", uploaded_filename)
@@ -85,7 +85,7 @@ module DepositData
       FileUtils.mkdir_p(target_dir)
       File.open(target_file, "wb") do |output|
         output.write f.string
-      end 
+      end
     end
   end
 

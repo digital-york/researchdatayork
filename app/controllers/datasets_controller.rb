@@ -8,7 +8,6 @@ class DatasetsController < ApplicationController
   # GET /datasets
   # GET /datasets.json
   def index
-
   end
 
   # GET /datasets/1
@@ -25,10 +24,9 @@ class DatasetsController < ApplicationController
     if params[:request]
       # handle case where user has just provided an email address
       if params[:request][:email].include? '@'
-        @notice = "Thank you. We will send you an email when the data is available."
+        @notice = 'Thank you. We will send you an email when the data is available.'
         create_dip(@dataset)
         set_requestor_email(params[:request][:email])
-        save_dip
         # send an email to RDM team to tell them that data has been requested
         RdMailer.notify_rdm_team_about_request(params[:id], params[:request][:email]).deliver_now
       # handle case where user hasn't provided an email address
@@ -42,7 +40,7 @@ class DatasetsController < ApplicationController
     respond_to do |format|
       format.html { render :show, notice: @notice }
       format.json { render :show, status: :created, location: @deposit }
-      format.zip { send_data zip_file_stream.read, filename: "dataset.zip" } 
+      format.zip { send_data zip_file_stream.read, filename: 'dataset.zip' }
     end
   end
 
@@ -57,14 +55,15 @@ class DatasetsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_dataset
-      @request = Request.new
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def dataset_params
-      params.fetch(:dataset, {})
-      params.permit(:request, :email)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_dataset
+    @request = Request.new
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def dataset_params
+    params.fetch(:dataset, {})
+    params.permit(:request, :email)
+  end
 end

@@ -19,141 +19,139 @@ require 'rails_helper'
 # that an instance is receiving a specific message.
 
 RSpec.describe depositsController, type: :controller do
-
   # This should return the minimal set of attributes required to create a valid
   # deposit. As you add validations to deposit, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
-  }
+  let(:valid_attributes) do
+    skip('Add a hash of attributes valid for your model')
+  end
 
-  let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
-  }
+  let(:invalid_attributes) do
+    skip('Add a hash of attributes invalid for your model')
+  end
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # depositsController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
-  describe "GET #index" do
-    it "assigns all deposits as @deposits" do
+  describe 'GET #index' do
+    it 'assigns all deposits as @deposits' do
       deposit = deposit.create! valid_attributes
       get :index, {}, valid_session
       expect(assigns(:deposits)).to eq([deposit])
     end
   end
 
-  describe "GET #show" do
-    it "assigns the requested deposit as @deposit" do
+  describe 'GET #show' do
+    it 'assigns the requested deposit as @deposit' do
       deposit = deposit.create! valid_attributes
-      get :show, {:id => deposit.to_param}, valid_session
+      get :show, { id: deposit.to_param }, valid_session
       expect(assigns(:deposit)).to eq(deposit)
     end
   end
 
-  describe "GET #new" do
-    it "assigns a new deposit as @deposit" do
+  describe 'GET #new' do
+    it 'assigns a new deposit as @deposit' do
       get :new, {}, valid_session
       expect(assigns(:deposit)).to be_a_new(deposit)
     end
   end
 
-  describe "GET #edit" do
-    it "assigns the requested deposit as @deposit" do
+  describe 'GET #edit' do
+    it 'assigns the requested deposit as @deposit' do
       deposit = deposit.create! valid_attributes
-      get :edit, {:id => deposit.to_param}, valid_session
+      get :edit, { id: deposit.to_param }, valid_session
       expect(assigns(:deposit)).to eq(deposit)
     end
   end
 
-  describe "POST #create" do
-    context "with valid params" do
-      it "creates a new deposit" do
-        expect {
-          post :create, {:deposit => valid_attributes}, valid_session
-        }.to change(deposit, :count).by(1)
+  describe 'POST #create' do
+    context 'with valid params' do
+      it 'creates a new deposit' do
+        expect do
+          post :create, { deposit: valid_attributes }, valid_session
+        end.to change(deposit, :count).by(1)
       end
 
-      it "assigns a newly created deposit as @deposit" do
-        post :create, {:deposit => valid_attributes}, valid_session
+      it 'assigns a newly created deposit as @deposit' do
+        post :create, { deposit: valid_attributes }, valid_session
         expect(assigns(:deposit)).to be_a(deposit)
         expect(assigns(:deposit)).to be_persisted
       end
 
-      it "redirects to the created deposit" do
-        post :create, {:deposit => valid_attributes}, valid_session
+      it 'redirects to the created deposit' do
+        post :create, { deposit: valid_attributes }, valid_session
         expect(response).to redirect_to(deposit.last)
       end
     end
 
-    context "with invalid params" do
-      it "assigns a newly created but unsaved deposit as @deposit" do
-        post :create, {:deposit => invalid_attributes}, valid_session
+    context 'with invalid params' do
+      it 'assigns a newly created but unsaved deposit as @deposit' do
+        post :create, { deposit: invalid_attributes }, valid_session
         expect(assigns(:deposit)).to be_a_new(deposit)
       end
 
       it "re-renders the 'new' template" do
-        post :create, {:deposit => invalid_attributes}, valid_session
-        expect(response).to render_template("new")
+        post :create, { deposit: invalid_attributes }, valid_session
+        expect(response).to render_template('new')
       end
     end
   end
 
-  describe "PUT #update" do
-    context "with valid params" do
-      let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
-      }
-
-      it "updates the requested deposit" do
-        deposit = deposit.create! valid_attributes
-        put :update, {:id => deposit.to_param, :deposit => new_attributes}, valid_session
-        deposit.reload
-        skip("Add assertions for updated state")
+  describe 'PUT #update' do
+    context 'with valid params' do
+      let(:new_attributes) do
+        skip('Add a hash of attributes valid for your model')
       end
 
-      it "assigns the requested deposit as @deposit" do
+      it 'updates the requested deposit' do
         deposit = deposit.create! valid_attributes
-        put :update, {:id => deposit.to_param, :deposit => valid_attributes}, valid_session
+        put :update, { id: deposit.to_param, deposit: new_attributes }, valid_session
+        deposit.reload
+        skip('Add assertions for updated state')
+      end
+
+      it 'assigns the requested deposit as @deposit' do
+        deposit = deposit.create! valid_attributes
+        put :update, { id: deposit.to_param, deposit: valid_attributes }, valid_session
         expect(assigns(:deposit)).to eq(deposit)
       end
 
-      it "redirects to the deposit" do
+      it 'redirects to the deposit' do
         deposit = deposit.create! valid_attributes
-        put :update, {:id => deposit.to_param, :deposit => valid_attributes}, valid_session
+        put :update, { id: deposit.to_param, deposit: valid_attributes }, valid_session
         expect(response).to redirect_to(deposit)
       end
     end
 
-    context "with invalid params" do
-      it "assigns the deposit as @deposit" do
+    context 'with invalid params' do
+      it 'assigns the deposit as @deposit' do
         deposit = deposit.create! valid_attributes
-        put :update, {:id => deposit.to_param, :deposit => invalid_attributes}, valid_session
+        put :update, { id: deposit.to_param, deposit: invalid_attributes }, valid_session
         expect(assigns(:deposit)).to eq(deposit)
       end
 
       it "re-renders the 'edit' template" do
         deposit = deposit.create! valid_attributes
-        put :update, {:id => deposit.to_param, :deposit => invalid_attributes}, valid_session
-        expect(response).to render_template("edit")
+        put :update, { id: deposit.to_param, deposit: invalid_attributes }, valid_session
+        expect(response).to render_template('edit')
       end
     end
   end
 
-  describe "DELETE #destroy" do
-    it "destroys the requested deposit" do
+  describe 'DELETE #destroy' do
+    it 'destroys the requested deposit' do
       deposit = deposit.create! valid_attributes
-      expect {
-        delete :destroy, {:id => deposit.to_param}, valid_session
-      }.to change(deposit, :count).by(-1)
+      expect do
+        delete :destroy, { id: deposit.to_param }, valid_session
+      end.to change(deposit, :count).by(-1)
     end
 
-    it "redirects to the deposits list" do
+    it 'redirects to the deposits list' do
       deposit = deposit.create! valid_attributes
-      delete :destroy, {:id => deposit.to_param}, valid_session
+      delete :destroy, { id: deposit.to_param }, valid_session
       expect(response).to redirect_to(deposits_url)
     end
   end
-
 end
