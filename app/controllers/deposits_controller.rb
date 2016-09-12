@@ -23,7 +23,41 @@ class DepositsController < ApplicationController
     # This is an empty ActiveRecord object. It is never saved.
     @deposit = Deposit.new
 
+<<<<<<< HEAD
     # Setup base query parameters.
+=======
+    # if user asked for new/updated datasets, fetch or update them
+    if params[:refresh] == 'true'
+      # Get number of results to return
+      num_datasets = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
+      solr_response = nil
+      # Get all dataset records from Solr
+      unless num_datasets == 0
+        solr_response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"','pure_uuid_tesim',num_datasets)
+      end
+      if params[:refresh_num]
+
+        c = get_uuids(params[:refresh_num])
+        get_datasets_from_collection(c, solr_response)
+
+      elsif params[:refresh_from]
+
+        c = get_uuids_created_from_tonow(params[:refresh_from])
+        uuids = get_datasets_from_collection(c, solr_response)
+
+        # uuids is a list of new datasets created after the solr query
+        # these are used to ensure we don't create duplicates
+        c = get_uuids_modified_from_tonow(params[:refresh_from])
+        get_datasets_from_collection(c, solr_response, uuids)
+
+      else
+        c = get_uuids
+        get_datasets_from_collection(c, solr_response)
+      end
+    end
+
+    # setup base query parameters
+>>>>>>> 3511ab699a0b29082cf9ab9676db4b81ef7cfee4
     q = 'has_model_ssim:"Dlibhydra::Dataset"'
     ids = []
     fq = []
@@ -192,6 +226,7 @@ class DepositsController < ApplicationController
       end
     end
 
+<<<<<<< HEAD
     if params[:refresh] == 'true'
       if params[:refresh_num]
 
@@ -213,6 +248,8 @@ class DepositsController < ApplicationController
         get_datasets_from_collection(c, response)
       end
     end
+=======
+>>>>>>> 3511ab699a0b29082cf9ab9676db4b81ef7cfee4
 
     @deposits = if response.nil?
                   []
