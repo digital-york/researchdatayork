@@ -201,7 +201,7 @@ class DepositsController < ApplicationController
     if params[:deposit]
       # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]
       if params[:deposit][:file] || params[:selected_files]
-        @aip = new_aip
+        @aip = create_aip
         set_user_deposit(@dataset, params[:deposit][:readme])
         new_deposit(@dataset.id, @aip.id)
         add_metadata(@dataset.for_indexing)

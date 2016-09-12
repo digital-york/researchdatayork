@@ -89,6 +89,7 @@ module CreateDataset
     @d.doi << a
   end
 
+  # REVIEW: arrays don't behave in Hydra objects, check this works
   def set_link(a)
     a.each do |link|
       @d.pure_link << link['url']

@@ -35,6 +35,15 @@ Rails.application.routes.draw do
           # delete '/' => 'api_aips#destroy'
         end
       end
+      scope '/dip' do
+        scope '/:id' do
+          put '/' => 'api_dips#update'
+        end
+        scope '/:waiting' do
+          # post because we need to pass api-key
+          post '/' => 'api_dips#waiting'
+        end
+      end
     end
   end
 

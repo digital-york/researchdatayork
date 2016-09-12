@@ -22,10 +22,10 @@ class BaseApiController < ApplicationController
   private
 
   def verify_key!
-    if !@json['aip']['api-key']
+    if !@json['package']['api-key']
       render nothing: true, status: :unauthorized
     else
-      unless @json['aip']['api-key'] == ENV['ARCHIVEMATICA_API_KEY']
+      unless @json['package']['api-key'] == ENV['ARCHIVEMATICA_API_KEY']
         render nothing: true, status: :unauthorized
       end
     end
