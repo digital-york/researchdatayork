@@ -21,7 +21,6 @@ module CreateAip
     aip_status('Not Yet Processed')
     aip_uuid('tbc')
     aip_member_of(dataset)
-    @aip.save
   end
 
   def aip_member_of(dataset)
@@ -63,6 +62,14 @@ module CreateAip
 
   def aip_origin_pipeline(pipeline)
     @aip.aip_origin_pipeline = pipeline
+  end
+
+  def save_aip
+    @aip.save
+  end
+
+  def delete_aip
+    @aip.destroy_eradicate
   end
 
 end

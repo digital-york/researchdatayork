@@ -234,9 +234,10 @@ class DepositsController < ApplicationController
       # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]
       if params[:deposit][:file] || params[:selected_files]
         @aip = create_aip
-        set_user_deposit(@dataset, params[:deposit][:readme])
+        user_deposit(@dataset, params[:deposit][:readme])
         new_deposit(@dataset.id, @aip.id)
         add_metadata(@dataset.for_indexing)
+
         begin
           # handle readme (submission documentation)
           if params[:deposit][:readme] and !params[:deposit][:readme].empty?
@@ -252,7 +253,10 @@ class DepositsController < ApplicationController
           end
         # if there was problem uploading files, delete the new AIP and delete any files that did get uploaded
         rescue => e
+          # delete the aip from the aips list
           @dataset.aips.delete(@dataset.aips.last)
+          # then delete the aip object
+          delete_aip
           delete_deposited_files
           @notice = 'Failed to deposit selected files: ' + e.message
         else
