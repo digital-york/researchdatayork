@@ -51,19 +51,24 @@ module ReingestAip
         return ""
       end 
 
-      # make sure that the response was 200 OK
-      if response.status == "200"
+      # make sure that the response was 200 series
+      if response.status and response.status.to_s.match(/^2\d\d$/)
         # now that reingest request has been made successfully, set dip status to approved
         dip.dip_status = 'APPROVE'
         dip.save
       else
-        Rails.logger.error "Error in concerns/reingest_aip.rb#reingest_aip - response from Archivematica API was " + response.status + " (expecting 200). Response: " + response.body
-        flash[:error] = "Unexpected response from Archivematica. Make sure the Archivematica credentials are valid and that the dataset exists in Archivematica"
+        Rails.logger.error "Error in concerns/reingest_aip.rb#reingest_aip - response from Archivematica API was " + response.status.to_s + " (expecting 2xx). Response: " + response.body
+        begin
+          json_response = JSON.parse(response.body)
+          flash[:error] = json_response['message']
+        rescue => e
+          Rails.logger.error e
+          flash[:error] = "Unexpected response from Archivematica. Make sure the Archivematica credentials are valid and that the dataset exists in Archivematica"
+        end
         return ""
       end
       # TODO abstract faraday for re-use
       JSON.parse(response.body)
-
     end
   end
 
