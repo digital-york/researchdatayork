@@ -188,7 +188,7 @@ class DepositsController < ApplicationController
       elsif params[:sort] == 'created'
         solr_sort = 'pure_creation_ssi'
       elsif params[:sort] == 'available'
-        solr_sort = 'date_available_ssi' 
+        solr_sort = 'date_available_ssi'
       end
       # if a valid sort direction was given, include that in the sort clause
       if params[:sort_order] and ["asc","desc"].include?(params[:sort_order]) then
@@ -228,7 +228,12 @@ class DepositsController < ApplicationController
       @deposits = response
     end
     respond_to do |format|
-      format.html { render :index }
+      if params[:refresh]
+        format.html { redirect_to deposits_path }
+      else
+        format.html { render :index }
+
+      end
       # format.json { render :index, status: :created, location: @dataset }
     end
   end
@@ -240,9 +245,9 @@ class DepositsController < ApplicationController
     @notice = ''
 
     if params[:deposit]
-      # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]  
+      # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]
       if params[:deposit][:file] or params[:selected_files]
-        @aip = new_aip
+        @aip = create_aip
         set_user_deposit(@dataset, params[:deposit][:readme])
         new_deposit(@dataset.id, @aip.id)
         add_metadata(@dataset.for_indexing)
@@ -259,9 +264,12 @@ class DepositsController < ApplicationController
           if params[:selected_files] and params[:selected_paths] and params[:selected_mimetypes]
             deposit_files_from_cloud(params[:selected_files], params[:selected_paths], params[:selected_mimetypes])
           end
-        # if there was problem uploading files, delete the new AIP and delete any files that did get uploaded
+            # if there was problem uploading files, delete the new AIP and delete any files that did get uploaded
         rescue => e
+          # delete from aips membership
           @dataset.aips.delete(@dataset.aips.last)
+          # delete aip
+          delete_aip
           delete_deposited_files
           @notice = 'Failed to deposit selected files: ' + e.message
         else
