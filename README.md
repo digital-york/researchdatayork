@@ -23,6 +23,10 @@ and for requesting dissemination copies on demand.
 * A form for requesting access to a dataset that is not yet available.
 * A download interface for downloading individual files or the whole dataset.
 
+### Health Warning
+
+This is a prototype and is in no way production ready.
+
 ## Pre-requisites
 
 Using this application requires:
@@ -30,6 +34,9 @@ Using this application requires:
 * A running instance of the Fedora 4 repository (tested with version 4.5)
 * A running instance of Apache Solr (tested with version 6.1.0)
 * A running instance of Archivmatica with this fork of Automation Tools: ( https://github.com/digital-york/automation-tools ) installed
+* Google API Client ID and Secret (for the Google Drive upload)
+* Shared transfer filestore with read/write access for researchdatayork and read access for Archivematica
+* Shared dipstore filestore with read/write access for Archivematica and read access for researchdatayork
 
 ## Try it out
 
