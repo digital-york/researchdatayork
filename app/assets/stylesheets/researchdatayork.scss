@@ -1,0 +1,81 @@
+.navbar-header {
+  color: teal;
+  font-weight: bold;
+  font-size: 1.5em;
+  line-height: 100px;
+
+}
+
+#header-navbar {
+  .navbar-brand {  /* The main logo image for the Blacklight instance */
+    width: 200px;
+    height: 92px;
+  }
+}
+
+.check_box_true {
+  position:relative;
+  padding-right: 15px
+}
+.check_box_true:before {
+  content: "\f0c7"; /* fa-floppy-o */
+  font-family: FontAwesome;
+  position:absolute;
+  top:0;
+  padding-right: -10px;
+  color: green
+}
+
+.check_box_false {
+  font-weight: normal;
+  font-style: normal;
+}
+
+.search_box {
+  .q_div {
+    label {
+      font-weight: bold;
+      width: 10%;
+    }
+  }
+  #q {
+    width: 80%;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
+  }
+  label {
+    font-weight: normal;
+  }
+  table {
+    width: 80%;
+    margin-left: 10%
+  }
+  td {
+    padding: 5px 5px 5px 5px;
+  }
+  .actions {
+    margin-left: 10%;
+    input {
+      border-radius: 5px;
+      background-color: teal;
+      color: white;
+      font-weight: bold;
+      padding: 5px 5px 5px 5px;
+    }
+  }
+
+}
+
+/* set colour for all links in the application, overriding selectors defined by blacklight */
+a, a:hover, a:visited, .navbar-inverse .navbar-nav > li > a, .navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:visited {
+  color: teal;
+  text-decoration: underline;
+}
+
+/* some special css for the notes column of the main datasets table */
+a.delete {
+  display: none
+}
+p.note:hover a.delete {
+  display: inline
+}

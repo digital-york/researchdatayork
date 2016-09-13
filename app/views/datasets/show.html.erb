@@ -1,34 +1,63 @@
 <p id="notice"><%= @notice %></p>
 
-<%= render 'dataset_metadata' %>
 
 
-<% if @dataset.aips.size == 0 %>
-    <p>The researcher has not yet deposited the data.</p>
+<% if (@dataset.access_rights != 'Open' or
+    @dataset.wf_status.include? 'held-pub-data') and current_user.nil?
+%>
+    <% unless @dataset.wf_status.include? 'held-pub-meta' or @dataset.access_rights != 'Closed' %>
+        <%= render 'dataset_metadata' %>
+    <% end %>
+
+    <%= render 'contact' %>
+
 <% else %>
-    <% if @dataset.dips.size == 0 %>
 
-        <p>We need to prepare this data for download. Please provide your email address below and we will contact
+    <% unless current_user.nil? %>
+        <%= render 'contact' %>
+    <% end %>
+
+    <%= render 'dataset_metadata' %>
+
+    <% if @dataset.aips.size == 0 %>
+        <p>The researcher has not yet deposited the data. Please provide your email address below and we will contact
           you as soon as the download is ready.</p>
         <p>
           <%= render 'form_email' %>
         </p>
     <% else %>
-        <% if @dataset.dips.first.dip_status != 'UPLOADED' %>
-            <p>We are preparing this data for download. Please provide your email address to be alerted once the
-              data becomes available.</p>
+        <% if @dataset.dips.size == 0 %>
+
+            <p>We need to prepare this data for download. Please provide your email address below and we will contact
+              you as soon as the download is ready.</p>
             <p>
               <%= render 'form_email' %>
             </p>
-
         <% else %>
-            <h3>Download the Data</h3>
-            <% @dataset.dips.first.works.each do |m|
-              m.members.each do |f| %>
-                    <%= link_to m.preflabel, f.files.first.uri.to_s %> <br/>
-                <% end
-                   end
-                %>
+            <% if @dataset.dips.first.dip_status != 'UPLOADED' %>
+                <p>We are preparing this data for download. Please provide your email address to be alerted once the
+                  data becomes available.</p>
+                <p>
+                  <%= render 'form_email' %>
+                </p>
+
+            <% else %>
+                <% if @dataset.aips and @dataset.aips.first and @dataset.aips.first.readme and !@dataset.readme.to_s.empty? %>
+                    <h3>View Submission Documentation</h3>
+                    <p><%= link_to "readme.txt", documentation_url(@dataset.id) %></p>
+                <% end %>
+                <h3>Download the Data</h3>
+                <% if @dip_files.length > 0 %>
+                    <h4>As a zip file</h4>
+                    <p><%= link_to "Download zip", format: :zip %></p>
+                    <h4>As individual files</h4>
+                    <% @dip_files.each do |key, file| %>
+                        <%= link_to file[:file_path], file[:file_uri] %> <br/>
+                    <% end %>
+                <% else %>
+                    <p>There are currently no downloadable files</p>
+                <% end %>
+            <% end %>
         <% end %>
     <% end %>
 <% end %>

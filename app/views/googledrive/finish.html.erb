@@ -1,0 +1,10 @@
+<% # To finish the process of connecting to the Google API, call a javascript function in the parent window that will close this window %>
+<% if connected_to_google_api? %>
+  <script>
+    opener.authentication_complete();
+  </script>
+<% else %>
+  <p>There was a problem connecting to your Google Drive. Make sure that you allow the application to access your Google Drive if you
+      want to include Google Drive files in your deposit</p>
+  <button onclick="javascript:window.close()">OK</button>
+<% end %>

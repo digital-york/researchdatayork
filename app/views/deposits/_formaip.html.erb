@@ -14,15 +14,33 @@
     <div class="field">
       <%= f.label 'README' %><br>
       <p>Please provide any information that would help others use the data, for example deployment instructions or required software.</p>
-      <%= f.text_area :readme %>
+      <%= f.text_area :readme, cols: 100, rows: 6 %>
     </div>
 
     <div class="field">
-      <%= f.label "Select a file to deposit" %>&nbsp;
-      <%= f.file_field :file %>
+      <%= f.label "Select local files to deposit" %>&nbsp;
+      <%= f.file_field :file, id: "real_file_btn", style: "display: none", multiple: true %><br>
+      <button type="button" class="btn btn-large btn-success" id="file_upload_btn">Choose Files</button>
+      <span id="file_upload_status">No file chosen</span>
     </div>
 
-    <div class="actions">
-      <%= f.submit 'Deposit' %>
+    <div class="field">
+      <%= f.label "Select a local directory to deposit" %>&nbsp;
+      <%= f.file_field :file, id: "real_dir_btn", style: "display: none", multiple: true, directory: true, webkitdirectory: true, mozdirectory: true %><br>
+      <button type="button" class="btn btn-large btn-success" id="dir_upload_btn">Choose Directory</button>
+      <span id="dir_upload_status">No directory chosen</span>
     </div>
+
+    <div class="field">
+      <%= f.label "Select Google Drive files to deposit" %>&nbsp;<br>
+      <button type="button" class="btn btn-large btn-success" id="google-drive-btn">Choose Files</button>
+      <span id="google_drive_status2">No file chosen</span>
+    </div>
+
+    <%= render "formgoogledrive" %>
+
+    <div class="actions">
+      <%= f.submit 'Deposit', data: { disable_with: 'Please wait...' }%>
+    </div>
+
 <% end %>

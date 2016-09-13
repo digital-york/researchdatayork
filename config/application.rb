@@ -2,11 +2,12 @@ require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 
+# TODO: REMOVE THIS IN PRODUCTION APP!
+# require 'openssl'
+# OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
-#TODO REMOVE THIS IN PRODUCTION APP!
-require 'openssl'
-OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 Bundler.require(*Rails.groups)
 
 # Load as otherwise ENV['GOOGLE KEYS'] were being rendered as text rather than getting the variable
@@ -14,9 +15,8 @@ Dotenv::Railtie.load
 
 module Researchdatayork
   class Application < Rails::Application
-    
     config.generators do |g|
-      g.test_framework :rspec, :spec => true
+      g.test_framework :rspec, spec: true
     end
 
     # Settings in config/environments/* take precedence over those specified here.
@@ -33,6 +33,5 @@ module Researchdatayork
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
-
   end
 end
