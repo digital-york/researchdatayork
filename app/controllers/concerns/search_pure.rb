@@ -23,6 +23,11 @@ module SearchPure
                       modified_start: m_from, # optional
                       modified_end:   m_to # ,  # optional
     metadata
+  rescue => e
+    Rails.logger.error "Error in concerns/search_pure.rb#get_uuids - probably unable to connect to Pure... " + e.message
+    flash[:error] = "Unable to connect to Pure. Please try again later."
+    # return an empty hash so that processing can continue - flash error will be displayed to user
+    {}
   end
 
   def get_uuids_created_from_tonow(from_no)
@@ -54,5 +59,10 @@ module SearchPure
       d.find id: uuid
     end
     d.metadata
+  rescue => e
+    Rails.logger.error "Error in concerns/search_pure.rb#get_pure_dataset - probably unable to connect to Pure... " + e.message
+    flash[:error] = "Unable to connect to Pure. Please try again later."
+    # return an empty hash so that processing can continue - flash error will be displayed to user
+    {}
   end
 end
