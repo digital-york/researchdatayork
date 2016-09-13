@@ -31,9 +31,9 @@ This is a prototype and is in no way production ready.
 
 Using this application requires:
 * Access to the REST web services of an instance of the PURE research information system via basic auth
-* A running instance of the Fedora 4 repository (tested with version 4.5)
-* A running instance of Apache Solr (tested with version 6.1.0)
-* A running instance of Archivmatica with this fork of Automation Tools: ( https://github.com/digital-york/automation-tools ) installed
+* A running instance of the Fedora 4 repository (tested with version 4.5 and 4.6)
+* A running instance of Apache Solr (tested with version 6.*)
+* A running instance of Archivmatica and Archivematica Storage Service (1.5 / 0.9.1) with this fork of Automation Tools: ( https://github.com/digital-york/automation-tools ) installed
 * Google API Client ID and Secret (for the Google Drive upload)
 * Shared transfer filestore with read/write access for researchdatayork and read access for Archivematica
 * Shared dipstore filestore with read/write access for Archivematica and read access for researchdatayork
