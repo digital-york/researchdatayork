@@ -5,7 +5,7 @@ gem 'puree'
 gem 'active_fedora-noid'
 gem 'browse-everything'
 # gem 'hydra', '9.1.0'
-gem 'hydra', git: 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
+gem 'hydra', git: 'https://github.com/projecthydra/hydra.git' #, tag: 'v9.1.0.rc3'
 gem 'hydra-works', '0.7.0'
 gem 'dotenv-rails', groups: [:development, :test, :production]
 gem 'faraday'
@@ -70,7 +70,7 @@ group :development, :test do
   gem 'solr_wrapper', '>= 0.13.2'
 end
 
-gem 'rsolr', '~> 1.0.6'
+gem 'rsolr' #, '~> 1.0.6'
 gem 'globalid'
 gem 'devise'
 gem 'devise-guests', '~> 0.3'
