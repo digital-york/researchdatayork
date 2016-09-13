@@ -23,3 +23,4 @@ SECRET_KEY_BASE= # for devise
 HOST= # application base url, eg. locahost:3000
 EMAIL_FROM= # eg. do-not-reply@york.ac.uk
 RDM_EMAIL= # email for the RDM team
+ERROR_EMAIL_TO= # email address to send error messages to

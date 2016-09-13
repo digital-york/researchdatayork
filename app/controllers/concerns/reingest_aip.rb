@@ -2,6 +2,7 @@
 module ReingestAip
   extend ActiveSupport::Concern
 
+  include Exceptions
   included do
     # ???
     attr_reader :aip
@@ -16,16 +17,10 @@ module ReingestAip
     unless aip.aip_uuid.nil?
 
       url = ENV['ARCHIVEMATICA_SS_URL']
-      begin
-        conn = Faraday.new(:url => url) do |faraday|
-          faraday.request  :url_encoded             # form-encode POST params
-          faraday.response :logger                  # log requests to STDOUT
-          faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
-        end
-      rescue => e
-        Rails.logger.error "Error in concerns/reingest_aip.rb#reingest_aip (unable to connect to Archivematica). Error message: " + e.message
-        flash[:error] = "Unable to connect to Archivematica. Please try again later."
-        return ""
+      conn = Faraday.new(:url => url) do |faraday|
+        faraday.request  :url_encoded             # form-encode POST params
+        faraday.response :logger                  # log requests to STDOUT
+        faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
 
       path = '/api/v2/file/' + aip.aip_uuid + '/reingest/'
@@ -46,8 +41,7 @@ module ReingestAip
           req.body = body
         end
       rescue => e
-        Rails.logger.error "Error in concerns/reingest_aip.rb#reingest_aip (problem calling Archivematica API). Error message: " + e.message
-        flash[:error] = "Unable to connect to Archivematica. Please try again later."
+        handle_exception(e, "Unable to connect to Archivematica. Please try again later.", "Dataset id: " + id, true)
         return ""
       end 
 
@@ -57,19 +51,28 @@ module ReingestAip
         dip.dip_status = 'APPROVE'
         dip.save
       else
-        Rails.logger.error "Error in concerns/reingest_aip.rb#reingest_aip - response from Archivematica API was " + response.status.to_s + " (expecting 2xx). Response: " + response.body
         begin
-          json_response = JSON.parse(response.body)
-          flash[:error] = json_response['message']
+          raise
         rescue => e
-          Rails.logger.error e
-          flash[:error] = "Unexpected response from Archivematica. Make sure the Archivematica credentials are valid and that the dataset exists in Archivematica"
+          begin
+            json_response = JSON.parse(response.body)
+            handle_exception(e, "Unable to reingest AIP: " + json_response['message'], "Response from Archivematica: " + json_response['message'])
+          rescue => e2
+            if response.body and !response.body.empty?
+              handle_exception(e2, "Unable to reingest AIP: " + response.body, "Dataset id: " + id + "\nError from Archivematica: " + response.body, true)
+            else 
+              handle_exception(e2, "Unexpected response from Archivematica. Make sure the Archivematica credentials are valid and that the dataset exists in Archivematica", "Dataset id: " + id, true)
+            end
+          end
+          return ""
         end
-        return ""
       end
       # TODO abstract faraday for re-use
       JSON.parse(response.body)
     end
+  rescue => e
+    handle_exception(e, "Unable to connect to Archivematica. Please try again later.", "Dataset id: " + id, true)
+    return ""
   end
 
   def find_aip(id)

@@ -14,6 +14,7 @@ class DepositsController < ApplicationController
   include DepositData
   include ReingestAip
   include CreateDip
+  include Exceptions
   include Googledrive
   helper_method :connected_to_google_api? # defined in Googledrive module so view can know whether or not to call google api
 
