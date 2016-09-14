@@ -3,6 +3,7 @@ module CreateDataset
   extend ActiveSupport::Concern
   include Puree
   include SearchSolr
+  include Exceptions
 
   included do
     # ???
@@ -15,6 +16,10 @@ module CreateDataset
 
   def find_dataset(id)
     Dlibhydra::Dataset.find(id)
+  rescue => e
+    handle_exception(e, "Unable to find dataset " + id + ". Make sure Solr is running.", "Possibly unable to connect to Solr, or given dataset doesn't exist. Given dataset: " + id)
+    # this is a showstopper - raise an exception and let the app-wide error handler deal with it
+    raise
   end
 
   def set_metadata(d, puree_dataset)

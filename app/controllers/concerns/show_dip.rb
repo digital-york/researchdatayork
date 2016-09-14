@@ -55,6 +55,9 @@ module ShowDip
       dip_structure.sort_by {|file_id, file_details| file_details[:file_path].downcase}.to_h
     end
     dip_structure
+  rescue => e
+    handle_exception(e, "Unable to present DIP files for download, failed to parse METS.xml", "Given dataset: " + dataset.id, true)
+    return {}
   end
 
   # given a dataset, generate an in-memory zip file of the dataset's dip files (with the correct directory structure)

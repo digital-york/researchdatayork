@@ -1,0 +1,5 @@
+<h2>Error</h2>
+<% if flash[:error] %>
+  <p><%= flash[:error] %>
+<% end %>
+<p><%= link_to 'Go back', url_for(:back) %></p>

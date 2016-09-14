@@ -18,7 +18,12 @@ module CreateDip
   end
 
   def update_dip(id, uuid)
-    dataset = Dlibhydra::Dataset.find(id)
+    begin
+      dataset = Dlibhydra::Dataset.find(id)
+    rescue => e
+      handle_exception(e, "Unable to find dataset. Make sure Solr is running", "Dataset id: " + id)
+      raise
+    end
     @dip = dataset.aips[0]
     dip_info = get_dip_details(uuid)
     # if dip_info is empty, there was probably an error getting the dip details so just return
