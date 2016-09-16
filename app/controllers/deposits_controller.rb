@@ -53,6 +53,10 @@ class DepositsController < ApplicationController
         c = get_uuids
         get_datasets_from_collection(c, solr_response)
       end
+      # now delete 'refresh' from params so that it doesn't get called again on subsequent page actions
+      params.delete(:refresh)
+      params.delete(:refresh_num)
+      params.delete(:refresh_from)
     end
 
     # setup base query parameters
