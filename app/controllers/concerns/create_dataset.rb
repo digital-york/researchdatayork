@@ -17,7 +17,11 @@ module CreateDataset
   def find_dataset(id)
     Dlibhydra::Dataset.find(id)
   rescue => e
-    handle_exception(e, "Unable to find dataset " + id + ". Make sure Solr is running.", "Possibly unable to connect to Solr, or given dataset doesn't exist. Given dataset: " + id)
+    if solr_is_running
+      handle_exception(e, "Unable to find dataset " + id, "Given dataset doesn't exist. Given dataset: " + id)
+    else
+      handle_exception(e, "Unable to connect to Solr. Please try again later.", "Unable to connect to Solr", true)
+    end
     # this is a showstopper - raise an exception and let the app-wide error handler deal with it
     raise
   end

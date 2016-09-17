@@ -51,6 +51,15 @@ module SearchSolr
     raise
   end
 
+  # are we able to talk to solr?
+  def solr_is_running
+    # run a basic query to find out
+    response = solr_connect.get 'select', :params => { :q => "has_model_ssim:Dlibhydra::Dataset", :rows => 1 }
+    true
+  rescue => e
+    false
+  end
+
   private
 
   def solr_connect
