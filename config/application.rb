@@ -35,7 +35,7 @@ module Researchdatayork
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
 
-    # handle 404 and 500 error dynamically
-    config.exceptions_app = self.routes
+    # handle 404 and 500 errors dynamically
+    config.exceptions_app = ->(env) { ErrorsController.action(:show).call(env) }
   end
 end
