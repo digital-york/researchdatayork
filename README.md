@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/digital-york/researchdatayork.png?label=ready&title=Ready)](https://waffle.io/digital-york/researchdatayork)
 # Research Data York
 
 [![Code Climate](https://codeclimate.com/github/digital-york/researchdatayork/badges/gpa.svg)](https://codeclimate.com/github/digital-york/researchdatayork)
