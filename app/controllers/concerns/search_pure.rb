@@ -2,6 +2,7 @@
 module SearchPure
   extend ActiveSupport::Concern
   include Puree
+  include Exceptions
 
   def get_uuids(limit = 1, c_from = nil, c_to = nil, m_from = nil, m_to = nil)
     Puree.configure do |c|
@@ -24,9 +25,8 @@ module SearchPure
                       modified_end:   m_to # ,  # optional
     metadata
   rescue => e
-    Rails.logger.error "Error in concerns/search_pure.rb#get_uuids - probably unable to connect to Pure... " + e.message
-    flash[:error] = "Unable to connect to Pure. Please try again later."
-    # return an empty hash so that processing can continue - flash error will be displayed to user
+    handle_exception(e, "Unable to connect to Pure. Please try again later.", "Probably Puree is unable to connect to Pure...", true) 
+    # return an empty hash so that processing can continue
     {}
   end
 
@@ -60,9 +60,8 @@ module SearchPure
     end
     d.metadata
   rescue => e
-    Rails.logger.error "Error in concerns/search_pure.rb#get_pure_dataset - probably unable to connect to Pure... " + e.message
-    flash[:error] = "Unable to connect to Pure. Please try again later."
-    # return an empty hash so that processing can continue - flash error will be displayed to user
+    handle_exception(e, "Unable to connect to Pure. Please try again later.", "Probably Puree is unable to connect to Pure...", true) 
+    # return an empty hash so that processing can continue
     {}
   end
 end

@@ -25,6 +25,15 @@ class RdMailer < ApplicationMailer
     # get the RDM team email address
     to = ENV['RDM_EMAIL']
     # send email
-    mail(to: to, subject: 'Data requested for dataset ' + @dataset.id) unless to.empty?
+    mail(to: to, subject: "Data requested for dataset " + @dataset.id) unless to.nil? or to.empty?
+  end
+
+  # send an email about an error/exception that occurred
+  def notify_admin_about_error(error_message)
+    @error_message = error_message
+    # get the admin email address
+    to = ENV["ERROR_EMAIL_TO"]
+    # send email
+    mail(to: to, subject: "Error in RDM application") unless to.nil? or to.empty?
   end
 end

@@ -1,0 +1,18 @@
+<h2>Error</h2>
+<% if @status.to_s == "404" %>
+  <p>404: The requested page does not exist</p>
+<% elsif !flash[:error].empty? %>
+  <p><%= flash[:error] %>
+<% else %>
+  <p>An unexpected error occurred. Please try again later. Contact the system administrator if the problem persists.</p>
+<% end %>
+<p><%= link_to 'Go back', url_for(:back) %></p>
+<div id="errors">
+  <input type="checkbox" id="show_errors">
+  <label for="show_errors" id="error_label">Details</label>
+  <div id="error_details">
+    <p>Status: <%= @status %></p>
+    <p>Error type: <%= details[:name] %></p>
+    <p>Error message: <%= details[:message] %></p>
+  </div>
+</div>

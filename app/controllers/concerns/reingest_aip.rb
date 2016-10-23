@@ -2,6 +2,7 @@
 module ReingestAip
   extend ActiveSupport::Concern
 
+  include Exceptions
   included do
     # ???
     attr_reader :aip
@@ -11,8 +12,6 @@ module ReingestAip
     dataset = Dlibhydra::Dataset.find(id)
     aip = dataset.aips[0]
     dip = dataset.aips[0]
-    dip.dip_status = 'APPROVE'
-    dip.save
 
     unless aip.aip_uuid.nil?
 
@@ -33,18 +32,46 @@ module ReingestAip
         'api_key' => ENV['ARCHIVEMATICA_SS_API_KEY']
       }
 
-      response = conn.post do |req|
-        req.url path
-        req.headers['Content-Type'] = 'application/json'
-        req.params = params
-        req.body = body
-      end
+      begin
+        response = conn.post do |req|
+          req.url path
+          req.headers['Content-Type'] = 'application/json'
+          req.params = params
+          req.body = body
+        end
+      rescue => e
+        handle_exception(e, "Unable to connect to Archivematica. Please try again later.", "Dataset id: " + id, true)
+        return ""
+      end 
 
-      # TODO: some error handling!
+      # make sure that the response was 200 series
+      if response.status and response.status.to_s.match(/^2\d\d$/)
+        # now that reingest request has been made successfully, set dip status to approved
+        dip.dip_status = 'APPROVE'
+        dip.save
+      else
+        begin
+          raise
+        rescue => e
+          begin
+            json_response = JSON.parse(response.body)
+            handle_exception(e, "Unable to reingest AIP: " + json_response['message'], "Response from Archivematica: " + json_response['message'])
+          rescue => e2
+            if response.body and !response.body.empty?
+              handle_exception(e2, "Unable to reingest AIP: " + response.body, "Dataset id: " + id + "\nError from Archivematica: " + response.body, true)
+            else 
+              handle_exception(e2, "Unexpected response from Archivematica. Make sure the Archivematica credentials are valid and that the dataset exists in Archivematica", "Dataset id: " + id, true)
+            end
+          end
+          return ""
+        end
+      end
       # TODO abstract faraday for re-use
       JSON.parse(response.body)
-
     end
+  rescue => e
+    handle_exception(e, "Unable to connect to Archivematica. Please try again later.", "Dataset id: " + id, true)
+    return ""
   end
 
   def find_aip(id)

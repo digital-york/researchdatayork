@@ -14,6 +14,7 @@ class DepositsController < ApplicationController
   include DepositData
   include ReingestAip
   include CreateDip
+  include Exceptions
   include Googledrive
   helper_method :connected_to_google_api? # defined in Googledrive module so view can know whether or not to call google api
 
@@ -52,6 +53,10 @@ class DepositsController < ApplicationController
         c = get_uuids
         get_datasets_from_collection(c, solr_response)
       end
+      # now delete 'refresh' from params so that it doesn't get called again on subsequent page actions
+      params.delete(:refresh)
+      params.delete(:refresh_num)
+      params.delete(:refresh_from)
     end
 
     # setup base query parameters
@@ -421,10 +426,17 @@ class DepositsController < ApplicationController
 
   def dipuuid
     message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
-    # data (DIP) is now available so send an email to anyone who requested the data
-    RdMailer.notify_requester(params[:deposit][:id]).deliver_now
+    # if that was successful, email users, if it wasn't successful, do nothing
+    if !message.empty?
+      # data (DIP) is now available so send an email to anyone who requested the data
+      RdMailer.notify_requester(params[:deposit][:id]).deliver_now
+    end
     respond_to do |format|
-      format.html { redirect_to deposits_url, notice: message }
+      if !message.empty?
+        format.html { redirect_to deposits_url, notice: message }
+      else 
+        format.html { redirect_to deposits_url }
+      end
       format.json { head :no_content }
     end
   end

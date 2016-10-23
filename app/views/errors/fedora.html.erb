@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Fedora Error</title>
+<style media="screen" type="text/css">
+body {
+  font-family: arial
+}
+h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+div#main_div {
+  margin-top: 100px;
+  margin-left: 400px; 
+  margin-right: 400px;
+}
+</style>
+<div id="main_div">
+  <h1>Error</h1>
+  <p>It looks like there is a problem connecting to Fedora. Please check that Fedora is running and try again.</p>
+  <div id="error_details">
+    <p>Status: <%= @status %></p>
+    <p>Error type: <%= details[:name] %></p>
+    <p>Error message: <%= details[:message] %></p>
+  </div>
+</div>
