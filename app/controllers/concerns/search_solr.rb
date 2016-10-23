@@ -14,6 +14,10 @@ module SearchSolr
     }
     puts response
     response['response']['numFound']
+  rescue => e
+    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running", "Error connecting to Solr. Given params 'q' => '" + q.to_s + "', 'fq' => '" + fq.to_s + "'", true)
+    # showstopper - can't continue after this
+    raise
   end
 
   def solr_query_short(q = '*:*', fl = 'id', rows = 0)
@@ -24,6 +28,10 @@ module SearchSolr
       sort: 'id asc'
     }
     response['response']
+  rescue => e
+    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running", "Error connecting to Solr. Given params 'q' => '" + q.to_s + "', 'fl' => '" + fl.to_s + "', 'rows' => '" + rows.to_s + "'", true)
+    # showstopper - can't continue after this
+    raise
   end
 
   # execute a solr query with the option of paginating results (using 'start' and 'rows')
@@ -37,11 +45,26 @@ module SearchSolr
         :start => start
     }
     response['response']
+  rescue => e
+    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running", "Error connecting to Solr. Given params 'q' => '" + q.to_s + "', 'fq' => '" + fq.to_s + "', 'fl' => '" + fl.to_s + "', 'rows' => '" + rows.to_s + "', 'sort' => '" + sort.to_s + "', 'start' => '" + start.to_s + "'", true)
+    # showstopper - can't continue after this
+    raise
+  end
+
+  # are we able to talk to solr?
+  def solr_is_running
+    # run a basic query to find out
+    response = solr_connect.get 'select', :params => { :q => "has_model_ssim:Dlibhydra::Dataset", :rows => 1 }
+    true
+  rescue => e
+    false
   end
 
   private
 
   def solr_connect
-    RSolr.connect url: ENV['SOLR_DEV']
+    RSolr.connect :url => ENV['SOLR_DEV']
+  rescue => e
+    handle_exception(e, "Unable to connect to Solr. Make sure Solr is running", "", true)
   end
 end

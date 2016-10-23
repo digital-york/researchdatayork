@@ -3,6 +3,11 @@ module CreateDip
   extend ActiveSupport::Concern
 
   include SearchSolr
+  include Exceptions
+  included do
+    # ???
+    attr_reader :dip
+  end
 
   def create_dip(dataset)
     @dip = dataset.aips.first
@@ -16,20 +21,36 @@ module CreateDip
 
   # REVIEW: change/remove this when status.py is doing the updating
   def update_dip(id, uuid)
-    dataset = Dlibhydra::Dataset.find(id)
+    begin
+      dataset = Dlibhydra::Dataset.find(id)
+    rescue => e
+      handle_exception(e, "Unable to find dataset. Make sure Solr is running", "Dataset id: " + id)
+      raise
+    end
     @dip = dataset.aips[0]
     dip_info = get_dip_details(uuid)
-    ingest_dip(dip_info['current_path'])
-    dip_current_path(dip_info['current_path'])
-    dip_uuid(dip_info['uuid'])
-    dip_status(dip_info['status'])
-    dip_size(dip_info['size'])
-    dip_current_location(dip_info['current_location']) # api location
-    dip_resource_uri(dip_info['resource_uri']) # api uri
-    dip_size(dip_info['size'])
-    dip_origin_pipeline(dip_info['origin_pipeline'])
-    save_dip
-    'AIP updated with dissemination objects'
+    # if dip_info is empty, there was probably an error getting the dip details so just return
+    if dip_info.empty?
+      return ""
+    else
+      begin
+        ingest_dip(dip_info['current_path'])
+      rescue => e
+        # ingest dip failed so just return
+        return ""
+      end
+      ingest_dip(dip_info['current_path'])
+      dip_current_path(dip_info['current_path'])
+      dip_uuid(dip_info['uuid'])
+      dip_status(dip_info['status'])
+      dip_size(dip_info['size'])
+      dip_current_location(dip_info['current_location']) # api location
+      dip_resource_uri(dip_info['resource_uri']) # api uri
+      dip_size(dip_info['size'])
+      dip_origin_pipeline(dip_info['origin_pipeline'])
+      save_dip
+      'AIP updated with dissemination objects'
+    end
   end
 
   def dip_uuid(uuid)
@@ -131,10 +152,20 @@ module CreateDip
         save_dip
       end
     end
+  rescue => e
+    handle_exception(e, "Unable to ingest DIP for given UUID. Make sure you entered the correct UUID and try again", "Given DIP location: " + dip_location)
+    raise
   end
 
   # REVIEW: may not be needed after status.py update
   def get_dip_details(uuid)
+
+    # first of all, make sure we've been given a valid uuid
+    if !uuid.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)
+      flash[:error] = "You didn't enter a valid UUID"
+      return {}
+    end
+
     url = ENV['ARCHIVEMATICA_SS_URL']
     conn = Faraday.new(url: url) do |faraday|
       faraday.request :url_encoded # form-encode POST params
@@ -147,12 +178,40 @@ module CreateDip
       'api_key' => ENV['ARCHIVEMATICA_SS_API_KEY']
     }
 
-    response = conn.get do |req|
-      req.url '/api/v2/file/' + uuid + '/'
-      req.headers['Accept'] = 'application/json'
-      req.params = params
+    begin
+      response = conn.get do |req|
+        req.url '/api/v2/file/' + uuid + '/'
+        req.headers['Accept'] = 'application/json'
+        req.params = params
+      end
+    rescue => e
+      handle_exception(e, "Unable to get DIP information: " + e.message, "Error while trying to get dip details for uuid '" + uuid + "'", true) 
+      return {}
+    end
+    # handle case where response wasn't 200 OK
+    if response.status and !response.status.to_s.match(/^2\d\d$/)
+      begin
+        raise
+      rescue => e
+        begin
+          if response.status.to_s == "404"
+            handle_exception(e, "Given UUID is not recognised by Archivematica. Make sure you entered it correctly and try again", "404 response from Archivematica for uuid: " + uuid)
+          else
+            json_response = JSON.parse(response.body)
+            handle_exception(e, json_response.message)
+          end
+        rescue => e2
+          if response.body and !response.body.empty?
+            handle_exception(e2, "Unable to get DIP details: " + response.body, "UUID input: " + uuid + "\nError from Archivematica: " + response.body, true)
+          else
+            handle_exception(e2, "Unexpected response from Archivematica. Please try again later", "UUID input: " + uuid, true)
+          end
+        end
+        return {}
+      end
     end
     JSON.parse(response.body)
+
   end
 
   # Return a has of aip_uuids where dip creation has been approved
@@ -167,6 +226,9 @@ module CreateDip
       end
      end
     dips
+  rescue => e
+    handle_exception(e, "Unexpected error while trying to get DIP information. Please try again later", "UUID input: " + uuid, true)
+    return {}
   end
 
 

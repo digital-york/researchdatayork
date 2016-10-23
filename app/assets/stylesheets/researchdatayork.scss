@@ -79,3 +79,30 @@ a.delete {
 p.note:hover a.delete {
   display: inline
 }
+
+/* styles for presenting error message to user */
+div#errors label#error_label {
+  font-size: 0.8em;
+  cursor: pointer;
+}
+div#errors label#error_label:before {
+  content: "Show ";
+}
+div#errors input[type=checkbox] {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+/* default */
+div#errors div#error_details {
+  display: none;
+}
+/* Toggled State */
+div#errors input[type=checkbox]:checked ~ div#error_details {
+  display: block;
+  border: 1px solid gray;
+  padding: 10px;
+}
+div#errors input[type=checkbox]:checked ~ label#error_label:before {
+  content: "Hide ";
+}
