@@ -12,17 +12,22 @@ module SearchPure
       c.basic_auth = true
     end
     c = Puree::Collection.new resource: :dataset
-
+    puts 'here I am'
     puts c_from
     puts c_to
     puts m_from
     puts m_to
-    metadata = c.find limit: limit,
-                      offset: 0,
-                      created_start:  c_from, # optional
-                      created_end:    c_to, # optional
-                      modified_start: m_from, # optional
-                      modified_end:   m_to # ,  # optional
+    if c_from.nil?
+      metadata = c.find limit: limit,
+                        offset: 0
+    else
+      metadata = c.find limit: limit,
+                        offset: 0,
+                        created_start:  c_from, # optional
+                        created_end:    c_to, # optional
+                        modified_start: m_from, # optional
+                        modified_end:   m_to # ,  # optional
+    end
     metadata
   rescue => e
     handle_exception(e, "Unable to connect to Pure. Please try again later.", "Probably Puree is unable to connect to Pure...", true) 

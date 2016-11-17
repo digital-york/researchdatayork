@@ -5,17 +5,17 @@ module CreateDataset
   include SearchSolr
   include Exceptions
 
+
   included do
-    # ???
     attr_reader :dataset
   end
 
   def new_dataset
-    Dlibhydra::Dataset.new
+    Dataset.new
   end
 
   def find_dataset(id)
-    Dlibhydra::Dataset.find(id)
+    Dataset.find(id)
   rescue => e
     if solr_is_running
       handle_exception(e, "Unable to find dataset " + id, "Given dataset doesn't exist. Given dataset: " + id)
@@ -52,9 +52,9 @@ module CreateDataset
 
   def set_access(access)
     @d.access_rights = if access == ''
-                         'not set'
+                         ['not set']
                        else
-                         access
+                         [access]
                        end
   end
 
@@ -67,7 +67,7 @@ module CreateDataset
   end
 
   def set_publisher(a)
-    @d.publisher = a
+    @d.publisher << a
   end
 
   def set_doi(a)
@@ -110,7 +110,7 @@ module CreateDataset
     o.name = a['name']
     o.preflabel = a['name']
     o.save
-    @d.managing_organisation << o
+    @d.managing_organisation_resource << o
   end
 
   def create_pure_person(p, type)
@@ -126,6 +126,6 @@ module CreateDataset
     person.pure_uuid = p['uuid'].to_s
     person.preflabel = p['name']['first'] + ' ' + p['name']['last']
     person.save
-    @d.creator << person
+    @d.creator_resource << person
   end
 end

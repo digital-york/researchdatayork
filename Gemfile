@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'dlibhydra', git: 'git://github.com/digital-york/dlibhydra.git', branch: 'dlibhydra_latest'
+gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git', branch: 'master'
 gem 'puree'
 gem 'active_fedora-noid'
 gem 'browse-everything'
