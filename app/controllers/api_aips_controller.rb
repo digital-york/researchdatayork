@@ -15,8 +15,6 @@ class ApiAipsController < BaseApiController
   end
 
   def update
-    puts 'CALLED'
-    puts @json
     # update status
     aip_uuid(@json['package']['aip_uuid']) unless @json['package']['aip_uuid'].nil?
     # update uuid

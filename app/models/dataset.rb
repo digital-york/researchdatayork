@@ -1,2 +1,2 @@
-class Dataset < ActiveRecord::Base
+class Dataset < Dlibhydra::Dataset
 end

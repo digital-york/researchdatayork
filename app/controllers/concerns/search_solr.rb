@@ -3,7 +3,7 @@ module SearchSolr
   extend ActiveSupport::Concern
 
   included do
-    # attr_reader :month, :contests
+
   end
 
   def get_number_of_results(q = '*:*', fq = '')
@@ -15,7 +15,10 @@ module SearchSolr
     puts response
     response['response']['numFound']
   rescue => e
-    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running", "Error connecting to Solr. Given params 'q' => '" + q.to_s + "', 'fq' => '" + fq.to_s + "'", true)
+    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running",
+                     "Error connecting to Solr. Given params 'q' => '" +
+                         q.to_s + "', 'fq' => '" +
+                         fq.to_s + "'", true)
     # showstopper - can't continue after this
     raise
   end
@@ -29,7 +32,11 @@ module SearchSolr
     }
     response['response']
   rescue => e
-    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running", "Error connecting to Solr. Given params 'q' => '" + q.to_s + "', 'fl' => '" + fl.to_s + "', 'rows' => '" + rows.to_s + "'", true)
+    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running",
+                     "Error connecting to Solr. Given params 'q' => '" +
+                         q.to_s + "', 'fl' => '" +
+                         fl.to_s + "', 'rows' => '" +
+                         rows.to_s + "'", true)
     # showstopper - can't continue after this
     raise
   end
@@ -46,7 +53,14 @@ module SearchSolr
     }
     response['response']
   rescue => e
-    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running", "Error connecting to Solr. Given params 'q' => '" + q.to_s + "', 'fq' => '" + fq.to_s + "', 'fl' => '" + fl.to_s + "', 'rows' => '" + rows.to_s + "', 'sort' => '" + sort.to_s + "', 'start' => '" + start.to_s + "'", true)
+    handle_exception(e, "Unable to execute Solr query. Make sure Solr is running",
+                     "Error connecting to Solr. Given params 'q' => '" +
+                         q.to_s + "', 'fq' => '" +
+                         fq.to_s + "', 'fl' => '" +
+                         fl.to_s + "', 'rows' => '" +
+                         rows.to_s + "', 'sort' => '" +
+                         sort.to_s + "', 'start' => '" +
+                         start.to_s + "'", true)
     # showstopper - can't continue after this
     raise
   end

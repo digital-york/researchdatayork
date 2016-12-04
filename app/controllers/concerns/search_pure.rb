@@ -12,11 +12,6 @@ module SearchPure
       c.basic_auth = true
     end
     c = Puree::Collection.new resource: :dataset
-    puts 'here I am'
-    puts c_from
-    puts c_to
-    puts m_from
-    puts m_to
     if c_from.nil?
       metadata = c.find limit: limit,
                         offset: 0
@@ -30,7 +25,8 @@ module SearchPure
     end
     metadata
   rescue => e
-    handle_exception(e, "Unable to connect to Pure. Please try again later.", "Probably Puree is unable to connect to Pure...", true) 
+    handle_exception(e, "Unable to connect to Pure. Please try again later.",
+                     "Probably Puree is unable to connect to Pure...", true)
     # return an empty hash so that processing can continue
     {}
   end
@@ -65,7 +61,8 @@ module SearchPure
     end
     d.metadata
   rescue => e
-    handle_exception(e, "Unable to connect to Pure. Please try again later.", "Probably Puree is unable to connect to Pure...", true) 
+    handle_exception(e, "Unable to connect to Pure. Please try again later.",
+                     "Probably Puree is unable to connect to Pure...", true)
     # return an empty hash so that processing can continue
     {}
   end

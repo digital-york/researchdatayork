@@ -1,9 +1,9 @@
 # app/controllers/concerns/search_pure.rb
 module CreateDip
   extend ActiveSupport::Concern
-
   include SearchSolr
   include Exceptions
+
   included do
     # ???
     attr_reader :dip
@@ -22,34 +22,33 @@ module CreateDip
   # REVIEW: change/remove this when status.py is doing the updating
   def update_dip(id, uuid)
     begin
-      dataset = Dlibhydra::Dataset.find(id)
+      @dataset = Dlibhydra::Dataset.find(id)
     rescue => e
       handle_exception(e, "Unable to find dataset. Make sure Solr is running", "Dataset id: " + id)
       raise
     end
-    @dip = dataset.aips[0]
+    @dip = @dataset.aips[0]
     dip_info = get_dip_details(uuid)
     # if dip_info is empty, there was probably an error getting the dip details so just return
     if dip_info.empty?
-      return ""
+      return ''
     else
       begin
         ingest_dip(dip_info['current_path'])
+        dip_current_path(dip_info['current_path'])
+        dip_uuid(dip_info['uuid'])
+        dip_status(dip_info['status'])
+        dip_size(dip_info['size'])
+        dip_current_location(dip_info['current_location']) # api location
+        dip_resource_uri(dip_info['resource_uri']) # api uri
+        dip_size(dip_info['size'])
+        dip_origin_pipeline(dip_info['origin_pipeline'])
+        save_dip
+        'AIP updated with dissemination objects'
       rescue => e
         # ingest dip failed so just return
-        return ""
+        return ''
       end
-      ingest_dip(dip_info['current_path'])
-      dip_current_path(dip_info['current_path'])
-      dip_uuid(dip_info['uuid'])
-      dip_status(dip_info['status'])
-      dip_size(dip_info['size'])
-      dip_current_location(dip_info['current_location']) # api location
-      dip_resource_uri(dip_info['resource_uri']) # api uri
-      dip_size(dip_info['size'])
-      dip_origin_pipeline(dip_info['origin_pipeline'])
-      save_dip
-      'AIP updated with dissemination objects'
     end
   end
 
@@ -97,10 +96,17 @@ module CreateDip
   # - a file called "ProcessingMCP.xml"
   # Need to create a FileSet for METS.xxxx.xml, a FileSet for Processing.MCP.xml, and a FileSet for each actual file in the dip
   # (which will consist of a primary file (in "objects") and an additional file (in "thumbnails"))
-  def ingest_dip(dip_location)
-    # uncomment the next 2 lines, and add 2nd parameter "dataid" to the function spec in order to call this method standalone
-    # dataset = Dlibhydra::Dataset.find(dataid)
-    # @dip = dataset.aips[0]
+  # Actual files are added to the dataset object; METS and Processing.MCP are added to the dip object
+  def ingest_dip(dip_location, dipid=nil, dataid=nil)
+    # call this method  with the dip id (dipid) or the dataset id (dataid)
+    unless dataid.nil?
+      @dataset = Dlibhydra::Dataset.find(dataid)
+      @dip = @dataset.aips[0]
+    end
+    unless dipid.nil?
+      @dip = Dlibhydra::Package.find(dipid)
+      @dataset = @dip.packages[0]
+    end
     location = File.join(ENV['DIP_LOCATION'], dip_location)
     # for each file/folder in the dip location
     Dir.foreach(location) do |item|
@@ -111,7 +117,9 @@ module CreateDip
           # skip any directories inside the objects folder
           next if File.directory?(File.join(location, item, object))
           # create a new FileSet
-          obj_fs = Dlibhydra::FileSet.new
+          obj_fs = FileSet.new
+          obj_fs.permissions
+          obj_fs.apply_depositor
           # add this file to the FileSet
           obj_fs.preflabel = object
           path = File.join(location, item, object)
@@ -133,23 +141,21 @@ module CreateDip
             f3 = open(ocrfile_path)
             Hydra::Works::AddFileToFileSet.call(obj_fs, f3, :extracted_text, update_existing: false)
           end
-          # add this FileSet to the dip
-          obj_fs.save
-          @dip.members << obj_fs
-          save_dip
+          # add this FileSet to the dataset
+          @dataset.members << obj_fs
         end
         # otherwise, if it's a file (not a folder)
       elsif File.file?(File.join(location, item))
         # create a new FileSet
-        obj_fs = Dlibhydra::FileSet.new
+        obj_fs = FileSet.new
+        obj_fs.permissions
+        obj_fs.apply_depositor
         # add this file to the FileSet
         obj_fs.preflabel = item
         f = open(File.join(location, item))
         Hydra::Works::UploadFileToFileSet.call(obj_fs, f)
         # add this FileSet to the dip
-        obj_fs.save
         @dip.members << obj_fs
-        save_dip
       end
     end
   rescue => e
@@ -214,10 +220,11 @@ module CreateDip
 
   end
 
-  # Return a has of aip_uuids where dip creation has been approved
+  # Return a hash of aip_uuids where dip creation has been approved
   #  but the dip has yet to be uploaded
   def waiting_for_dips
     q = 'dip_status_tesim:APPROVED'
+    puts q
     dips = {}
     num_results = get_number_of_results(q)
     unless num_results == 0
