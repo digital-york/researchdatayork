@@ -1,7 +1,7 @@
 <%# include javascript and css libraries for jstree (in /vendor/assets) which will help user browse google drive files %>
 <% content_for :head do %>
-  <%= stylesheet_link_tag "jstree.min.css" %> 
-  <%= javascript_include_tag "jstree.min.js" %> 
+    <%= stylesheet_link_tag "jstree.min.css" %>
+    <%= javascript_include_tag "jstree.min.js" %>
 <% end %>
 
 <% if @dataset.nil? %>
@@ -20,21 +20,16 @@
     <% if @dataset.aips.size > 0 %>
         <p>
           <strong><%= @dataset.aips.size %></strong>
-          data deposit<% if @dataset.aips.size > 1 %>s have
+          data deposit
+          <% if @dataset.aips.size > 1 %>s have
           <% else %>
               deposit has
           <% end %>
           been added for this PURE dataset.
         </p>
-        <% if current_user %>
-            <p>
-              Forthcoming feature for admins: the ability to add a newer version of the dataset.
-            </p>
-        <% else %>
-            <p>
-              If you need to add, remove or update the data, please contact the RDM team.
-            </p>
-        <% end %>
+        <p>
+          If you need to add, remove or update the data, please contact the RDM team.
+        </p>
     <% else %>
         <h1>Data Deposit</h1>
         <%= render 'formaip' %>

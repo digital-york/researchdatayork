@@ -8,7 +8,7 @@ class RdMailer < ApplicationMailer
     # for each DIP in the dataset
     @dataset.dips.each do |dip|
       # add the recipients for this dip to the recipient list
-      to += dip.requestor_email
+      to += dip.requestor_email.to_a
     end
     # remove any duplicates from the recipient list
     to.uniq!

@@ -10,14 +10,15 @@ module ShowDip
     attr_reader :dip
   end
 
-  # given a dataset, find its METS.xml file, parse it and return an array containing the file names and paths of all files in the DIP
+  # given a dataset, find its METS.xml file, parse it and return an array containing the file names
+  #   and paths of all files in the DIP
   def dip_directory_structure(dataset)
     # set up the return variable
     dip_structure = {}
     # if the dataset has a dip with downloadable files
-    if dataset.dips && dataset.dips.first && dataset.dips.first.members
+    if dataset.members
       # get the dip from the dataset
-      dip = dataset.dips.first
+      dip = dataset.aips[0]
       # loop through the DIP files until we find the METS.xml one
       dip.members.each do |f|
         if f.preflabel =~ /^METS\.[-a-z0-9]{36}\.xml$/
@@ -34,7 +35,7 @@ module ShowDip
             # get the file id as a string (need to parse out the "file-" prefix)
             file_id = f.to_s[/^file-(.*)$/, 1]
             # get the file path/name (parse out everything in the path before the DIP package id)
-            file_path = dip_file_paths[filecounter].to_s.sub(/^.*?objects\/([a-z0-9]{9}\/)?/, "") 
+            file_path = dip_file_paths[filecounter].to_s.sub(/^.*?objects\/([a-z0-9]{9}\/)?/, "")
             # add these to the return array
             dip_structure[file_id] = { file_path: file_path }
             filecounter += 1
@@ -43,12 +44,15 @@ module ShowDip
         # no need to continue looping now that we've dealt with METS.xml
         break
       end
-      # now loop over the DIP files again using the file id to find the uri of the stored file and add that to the return structure
-      dip.members.each do |f|
-        # get the file id of this stored file
-        file_id = f.preflabel[/^([-a-z0-9]{36})/, 1]
-        if dip_structure.key?(file_id)
-          dip_structure[file_id][:file_uri] = f.files.first.uri.to_s
+      # now loop over the Dataset files using the file id to find the uri of the stored file and add that
+      #   to the return structure
+      dataset.members.each do |f|
+        if f.class == 'Fileset'
+          # get the file id of this stored file
+          file_id = f.preflabel[/^([-a-z0-9]{36})/, 1]
+          if dip_structure.key?(file_id)
+            dip_structure[file_id][:file_uri] = f.files.first.uri.to_s
+          end
         end
       end
       # sort the resulting dip structure by file path
@@ -56,7 +60,8 @@ module ShowDip
     end
     dip_structure
   rescue => e
-    handle_exception(e, "Unable to present DIP files for download, failed to parse METS.xml", "Given dataset: " + dataset.id, true)
+    handle_exception(e, "Unable to present DIP files for download, failed to parse METS.xml",
+                     "Given dataset: " + dataset.id, true)
     return {}
   end
 

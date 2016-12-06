@@ -9,13 +9,16 @@
       <% end %>
   <% end %>
   <strong>Creator:</strong>
-  <% @dataset.creator.each do |c| %>
+  <% @dataset.creator_resource.each do |c| %>
       <%= c.preflabel %><br/>
   <% end %>
   <strong>Managing Department:</strong>
-  <% @dataset.managing_organisation.each do |m| %>
+  <% @dataset.managing_organisation_resource.each do |m| %>
       <%= m.preflabel %><br/>
   <% end %>
   <strong>Date Available:</strong> <%= @dataset.date_available %><br/>
-  <strong>Publisher:</strong> <%= @dataset.publisher %><br/>
+  <strong>Publisher:</strong>
+  <% @dataset.publisher.each do |p| %>
+      <%= p %><br/>
+  <% end %>
 </p>

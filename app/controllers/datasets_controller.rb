@@ -48,7 +48,7 @@ class DatasetsController < ApplicationController
   # return the submission documentation (probably readme.txt) for the given dataset if it exists
   def documentation
     dataset = find_dataset(params[:id])
-    @readme = dataset.aips.first.readme rescue ""
+    @readme = dataset.readme rescue ""
     respond_to do |format|
       format.text
     end

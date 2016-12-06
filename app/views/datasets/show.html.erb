@@ -2,10 +2,10 @@
 
 
 
-<% if (@dataset.access_rights != 'Open' or
+<% if (@dataset.dc_access_rights[0] != 'Open' or
     @dataset.wf_status.include? 'held-pub-data') and current_user.nil?
 %>
-    <% unless @dataset.wf_status.include? 'held-pub-meta' or @dataset.access_rights != 'Closed' %>
+    <% unless @dataset.wf_status.include? 'held-pub-meta' or @dataset.dc_access_rights[0] != 'Closed' %>
         <%= render 'dataset_metadata' %>
     <% end %>
 
@@ -42,7 +42,7 @@
                 </p>
 
             <% else %>
-                <% if @dataset.aips and @dataset.aips.first and @dataset.aips.first.readme and !@dataset.readme.to_s.empty? %>
+                <% if !@dataset.readme.to_s.empty? %>
                     <h3>View Submission Documentation</h3>
                     <p><%= link_to "readme.txt", documentation_url(@dataset.id) %></p>
                 <% end %>

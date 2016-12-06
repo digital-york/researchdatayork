@@ -3,6 +3,9 @@ module CreateAip
   extend ActiveSupport::Concern
   include Puree
 
+  # TODO apply permissions for 'Restricted' datasets
+  # TODO - add permissions (same as dataset, except for Restricted)
+
   included do
     #
   end
@@ -16,15 +19,16 @@ module CreateAip
   end
 
   def user_deposit(dataset, readme)
-    aip_preflabel('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime('%Y-%m-%d %R')}")
-    readme(readme)
+    aip_title('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime('%Y-%m-%d %R')}")
+    dataset.readme = readme
     aip_status('Not Yet Processed')
     aip_uuid('tbc')
+    add_aip_permissions
     aip_member_of(dataset)
   end
 
   def aip_member_of(dataset)
-    dataset.aips << @aip
+    dataset.packaged_by << @aip
     dataset.save
   end
 
@@ -48,12 +52,8 @@ module CreateAip
     @aip.aip_resource_uri = value
   end
 
-  def aip_preflabel(title)
-    @aip.preflabel = title
-  end
-
-  def readme(readme)
-    @aip.readme = readme
+  def aip_title(title)
+    @aip.title = [title]
   end
 
   def aip_status(status)
@@ -70,6 +70,20 @@ module CreateAip
 
   def delete_aip
     @aip.destroy_eradicate
+  end
+
+  def add_aip_permissions
+    # generate permissions for a new object
+    if @aip.access_control.nil?
+      @aip.permissions # generate permissions
+      write_aip_permissions # add write permissions
+    end
+  end
+
+  # Add the default depositor
+  # This required the dlibhydra depositor generator to have been run
+  def write_aip_permissions
+    @aip.apply_depositor
   end
 
 end

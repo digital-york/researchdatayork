@@ -1,4 +1,4 @@
-<% if (@dataset.access_rights != 'Open' or
+<% if (@dataset.dc_access_rights != 'Open' or
     @dataset.wf_status.include? 'held-pub-data')
 %>
 
@@ -16,8 +16,8 @@
 
     <p>This dataset is currently
 
-      <% if @dataset.access_rights != 'Open' and @dataset.access_rights != 'not set' %>
-          <%= @dataset.access_rights %>.
+      <% if @dataset.dc_access_rights[0] != 'Open' and @dataset.dc_access_rights[0] != 'not set' %>
+          <%= @dataset.dc_access_rights[0] %>.
       <% else %>
           not available.
       <% end %>

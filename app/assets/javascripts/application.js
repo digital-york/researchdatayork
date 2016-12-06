@@ -13,9 +13,9 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
+// require jquery-ui/sortable
 //= require turbolinks//
 // Required by Blacklight
 //= require blacklight/blacklight
-
 //= require browse_everything
 //= require_tree .

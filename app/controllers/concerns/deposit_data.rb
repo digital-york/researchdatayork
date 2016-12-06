@@ -27,7 +27,8 @@ module DepositData
   # given a string of text, write it to a readme.txt file in the submission documentation folder
   def deposit_submission_documentation(text)
     # the text should be written to @dir_aip/metadata/submissionDocumentation/readme.txt
-    # according to https://www.archivematica.org/en/docs/archivematica-1.4/user-manual/transfer/transfer/#create-submission
+    #   according to
+    #   https://www.archivematica.org/en/docs/archivematica-1.4/user-manual/transfer/transfer/#create-submission
     target_dir = File.join(@dir_aip, "metadata", "submissionDocumentation")
     target_file = File.join(target_dir, "readme.txt")
     FileUtils.mkdir_p(target_dir)
@@ -75,9 +76,11 @@ module DepositData
     files.zip(paths, mime_types).each do |file, path, mime_type|
       # download the file from Google
       f = get_file_from_google(service, file, mime_type)
-      # if the file was a google document it will have been exported to a specific format and may require an extra file extension
+      # if the file was a google document it will have been exported to a specific format
+      #   and may require an extra file extension
       if google_docs_mimetypes.has_key?(mime_type)
-        path = path + google_docs_mimetypes[mime_type]["export_extension"] unless path.ends_with?(google_docs_mimetypes[mime_type]["export_extension"])
+        path = path + google_docs_mimetypes[mime_type]["export_extension"] unless
+            path.ends_with?(google_docs_mimetypes[mime_type]["export_extension"])
       end
       # work out where this file should be uploaded to
       target_file = File.join(@dir_aip, "objects", path)
@@ -89,7 +92,8 @@ module DepositData
     end
   end
 
-  # delete all files deposited in the AIP - this will be called to clean things up if there was a problem during file upload
+  # delete all files deposited in the AIP - this will be called to clean things up if there was a problem
+  #   during file upload
   def delete_deposited_files
     if @dir_aip
       FileUtils.rm_rf(@dir_aip)
