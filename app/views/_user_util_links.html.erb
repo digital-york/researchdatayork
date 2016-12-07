@@ -14,7 +14,7 @@
         <% else %>
             <% if controller_name == 'home' %>
               <li>
-                <%= link_to t('blacklight.header_links.login'), new_user_session_path %>
+                <%= link_to t('blacklight.header_links.login'), user_shibboleth_omniauth_authorize_path %>
               </li>
             <% end %>
         <% end %>
