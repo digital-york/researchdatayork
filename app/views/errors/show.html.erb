@@ -1,7 +1,7 @@
 <h2>Error</h2>
 <% if @status.to_s == "404" %>
   <p>404: The requested page does not exist</p>
-<% elsif !flash[:error].empty? %>
+<% elsif flash[:error] && !flash[:error].empty? %>
   <p><%= flash[:error] %>
 <% else %>
   <p>An unexpected error occurred. Please try again later. Contact the system administrator if the problem persists.</p>
