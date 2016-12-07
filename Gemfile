@@ -19,6 +19,8 @@ gem 'rubyzip'
 gem 'nokogiri'
 # include the Google Drive API for browsing user's Google Drive files
 gem 'google-api-client', require: 'google/apis/drive_v3'
+# include library to enabling shibboleth authentication
+gem 'omniauth-shibboleth'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
