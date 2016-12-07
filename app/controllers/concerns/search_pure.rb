@@ -16,7 +16,7 @@ module SearchPure
       metadata = c.find limit: limit,
                         offset: 0
     else
-      metadata = c.find limit: limit,
+      metadata = c.find limit: limit.to_i,
                         offset: 0,
                         created_start:  c_from, # optional
                         created_end:    c_to, # optional
