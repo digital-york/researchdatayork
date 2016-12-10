@@ -8,6 +8,8 @@ class OmniauthcallbacksController < Devise::OmniauthCallbacksController
     # if the shib data indicates that this person is a member of staff in information systems, make them an admin
     if request.env["omniauth.auth"].info[:affiliation].include?("Staff")
       @user.update_attribute :admin, true
+    else
+      @user.update_attribute :admin, false
     end
     sign_in_and_redirect @user
 
