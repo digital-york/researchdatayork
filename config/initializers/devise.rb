@@ -240,8 +240,14 @@ Devise.setup do |config|
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
   config.omniauth :shibboleth, {:uid_field => 'eppn',
-                                :info_fields => {:email => 'mail', :name => 'cn', :last_name => 'sn', :affiliation => 'unscoped-affiliation'},
+                                :info_fields => {:email => 'mail', 
+	                                         :name => 'cn', 
+						 :last_name => 'sn', 
+						 :affiliation => lambda {|request_param| request_param.call('unscoped-affiliation').split(';')},
+                                                },
                                }
+  # FAM note: the above 'lambda' turns a shib multi-valued attribute value into ruby array
+  # See https://github.com/toyokazu/omniauth-shibboleth
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
