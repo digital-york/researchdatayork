@@ -2,9 +2,13 @@ class DepositsController < ApplicationController
   helper DepositsHelper
   before_action :set_deposit, only: [:show, :edit, :update, :destroy]
 
-  # only show page is visible
   # TODO some kind of token based visibility
-  before_action :authenticate_user!, except: [:show]
+
+  # enforce some access control rules. All methods require the end user to be logged in
+  before_action :authenticate_user!
+  # and most method (all except 'show' - the deposit upload page) require the end user to be an administrator
+  before_action :verify_is_admin, except: [:show]
+
   include Dlibhydra
   include Puree
   include SearchPure
@@ -477,6 +481,13 @@ class DepositsController < ApplicationController
       end
     end
     new_uuids
+  end
+
+  # if the current user isn't logged in and isn't an administrator, tell them they need to an admin to do what they were trying to do
+  def verify_is_admin
+    unless current_user && current_user.admin?
+      render :html => "<h1>Unauthorised</h1><p>You are not authorised to view this page</p>".html_safe, :status => :unauthorized, :layout => 'blacklight'
+    end 
   end
 
 end
