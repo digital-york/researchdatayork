@@ -469,7 +469,7 @@ class DepositsController < ApplicationController
 
     c.each do |puree_d|
       unless puree_d['publisher'].exclude? ENV['PUBLISHER']
-        if response != nil and (new_uuids.include? puree_d['uuid'] or response.to_s.include? d['uuid'])
+        if response != nil and (new_uuids.include? puree_d['uuid'] or response.to_s.include? puree_d['uuid'])
           r = solr_query_short('pure_uuid_tesim:"' + puree_d['uuid'] + '"', 'id', 1)
           local_d = find_dataset(r['docs'][0]['id'])
         else
