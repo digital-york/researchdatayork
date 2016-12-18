@@ -16,7 +16,7 @@ module ShowDip
     # set up the return variable
     dip_structure = {}
     # if the dataset has a dip with downloadable files
-    if dataset.members
+    if dataset.dips && !dataset.dips.empty?
       # get the dip from the dataset
       dip = dataset.aips[0]
       # loop through the DIP files until we find the METS.xml one
