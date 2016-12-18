@@ -10,7 +10,11 @@ module CreateDip
   end
 
   def create_dip(dataset)
-    @dip = dataset.aips.first
+    if dataset.aips and !dataset.aips.empty?
+      @dip = dataset.aips.first
+    else
+      @dip = Dlibhydra::Package.new
+    end
     # add a temporary uuid so that we can call datasets.dips
     @dip.dip_uuid = 'tbc'
   end
