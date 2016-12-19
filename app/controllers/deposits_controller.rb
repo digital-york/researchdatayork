@@ -252,8 +252,6 @@ class DepositsController < ApplicationController
   # GET /deposits/1.json
   def show
 
-    @notice = ''
-
     if params[:deposit]
       # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]
       if params[:deposit][:file] or params[:selected_files]
@@ -281,19 +279,19 @@ class DepositsController < ApplicationController
           # delete aip
           delete_aip
           delete_deposited_files
-          @notice = 'Failed to deposit selected files: ' + e.message
+          flash[:error] = 'Failed to deposit selected files: ' + e.message
         else
           # TODO write metadata.json
           # TODO add submission info
-          @notice = 'The deposit was successful.'
+          flash[:notice] = 'The deposit was successful.'
           @dataset = nil
         end
       else
-        @notice = "You didn't deposit any data!"
+        flash[:error] = "You didn't deposit any data!"
       end
     end
     respond_to do |format|
-      format.html { render :show, notice: @notice }
+      format.html { render :show }
       format.json { render :show, status: :created, location: @deposit }
     end
   end
