@@ -244,6 +244,7 @@ Devise.setup do |config|
                                                  :name => 'cn', 
                                                  :last_name => 'sn', 
                                                  :affiliation => lambda {|request_param| request_param.call('unscoped-affiliation').split(';')},
+                                                 #:affiliation => 'affiliation',
                                                 },
                                }
   # FAM note: the above 'lambda' turns a shib multi-valued attribute value into ruby array
