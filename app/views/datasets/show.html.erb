@@ -1,63 +1,55 @@
-<p id="notice"><%= @notice %></p>
+<% # the logic for presenting a dataset goes like this
+   #   - present notice about any restrictions on the dataset
+   #   - if the dataset is 'Open' or 'Restricted' or user is an admin
+   #     - present dataset metadata
+   #   - if the dataset is 'Open' or the user is an admin
+   #     - if data exists and is ready to be presented
+   #       - present the dataset data
+   #     - else if data has been deposited
+   #       - present form for requesting data
+   #     - else
+   #       - state that data hasn't yet been deposited and provide a contact email address  
+   # %>
 
+<% # present notice about any restrictions on the dataset %>
+<%= render 'contact' %>
 
-
-<% if (@dataset.dc_access_rights[0] != 'Open' or
-    @dataset.wf_status.include? 'held-pub-data') and current_user.nil?
-%>
-    <% unless @dataset.wf_status.include? 'held-pub-meta' or @dataset.dc_access_rights[0] != 'Closed' %>
-        <%= render 'dataset_metadata' %>
-    <% end %>
-
-    <%= render 'contact' %>
-
-<% else %>
-
-    <% unless current_user.nil? %>
-        <%= render 'contact' %>
-    <% end %>
-
-    <%= render 'dataset_metadata' %>
-
-    <% if @dataset.aips.size == 0 %>
-        <p>The researcher has not yet deposited the data. Please provide your email address below and we will contact
-          you as soon as the download is ready.</p>
-        <p>
-          <%= render 'form_email' %>
-        </p>
-    <% else %>
-        <% if @dataset.dips.size == 0 %>
-
-            <p>We need to prepare this data for download. Please provide your email address below and we will contact
-              you as soon as the download is ready.</p>
-            <p>
-              <%= render 'form_email' %>
-            </p>
-        <% else %>
-            <% if @dataset.dips.first.dip_status != 'UPLOADED' %>
-                <p>We are preparing this data for download. Please provide your email address to be alerted once the
-                  data becomes available.</p>
-                <p>
-                  <%= render 'form_email' %>
-                </p>
-
-            <% else %>
-                <% if !@dataset.readme.to_s.empty? %>
-                    <h3>View Submission Documentation</h3>
-                    <p><%= link_to "readme.txt", documentation_url(@dataset.id) %></p>
-                <% end %>
-                <h3>Download the Data</h3>
-                <% if @dip_files.length > 0 %>
-                    <h4>As a zip file</h4>
-                    <p><%= link_to "Download zip", format: :zip %></p>
-                    <h4>As individual files</h4>
-                    <% @dip_files.each do |key, file| %>
-                        <%= link_to file[:file_path], file[:file_uri] %> <br/>
-                    <% end %>
-                <% else %>
-                    <p>There are currently no downloadable files</p>
-                <% end %>
-            <% end %>
-        <% end %>
-    <% end %>
+<% # render metadata if dataset is open/restricted, or if the user is an admin %>
+<% if ["Open", "Restricted"].include?(@dataset.dc_access_rights[0]) or (current_user and current_user.admin?) then %>
+  <%= render 'dataset_metadata' %>
 <% end %>
+
+<% # if the dataset is open, or the user is an admin %>
+<% if ["Open"].include?(@dataset.dc_access_rights[0]) or (current_user and current_user.admin?) then %>
+  <% # if this dataset has data that's ready to be presented %>
+  <% if @dataset.dips and @dataset.dips.first and @dataset.dips.first.dip_status and @dataset.dips.first.dip_status == 'UPLOADED' then %>
+    <% # present it %>
+    <% if !@dataset.readme.to_s.empty? %>
+      <h3>View Submission Documentation</h3>
+      <p><%= link_to "readme.txt", documentation_url(@dataset.id) %></p>
+    <% end %>
+    <h3>Download the Data</h3>
+    <% if @dip_files.length > 0 %>
+      <h4>As a zip file</h4>
+      <p><%= link_to "Download zip", format: :zip %></p>
+      <h4>As individual files</h4>
+      <% @dip_files.each do |key, file| %>
+        <%= link_to file[:file_path], file[:file_uri] %> <br/>
+      <% end %>
+    <% else %>
+      <p>There are currently no downloadable files</p>
+    <% end %>
+  <% # otherwise, if data has been deposited %>
+  <% elsif @dataset.aips and @dataset.aips.size != 0 %>
+    <% # present the user with a contact form so they can be contacted when the data is ready %>
+    <p>We need to prepare this data for download. Please provide your email address below and we will contact
+       you as soon as the download is ready.</p>
+    <p><%= render 'form_email' %></p>
+  <% # otherwise tell them that the data hasn't been deposited %>
+  <% else %>
+    <p>The researcher has not yet deposited the data. 
+       Please email <%= mail_to 'library-research-support@york.ac.uk','Library Research Support' %> for further
+       information.</p>
+  <% end %>
+<% end %>
+
