@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'curation_concerns'
-gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git', branch: 'latest_dlibhydra'
+gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git'
 gem 'puree', '0.17.0'
 gem 'active_fedora-noid'
 gem 'browse-everything'
