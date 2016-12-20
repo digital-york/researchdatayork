@@ -70,7 +70,6 @@ group :development do
 end
 
 group :development, :test do
-  # gem 'solr_wrapper', '>= 0.3'
   gem 'solr_wrapper', '>= 0.13.2'
 end
 
