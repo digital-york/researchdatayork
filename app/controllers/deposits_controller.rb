@@ -279,15 +279,15 @@ class DepositsController < ApplicationController
           # delete aip
           delete_aip
           delete_deposited_files
-          flash[:error] = 'Failed to deposit selected files: ' + e.message
+          flash.now[:error] = 'Failed to deposit selected files: ' + e.message
         else
           # TODO write metadata.json
           # TODO add submission info
-          flash[:notice] = 'The deposit was successful.'
+          flash.now[:notice] = 'The deposit was successful.'
           @dataset = nil
         end
       else
-        flash[:error] = "You didn't deposit any data!"
+        flash.now[:error] = "You didn't deposit any data!"
       end
     end
     respond_to do |format|

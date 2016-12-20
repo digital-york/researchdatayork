@@ -167,7 +167,7 @@ module CreateDip
 
     # first of all, make sure we've been given a valid uuid
     if !uuid.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)
-      flash[:error] = "You didn't enter a valid UUID"
+      flash.now[:error] = "You didn't enter a valid UUID"
       return {}
     end
 

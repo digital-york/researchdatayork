@@ -23,14 +23,14 @@ class DatasetsController < ApplicationController
     if params[:request]
       # handle case where user has just provided an email address
       if params[:request][:email].include? '@'
-        flash[:notice] = 'Thank you. We will send you an email when the data is available.'
+        flash.now[:notice] = 'Thank you. We will send you an email when the data is available.'
         create_dip(@dataset)
         requestor_email(params[:request][:email])
         # send an email to RDM team to tell them that data has been requested
         RdMailer.notify_rdm_team_about_request(params[:id], params[:request][:email]).deliver_now
       # handle case where user hasn't provided an email address
       else
-        flash[:error] = 'Please provide a full email address.'
+        flash.now[:error] = 'Please provide a full email address.'
       end
     # handle case where user has requested zip download
     elsif request.format.zip?
