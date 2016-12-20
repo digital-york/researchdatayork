@@ -1,4 +1,4 @@
 <p>Hello</p>
-<p>The data you requested for dataset "<%= @dataset.preflabel %>" is now available for download at <%= url_for dataset_url(@dataset.id) %></p>
+<p>The data you requested for dataset "<%= @dataset.title[0].to_s %>" is now available for download at <%= url_for dataset_url(@dataset.id) %></p>
 <p>Thanks<br/>Research Data Auto-emailer</p>
 

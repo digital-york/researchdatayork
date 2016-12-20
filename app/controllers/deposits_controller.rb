@@ -420,6 +420,7 @@ class DepositsController < ApplicationController
   # Reingest
   def reingest
     message = reingest_aip('objects', params[:id])
+    flash.now[:notice] = message
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message['message'] }
       format.json { head :no_content }
@@ -428,11 +429,6 @@ class DepositsController < ApplicationController
 
   def dipuuid
     message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
-    # if that was successful, email users, if it wasn't successful, do nothing
-    if !message.empty?
-      # data (DIP) is now available so send an email to anyone who requested the data
-      RdMailer.notify_requester(params[:deposit][:id]).deliver_now
-    end
     respond_to do |format|
       if !message.empty?
         format.html { redirect_to deposits_url, notice: message }
