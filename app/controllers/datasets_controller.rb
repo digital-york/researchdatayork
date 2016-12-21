@@ -35,8 +35,7 @@ class DatasetsController < ApplicationController
     # handle case where user has requested zip download
     elsif request.format.zip?
       # log the download time and increment the download count
-      update_last_access(@dataset)
-      update_download_count(@dataset)
+      log_download(@dataset)
       # create a zip file 
       zip_file_stream = dip_as_zip_filestream(@dataset)
     end
@@ -65,8 +64,7 @@ class DatasetsController < ApplicationController
     # if the user is allowed to download this file (i.e. they're an admin or it's an 'open' dataset)
     if (current_user && current_user.admin?) || (dataset.dc_access_rights[0] == 'Open') then
       # log the last_access time and increment the number_of_downloads for this dataset
-      update_last_access(dataset)
-      update_download_count(dataset)
+      log_download(dataset)
       # get the dip files structure array
       dip_files = dip_directory_structure(dataset)
       # redirect the user the file they requested
@@ -89,16 +87,14 @@ class DatasetsController < ApplicationController
     params.permit(:request, :email)
   end
 
-  # given a dataset, update its last_access timestamp to the current date/time
-  def update_last_access(dataset)
-    dataset.last_access = Time.now.utc.iso8601
-    dataset.save
-  end
-
-  # given a dataset, increment the number_of_downloads field by one
-  def update_download_count(dataset)
-    dataset.number_of_downloads = dataset.number_of_downloads.to_i + 1
-    dataset.save
+  # given a dataset, update its last_access timestamp to the current date/time and increment the number_of_downloads field
+  def log_download(dataset)
+    # only log if the user is a human, not a bot (e.g. googlebot) - uses the 'browser' gem
+    if !browser.bot? then
+      dataset.last_access = Time.now.utc.iso8601
+      dataset.number_of_downloads = dataset.number_of_downloads.to_i + 1
+      dataset.save
+    end
   end
 
 end

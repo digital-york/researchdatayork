@@ -22,6 +22,8 @@ gem 'nokogiri'
 gem 'google-api-client', '~> 0.9' # require: 'google/apis/drive_v3'
 # include library to enabling shibboleth authentication
 gem 'omniauth-shibboleth'
+# include 'browser' to help us detect whether requests are coming from humans or bots
+gem 'browser'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
