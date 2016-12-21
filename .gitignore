@@ -26,3 +26,7 @@ client_secret.json
 
 # Ignore fedora data
 /fcrepo4-data
+
+# Ignore any local copies of assets or gems
+/public/assets
+/vendor/bundle

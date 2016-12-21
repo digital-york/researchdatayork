@@ -185,13 +185,24 @@
                   <%= dip_list.size %> dip<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
                       <%= dip.id %><br/>
-                      requested by <%= dip.requestor_email.join %> <br/>
+                      requested by <%= dip.requestor_email.join(", ") %> <br/>
                       <% if dip.aip_status == 'UPLOADED' and dip.dip_status.nil? %>
                           <%= link_to 'Approve', '/reingest/' + upload['id'] %>
                       <% elsif dip.aip_status.nil? or dip.aip_status != 'UPLOADED' %>
                           Waiting for AIP upload
                       <% elsif dip.dip_status == 'UPLOADED' %>
                           <%= dip.dip_status %>
+                          <br/><br/>
+                          Number of downloads: 
+                          <% unless upload['number_of_downloads_isim'].nil? %>
+                            <%= upload['number_of_downloads_isim'][0] %>
+                          <% else %>
+                            0
+                          <% end %> <br/>
+                          <% unless upload['last_access_tesim'].nil? %>
+                            Latest download:<br/> 
+                            <%= upload['last_access_tesim'][0].to_datetime.strftime('%d-%b-%Y %H:%M:%S') %>
+                          <% end %> <br/>
                       <% else %>
                           <%= dip.dip_status %>
                           <%= form_for @deposit, url: dipuuid_path do |f| %>

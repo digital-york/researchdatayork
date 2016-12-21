@@ -2,9 +2,13 @@ class DepositsController < ApplicationController
   helper DepositsHelper
   before_action :set_deposit, only: [:show, :edit, :update, :destroy]
 
-  # only show page is visible
   # TODO some kind of token based visibility
-  before_action :authenticate_user!, except: [:show]
+
+  # enforce some access control rules. All methods require the end user to be logged in
+  before_action :authenticate_user!
+  # and most method (all except 'show' - the deposit upload page) require the end user to be an administrator
+  before_action :verify_is_admin, except: [:show]
+
   include Dlibhydra
   include Puree
   include SearchPure
@@ -221,7 +225,8 @@ class DepositsController < ApplicationController
                                      'id,pure_uuid_tesim,title_tesim,wf_status_tesim,date_available_tesim,
                                     dc_access_rights_tesim,creator_value_ssim,managing_organisation_value_ssim,
                                     pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,
-                                    retention_policy_tesim,restriction_note_tesim',
+                                    retention_policy_tesim,restriction_note_tesim,last_access_tesim,
+                                    number_of_downloads_isim',
                                      @results_per_page, solr_sort_fields.join(","),
                                      (@current_page - 1) * @results_per_page)
       end
@@ -247,8 +252,6 @@ class DepositsController < ApplicationController
   # GET /deposits/1
   # GET /deposits/1.json
   def show
-
-    @notice = ''
 
     if params[:deposit]
       # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]
@@ -277,19 +280,19 @@ class DepositsController < ApplicationController
           # delete aip
           delete_aip
           delete_deposited_files
-          @notice = 'Failed to deposit selected files: ' + e.message
+          flash.now[:error] = 'Failed to deposit selected files: ' + e.message
         else
           # TODO write metadata.json
           # TODO add submission info
-          @notice = 'The deposit was successful.'
+          flash.now[:notice] = 'The deposit was successful.'
           @dataset = nil
         end
       else
-        @notice = "You didn't deposit any data!"
+        flash.now[:error] = "You didn't deposit any data!"
       end
     end
     respond_to do |format|
-      format.html { render :show, notice: @notice }
+      format.html { render :show }
       format.json { render :show, status: :created, location: @deposit }
     end
   end
@@ -418,6 +421,7 @@ class DepositsController < ApplicationController
   # Reingest
   def reingest
     message = reingest_aip('objects', params[:id])
+    flash.now[:notice] = message
     respond_to do |format|
       format.html { redirect_to deposits_url, notice: message['message'] }
       format.json { head :no_content }
@@ -426,11 +430,6 @@ class DepositsController < ApplicationController
 
   def dipuuid
     message = update_dip(params[:deposit][:id],params[:deposit][:dipuuid])
-    # if that was successful, email users, if it wasn't successful, do nothing
-    if !message.empty?
-      # data (DIP) is now available so send an email to anyone who requested the data
-      RdMailer.notify_requester(params[:deposit][:id]).deliver_now
-    end
     respond_to do |format|
       if !message.empty?
         format.html { redirect_to deposits_url, notice: message }
@@ -465,7 +464,7 @@ class DepositsController < ApplicationController
 
     c.each do |puree_d|
       unless puree_d['publisher'].exclude? ENV['PUBLISHER']
-        if response != nil and (new_uuids.include? puree_d['uuid'] or response.to_s.include? d['uuid'])
+        if response != nil and (new_uuids.include? puree_d['uuid'] or response.to_s.include? puree_d['uuid'])
           r = solr_query_short('pure_uuid_tesim:"' + puree_d['uuid'] + '"', 'id', 1)
           local_d = find_dataset(r['docs'][0]['id'])
         else
@@ -477,6 +476,13 @@ class DepositsController < ApplicationController
       end
     end
     new_uuids
+  end
+
+  # if the current user isn't logged in and isn't an administrator, tell them they need to an admin to do what they were trying to do
+  def verify_is_admin
+    unless current_user && current_user.admin?
+      render :html => "<h1>Unauthorised</h1><p>You are not authorised to view this page</p>".html_safe, :status => :unauthorized, :layout => 'blacklight'
+    end 
   end
 
 end

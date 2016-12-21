@@ -82,9 +82,8 @@ module CreateDip
 
   def requestor_email(value)
     unless @dip.requestor_email.include? value
-      emails = @dip.requestor_email.clone
-      emails << value
-      @dip.requestor_email = emails
+      # append the given value to the requestor_email field - for some reason @dip << value doesn't save properly (?)
+      @dip.requestor_email += [value]
       save_dip
     end
   end
@@ -168,7 +167,7 @@ module CreateDip
 
     # first of all, make sure we've been given a valid uuid
     if !uuid.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)
-      flash[:error] = "You didn't enter a valid UUID"
+      flash.now[:error] = "You didn't enter a valid UUID"
       return {}
     end
 

@@ -40,7 +40,16 @@
   <div id="main-container" class="<%= container_classes %>">
     <%= content_tag :h1, application_name, class: 'sr-only application-heading' %>
 
-    <%= render :partial=>'/flash_msg', layout: 'shared/flash_messages' %>
+    <%#= render :partial=>'/flash_msg', layout: 'shared/flash_messages' %>
+    <%# handle flash message output %>
+    <% flash.each do |name, msg| %>
+      <% if msg.is_a?(String) && msg != "" %>
+        <%= content_tag(:div, :class => "alert flash_#{name}") do %>
+          <%= msg %>
+          <a class="close" data-dismiss="alert" href="#">×</a>
+        <% end %>
+      <% end %>
+    <% end %>
 
     <div class="row">
       <%= yield %>

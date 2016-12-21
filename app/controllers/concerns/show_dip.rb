@@ -16,7 +16,7 @@ module ShowDip
     # set up the return variable
     dip_structure = {}
     # if the dataset has a dip with downloadable files
-    if dataset.members
+    if dataset.dips && !dataset.dips.empty?
       # get the dip from the dataset
       dip = dataset.aips[0]
       # loop through the DIP files until we find the METS.xml one
@@ -47,7 +47,7 @@ module ShowDip
       # now loop over the Dataset files using the file id to find the uri of the stored file and add that
       #   to the return structure
       dataset.members.each do |f|
-        if f.class == 'Fileset'
+        if f.respond_to?(:preflabel)
           # get the file id of this stored file
           file_id = f.preflabel[/^([-a-z0-9]{36})/, 1]
           if dip_structure.key?(file_id)
@@ -56,7 +56,7 @@ module ShowDip
         end
       end
       # sort the resulting dip structure by file path
-      dip_structure.sort_by { |_file_id, file_details| file_details[:file_path].downcase }.to_h
+      dip_structure.sort_by { |file_id, file_details| file_details[:file_path].downcase }.to_h
     end
     dip_structure
   rescue => e

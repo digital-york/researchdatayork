@@ -100,7 +100,7 @@
       if (googleApiAuthenticated) {
         open_google_drive_browser();
       } else {
-        googleWindow = window.open("/googledrive/connect", "_googlewindow", "width=500,height=500,resizable");
+        googleWindow = window.open("<%= connect_googledrive_index_path %>", "_googlewindow", "width=500,height=500,resizable");
       }
     });
   });
@@ -122,7 +122,7 @@
         'core': {
           'data': {
             'url' : function (node) {
-              return "/googledrive.json?folder=" + (node.id === "#" ? "root" : node.id)
+              return "<%= googledrive_index_path %>.json?folder=" + (node.id === "#" ? "root" : node.id)
             },
             'data' : function (node) {
 

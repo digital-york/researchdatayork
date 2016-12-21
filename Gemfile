@@ -1,10 +1,11 @@
 source 'https://rubygems.org'
 
-gem 'curation_concerns'
-gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git', branch: 'latest_dlibhydra'
+gem 'curation_concerns', '>= 1.7.0'
+gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git'
 gem 'puree', '0.17.0'
 gem 'active_fedora-noid'
-gem 'browse-everything'
+# force app to use the latest possible 'browse everything' to resolve a dependency dispute between curation_concerns and google_api_client
+gem 'browse-everything', git: 'https://github.com/projecthydra/browse-everything.git'
 # gem 'hydra', '9.1.0'
 #gem 'hydra' #, git: 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
 #gem 'hydra-works' #, '0.7.0'
@@ -18,7 +19,11 @@ gem 'rubyzip'
 # include Nokogiri for parsing XML
 gem 'nokogiri'
 # include the Google Drive API for browsing user's Google Drive files
-gem 'google-api-client', require: 'google/apis/drive_v3'
+gem 'google-api-client', '~> 0.9' # require: 'google/apis/drive_v3'
+# include library to enabling shibboleth authentication
+gem 'omniauth-shibboleth'
+# include 'browser' to help us detect whether requests are coming from humans or bots
+gem 'browser'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
@@ -67,7 +72,6 @@ group :development do
 end
 
 group :development, :test do
-  # gem 'solr_wrapper', '>= 0.3'
   gem 'solr_wrapper', '>= 0.13.2'
 end
 

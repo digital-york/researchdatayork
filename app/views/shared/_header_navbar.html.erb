@@ -19,7 +19,7 @@
   </div>
 </div>
 
-<% if controller_name == 'deposits' && action_name == 'index' %>
+<% if controller_name == 'deposits' && action_name == 'index' && current_user && current_user.admin? %>
   <div id="search-navbar" class="navbar navbar-default navbar-static-top" role="navigation">
     <div class="<%= container_classes %>">
       <%=
