@@ -1,12 +1,13 @@
 source 'https://rubygems.org'
 
-gem 'dlibhydra', git: 'git://github.com/digital-york/dlibhydra.git', branch: 'dlibhydra_latest'
-gem 'puree'
+gem 'curation_concerns'
+gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git', branch: 'latest_dlibhydra'
+gem 'puree', '0.17.0'
 gem 'active_fedora-noid'
 gem 'browse-everything'
 # gem 'hydra', '9.1.0'
-gem 'hydra' #, git: 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
-gem 'hydra-works' #, '0.7.0'
+#gem 'hydra' #, git: 'https://github.com/projecthydra/hydra.git', tag: 'v9.1.0.rc3'
+#gem 'hydra-works' #, '0.7.0'
 gem 'dotenv-rails', groups: [:development, :test, :production]
 gem 'faraday'
 gem 'qa'
@@ -35,7 +36,7 @@ gem 'therubyracer', platforms: :ruby
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # and add the jquery UI libraries as well
-gem 'jquery-ui-rails'
+gem 'jquery-ui-rails', '5.0.5'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder

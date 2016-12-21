@@ -1,18 +1,0 @@
-:terms:
-    - :id: public
-      :term: Public in Data Catalogue
-    - :id: waiting-info
-      :term: Researcher Contacted - Awaiting Info
-    - :id: waiting-data
-      :term: Researcher Contacted - Awaiting Data
-    - :id: nodata-external
-      :term: Data Externally Held
-    - :id: nodata-dept
-      :term: Data Held by Dept
-    - :id: held-pub-meta
-      :term: Metadata Held for Publication 
-    - :id: held-pub-data 
-      :term: Data Held for Publication
-    - :id: phd-data
-      :term: Data from PhD Student
-

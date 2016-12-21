@@ -218,11 +218,12 @@ class DepositsController < ApplicationController
       num_results = get_number_of_results(q, fq)
       unless num_results == 0
         response = solr_filter_query(q, fq,
-                                     'id,pure_uuid_tesim,preflabel_tesim,wf_status_tesim,date_available_tesim,
-                                    access_rights_tesim,creator_ssim,pureManagingUnit_ssim,
-                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,retention_policy_tesim,
-                                    restriction_note_tesim',
-                                     @results_per_page, solr_sort_fields.join(","), (@current_page - 1) * @results_per_page)
+                                     'id,pure_uuid_tesim,title_tesim,wf_status_tesim,date_available_tesim,
+                                    dc_access_rights_tesim,creator_value_ssim,managing_organisation_value_ssim,
+                                    pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,
+                                    retention_policy_tesim,restriction_note_tesim',
+                                     @results_per_page, solr_sort_fields.join(","),
+                                     (@current_page - 1) * @results_per_page)
       end
     end
 
@@ -255,7 +256,7 @@ class DepositsController < ApplicationController
         @aip = create_aip
         set_user_deposit(@dataset, params[:deposit][:readme])
         new_deposit(@dataset.id, @aip.id)
-        add_metadata(@dataset.for_indexing)
+        add_metadata(@dataset.for_indexing[0])
         begin
           # handle readme (submission documentation)
           if params[:deposit][:readme] and !params[:deposit][:readme].empty?
@@ -331,7 +332,6 @@ class DepositsController < ApplicationController
           end
 
           # Fetch metadata from pure and update the dataset
-
           set_metadata(@dataset, d)
         end
 
@@ -463,17 +463,17 @@ class DepositsController < ApplicationController
   # Ignore data not published by the given publisher
   def get_datasets_from_collection(c, response, new_uuids=[])
 
-    c.each do |d|
-      unless d['publisher'].exclude? ENV['PUBLISHER']
-        if response != nil and (new_uuids.include? d['uuid'] or response.to_s.include? d['uuid'])
-          r = solr_query_short('pure_uuid_tesim:"' + d['uuid'] + '"', 'id', 1)
+    c.each do |puree_d|
+      unless puree_d['publisher'].exclude? ENV['PUBLISHER']
+        if response != nil and (new_uuids.include? puree_d['uuid'] or response.to_s.include? d['uuid'])
+          r = solr_query_short('pure_uuid_tesim:"' + puree_d['uuid'] + '"', 'id', 1)
           local_d = find_dataset(r['docs'][0]['id'])
         else
-          new_uuids << d['uuid']
+          new_uuids << puree_d['uuid']
           local_d = new_dataset
         end
 
-        set_metadata(local_d, d)
+        set_metadata(local_d, puree_d)
       end
     end
     new_uuids

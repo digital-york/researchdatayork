@@ -45,18 +45,18 @@
           <tr>
             <td>
               <strong>PURE UUID:</strong> <%= upload['pure_uuid_tesim'][0] %><br/>
-              <strong>Title:</strong>  <%= upload['preflabel_tesim'][0] %><br/>
-              <% unless upload['creator_ssim'].nil? %>
+              <strong>Title:</strong>  <%= upload['title_tesim'][0] %><br/>
+              <% unless upload['creator_value_ssim'].nil? %>
                   <strong>Creator:</strong>
-                  <% upload['creator_ssim'].each do |i| %>
-                      <%= get_preflabel(i) %>;&nbsp;
+                  <% upload['creator_value_ssim'].each do |i| %>
+                      <%= i %>;&nbsp;
                   <% end %>
                   <br/>
               <% end %>
               <strong>Managing Org:</strong>
-              <% unless upload['pureManagingUnit_ssim'].nil? %>
-                  <% upload['pureManagingUnit_ssim'].each do |i| %>
-                      <%= get_preflabel(i) %>
+              <% unless upload['managing_organisation_value_ssim'].nil? %>
+                  <% upload['managing_organisation_value_ssim'].each do |i| %>
+                      <%= i %>
                   <% end %>
               <% end %>
               <br/>
@@ -89,8 +89,8 @@
             </td>
             <td>
 
-              <%= upload['access_rights_tesim'][0] %>
-              <% if upload['access_rights_tesim'][0] == 'Embargoed' %>
+              <%= upload['dc_access_rights_tesim'][0] %>
+              <% if upload['dc_access_rights_tesim'][0] == 'Embargoed' %>
                   <br/> (check PURE for embargo length)
               <% end %>
 

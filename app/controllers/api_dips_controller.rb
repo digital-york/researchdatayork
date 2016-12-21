@@ -14,28 +14,31 @@ class ApiDipsController < BaseApiController
     meth.call @json.key?('package')
   end
 
+  # this now replaces update_dip
   def update
-    # update metadata
     dip_uuid(@json['package']['dip_uuid']) unless @json['package']['dip_uuid'].nil?
-    dip_status(@json['package']['status']) unless @json['package']['status'].nil?
     dip_current_path(@json['package']['current_path']) unless @json['package']['current_path'].nil?
     dip_resource_uri(@json['package']['resource_uri']) unless @json['package']['resource_uri'].nil?
     dip_current_location(@json['package']['current_location']) unless @json['package']['current_location'].nil?
-    # ingest files
-    ingest_dip(@json['package']['current_path']) unless @json['package']['current_path'].nil?
+    dip_size(@json['package']['size']) unless @json['package']['current_location'].nil?
+
+    # we do get status, change this
+    @dip.dip_status = 'UPLOADED'
 
     if @dip.save
+      ingest_dip(@dip.dip_current_path,@dip.id)
       render json:  @dip.to_json, status: :ok
     else
       render nothing: true, status: :bad_request
     end
+
   end
 
   def waiting
     if waiting_for_dips.empty?
       render nothing: true, status: :no_content
     else
-      render json:  waiting_for_dips.to_json, status: :ok
+      render json: waiting_for_dips.to_json, status: :ok
     end
 
   end
@@ -45,6 +48,6 @@ class ApiDipsController < BaseApiController
   # Use callbacks to share common setup or constraints between actions.
   def find_dip
     @dip = Dlibhydra::Package.find(params[:id])
-    render nothing: true, status: :not_found unless @dip.present? # && @dip.user == @user
+    render nothing: true, status: :not_found unless @dip.present?
   end
 end
