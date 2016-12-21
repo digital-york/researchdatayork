@@ -34,7 +34,7 @@
       <p><%= link_to "Download zip", format: :zip %></p>
       <h4>As individual files</h4>
       <% @dip_files.each do |key, file| %>
-        <%= link_to file[:file_path], file[:file_uri] %> <br/>
+        <%= link_to file[:file_path], filedownload_url(@dataset.id, key), :target => "_blank" %> <br/>
       <% end %>
     <% else %>
       <p>There are currently no downloadable files</p>

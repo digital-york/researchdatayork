@@ -225,7 +225,8 @@ class DepositsController < ApplicationController
                                      'id,pure_uuid_tesim,title_tesim,wf_status_tesim,date_available_tesim,
                                     dc_access_rights_tesim,creator_value_ssim,managing_organisation_value_ssim,
                                     pure_link_tesim,doi_tesim,pure_creation_tesim, wf_status_tesim,
-                                    retention_policy_tesim,restriction_note_tesim',
+                                    retention_policy_tesim,restriction_note_tesim,last_access_tesim,
+                                    number_of_downloads_isim',
                                      @results_per_page, solr_sort_fields.join(","),
                                      (@current_page - 1) * @results_per_page)
       end

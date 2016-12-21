@@ -34,6 +34,10 @@ class DatasetsController < ApplicationController
       end
     # handle case where user has requested zip download
     elsif request.format.zip?
+      # log the download time and increment the download count
+      update_last_access(@dataset)
+      update_download_count(@dataset)
+      # create a zip file 
       zip_file_stream = dip_as_zip_filestream(@dataset)
     end
     respond_to do |format|
@@ -53,6 +57,25 @@ class DatasetsController < ApplicationController
     end
   end
 
+  # GET /datasets/1/filedownload/1
+  # given a dataset id and a file id, update the dataset's last_access and number_of_downloads fields and redirect the user to the file they want
+  def filedownload
+    # get the dataset
+    dataset = find_dataset(params[:id])
+    # if the user is allowed to download this file (i.e. they're an admin or it's an 'open' dataset)
+    if (current_user && current_user.admin?) || (dataset.dc_access_rights[0] == 'Open') then
+      # log the last_access time and increment the number_of_downloads for this dataset
+      update_last_access(dataset)
+      update_download_count(dataset)
+      # get the dip files structure array
+      dip_files = dip_directory_structure(dataset)
+      # redirect the user the file they requested
+      redirect_to dip_files[params[:fileid]][:file_uri]
+    else
+      render :plain => "You do not have permission to download this file"
+    end
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
@@ -65,4 +88,17 @@ class DatasetsController < ApplicationController
     params.fetch(:dataset, {})
     params.permit(:request, :email)
   end
+
+  # given a dataset, update its last_access timestamp to the current date/time
+  def update_last_access(dataset)
+    dataset.last_access = Time.now.utc.iso8601
+    dataset.save
+  end
+
+  # given a dataset, increment the number_of_downloads field by one
+  def update_download_count(dataset)
+    dataset.number_of_downloads = dataset.number_of_downloads.to_i + 1
+    dataset.save
+  end
+
 end

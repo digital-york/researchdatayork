@@ -26,6 +26,8 @@ Rails.application.routes.draw do
   post '/dipuuid', to: 'deposits#dipuuid'
   # custom route for presenting submission documentation 
   get '/datasets/:id/documentation' => 'datasets#documentation', as: :documentation, :defaults => { :format => :text }
+  # custom route for detecting dataset file download requests
+  get '/datasets/:id/filedownload/:fileid' => 'datasets#filedownload', as: :filedownload
 
   # update api for archivematica
   scope '/api' do

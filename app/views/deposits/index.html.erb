@@ -192,6 +192,17 @@
                           Waiting for AIP upload
                       <% elsif dip.dip_status == 'UPLOADED' %>
                           <%= dip.dip_status %>
+                          <br/><br/>
+                          Number of downloads: 
+                          <% unless upload['number_of_downloads_isim'].nil? %>
+                            <%= upload['number_of_downloads_isim'][0] %>
+                          <% else %>
+                            0
+                          <% end %> <br/>
+                          <% unless upload['last_access_tesim'].nil? %>
+                            Latest download:<br/> 
+                            <%= upload['last_access_tesim'][0].to_datetime.strftime('%d-%b-%Y %H:%M:%S') %>
+                          <% end %> <br/>
                       <% else %>
                           <%= dip.dip_status %>
                           <%= form_for @deposit, url: dipuuid_path do |f| %>
