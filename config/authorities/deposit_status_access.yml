@@ -1,0 +1,5 @@
+terms:
+  - id: held-pub-meta
+    term: Metadata Held for Publication
+  - id: held-pub-data
+    term: Data Held for Publication

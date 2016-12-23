@@ -238,6 +238,10 @@ class DepositsController < ApplicationController
     else
       @deposits = response
     end
+
+    # get the 'deposit status' fields via qa
+    load_status_fields
+
     respond_to do |format|
       if params[:refresh]
         format.html { redirect_to deposits_path }
@@ -349,15 +353,14 @@ class DepositsController < ApplicationController
         d = Dlibhydra::Dataset.find(@dataset_id)
         if params[:deposit][:status]
           d.wf_status = params[:deposit][:status]
+        else
+          d.wf_status = []
         end
         if params[:deposit][:retention_policy]
-
-          d.retention_policy = params[:deposit][:retention_policy]
+          d.retention_policy = [params[:deposit][:retention_policy]]
         end
         if params[:notes]
-          notes = d.restriction_note.to_a
-          notes << params[:notes]
-          d.restriction_note = notes
+          d.restriction_note += [params[:notes]]
         end
         if params[:delete_note_at_index] and params[:delete_note_at_index].match(/^\d+$/)
           notes = d.restriction_note.to_a
@@ -365,9 +368,15 @@ class DepositsController < ApplicationController
           d.restriction_note = notes
         end
         d.save
-        @deposit.status = d.wf_status
-        @deposit.retention_policy = d.retention_policy
-        @deposit.notes = d.restriction_note
+        @deposit.status = d.wf_status.to_a
+        @deposit.retention_policy = d.retention_policy.to_a[0]
+        # the following ".to_a.to_s" is to make the value consistent with how it's returned from the solr query in the index 
+        # method so that it can be treated the same way by the _notes.html.erb partial
+        @deposit.notes = d.restriction_note.to_a.to_s
+
+        # load status fields from QA for presenting in 'status' column of deposits table
+        load_status_fields
+
 
         respond_to do |format|
           #format.html { render :show, notice: notice }
@@ -484,5 +493,14 @@ class DepositsController < ApplicationController
       render :html => "<h1>Unauthorised</h1><p>You are not authorised to view this page</p>".html_safe, :status => :unauthorized, :layout => 'blacklight'
     end 
   end
+
+  # get the form fields/values necessary to populate the 'status' column in the main dashboard - using questioning authority (qa)
+  # note: the files that define the 'authorities' are in config/authorities
+  def load_status_fields
+    @deposit_status_general = Qa::Authorities::Local::FileBasedAuthority.new('deposit_status_general').all
+    @deposit_status_data = Qa::Authorities::Local::FileBasedAuthority.new('deposit_status_data').all
+    @deposit_status_access = Qa::Authorities::Local::FileBasedAuthority.new('deposit_status_access').all
+    @deposit_status_retention = Qa::Authorities::Local::FileBasedAuthority.new('deposit_status_retention').all
+  end 
 
 end

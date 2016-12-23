@@ -1,0 +1,7 @@
+terms:
+  - id: awaiting-data
+    term: Researcher Contacted - Awaiting Data
+  - id: nodata-external
+    term: Data Externally Held
+  - id: nodata-dept
+    term: Data Held By Dept
