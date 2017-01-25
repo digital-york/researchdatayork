@@ -28,7 +28,7 @@ class ApiDipsController < BaseApiController
     if @dip.save
       ingest_dip(@dip.dip_current_path,@dip.id)
       # data (DIP) is now available so send an email to anyone who requested the data
-      RdMailer.notify_requester(params[:id]).deliver_now
+      RdMailer.notify_requester(params[:id]).deliver_later
       render json:  @dip.to_json, status: :ok
     else
       render nothing: true, status: :bad_request

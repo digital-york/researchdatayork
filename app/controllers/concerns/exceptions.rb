@@ -22,7 +22,7 @@ module Exceptions
     # send an error email if appropriate
     if send_email
       begin
-        RdMailer.notify_admin_about_error(error_msg).deliver_now
+        RdMailer.notify_admin_about_error(error_msg).deliver_later
       rescue => e2
         # if there's an error in the mail routine, just log that there was an error
         Rails.logger.error "Also an error sending the error email: " + e2.message
