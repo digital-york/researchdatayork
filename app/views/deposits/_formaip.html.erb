@@ -14,6 +14,7 @@
     <div class="field">
       <%= f.label 'README' %><br>
       <p>Please provide any information that would help others use the data, for example deployment instructions or required software.</p>
+      <p>This information will be stored alongside and made available with your data.</p>
       <%= f.text_area :readme, cols: 100, rows: 6 %>
     </div>
 
@@ -26,6 +27,7 @@
 
     <div class="field">
       <%= f.label "Select a local directory to deposit" %>&nbsp;
+      <em>Note: this option only works on certain browsers, including Chrome and Safari</em>
       <%= f.file_field :file, id: "real_dir_btn", style: "display: none", multiple: true, directory: true, webkitdirectory: true, mozdirectory: true %><br>
       <button type="button" class="btn btn-large btn-success" id="dir_upload_btn">Choose Directory</button>
       <span id="dir_upload_status">No directory chosen</span>
