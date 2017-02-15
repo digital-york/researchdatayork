@@ -40,9 +40,9 @@ module ShowDip
             dip_structure[file_id] = { file_path: file_path }
             filecounter += 1
           end
+          # no need to continue looping now that we've dealt with METS.xml
+          break
         end
-        # no need to continue looping now that we've dealt with METS.xml
-        break
       end
       # now loop over the Dataset files using the file id to find the uri of the stored file and add that
       #   to the return structure
