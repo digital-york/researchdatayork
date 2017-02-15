@@ -51,7 +51,9 @@ module ShowDip
           # get the file id of this stored file
           file_id = f.preflabel[/^([-a-z0-9]{36})/, 1]
           if dip_structure.key?(file_id)
-            dip_structure[file_id][:file_uri] = f.files.first.uri.to_s
+            # the original file is in f.original_file - if it has a thumbnail, that's in f.thumbnail
+            dip_structure[file_id][:file_uri] = f.original_file.uri.to_s
+            dip_structure[file_id][:thumbnail_uri] = f.thumbnail.uri.to_s
           end
         end
       end

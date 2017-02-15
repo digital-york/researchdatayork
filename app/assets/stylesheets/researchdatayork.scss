@@ -133,3 +133,17 @@ div#errors input[type=checkbox]:checked ~ label#error_label:before {
   border-color: #eed3d7;
   color: #b94a48;
 }
+
+/* define some styles for displaying the list of files for download */
+ul.filedownload {
+  list-style: none; 
+  padding-left: 0
+}
+ul.filedownload li {
+  /*margin: 10px 0;*/ 
+  line-height:30px; 
+  height:auto
+}
+ul.filedownload li img {
+  width: 30px
+}
