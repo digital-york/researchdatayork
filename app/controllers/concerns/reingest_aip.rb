@@ -49,7 +49,7 @@ module ReingestAip
       # Error in approve reingest API. Pipeline Archivematica on am-local (1937aad1-c5fe-4bb9-9d8a-0bd3488204c5) returned an unexpected status code: 500 (Permission denied)
       if response.status and (response.status.to_s.match(/^2\d\d$/) or
           (response.status.to_s.match(/^5\d\d$/) and response.body.include? 'Permission denied'))
-        dip.dip_status =  approve_reingest(aip.id,aip.aip_uuid)
+        dip.dip_status =  approve_reingest(aip.id, aip.aip_uuid, id)
         dip.save
       else
         begin
@@ -76,7 +76,7 @@ module ReingestAip
     return ""
   end
 
-  def approve_reingest(aip_id,aip_uuid)
+  def approve_reingest(aip_id, aip_uuid, dataset_id)
 
     # let's make sure the ingest request is done
     sleep(5)
@@ -99,7 +99,7 @@ module ReingestAip
       }
 
     rescue => e
-      handle_exception(e, "Unable to connect to Archivematica. Please try again later.", "Dataset id: " + id, true)
+      handle_exception(e, "Unable to connect to Archivematica. Please try again later.", "Dataset id: " + dataset_id, true)
       return nil
     end
     if response.status and response.status.to_s.match(/^2\d\d$/)
@@ -114,7 +114,7 @@ module ReingestAip
           handle_exception(e, "Unable to approve reingest for AIP: " + json_response['message'], "Response from Archivematica: " + json_response['message'])
         rescue => e2
           if response.body and !response.body.empty?
-            handle_exception(e2, "Unable to approve reingest for AIP: " + response.body, "Dataset id: " + id + "\nError from Archivematica: " + response.body, true)
+            handle_exception(e2, "Unable to approve reingest for AIP: " + response.body, "Dataset id: " + dataset_id + "\nError from Archivematica: " + response.body, true)
           else
             handle_exception(e2, "Unexpected response from Archivematica. Make sure the Archivematica credentials are valid and that the dataset exists in Archivematica", "Dataset id: " + id, true)
           end
