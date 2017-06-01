@@ -182,7 +182,7 @@
                       <% end %>
                   <% end %>
                   <br/>
-                  <%= dip_list.size %> dip<% unless dip_list.size < 2 %>s<% end %> created<br/>
+                  <%= dip_list.size %> aip<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
                       <%= dip.id %><br/>
                       requested by <%= dip.requestor_email.join(", ") %> <br/>
@@ -205,16 +205,6 @@
                           <% end %> <br/>
                       <% else %>
                           <%= dip.dip_status %>
-                          <%= form_for @deposit, url: dipuuid_path do |f| %>
-                              <%= f.hidden_field :id, :value => upload['id'] %>
-                              <div class="field">
-                                <%= f.label 'DIP UUID' %><br>
-                                <%= f.text_field :dipuuid %>
-                              </div>
-                              <div class="actions">
-                                <%= f.submit 'Update DIP' %>
-                              </div>
-                          <% end %>
                       <% end %>
                   <% end %>
               <% else %>
