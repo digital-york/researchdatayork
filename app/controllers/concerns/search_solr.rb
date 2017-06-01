@@ -77,7 +77,7 @@ module SearchSolr
   private
 
   def solr_connect
-    RSolr.connect :url => ENV['SOLR_DEV']
+    RSolr.connect :url => ActiveFedora.solr_config[:url] # was ENV['SOLR_DEV'] but this should be correct for both dev and prod - solr url is defined in config/solr.yml
   rescue => e
     handle_exception(e, "Unable to connect to Solr. Make sure Solr is running", "", true)
   end
