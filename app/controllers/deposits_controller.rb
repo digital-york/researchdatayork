@@ -245,11 +245,11 @@ class DepositsController < ApplicationController
     respond_to do |format|
       if params[:refresh]
         format.html { redirect_to deposits_path }
+        format.json { render :index, status: :created }
       else
         format.html { render :index }
 
       end
-      # format.json { render :index, status: :created, location: @dataset }
     end
   end
 
