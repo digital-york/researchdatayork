@@ -248,7 +248,7 @@ class DepositsController < ApplicationController
         format.json { render :index, status: :created }
       else
         format.html { render :index }
-
+        format.json { render :index }
       end
     end
   end
