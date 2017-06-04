@@ -12,7 +12,6 @@ module SearchSolr
       fq: fq,
       rows: 0
     }
-    puts response
     response['response']['numFound']
   rescue => e
     handle_exception(e, "Unable to execute Solr query. Make sure Solr is running",
