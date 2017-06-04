@@ -12,7 +12,7 @@ module SearchPure
       c.basic_auth = true
     end
     c = Puree::Collection.new resource: :dataset
-    if c_from.nil?
+    if c_from.nil? and m_from.nil?
       metadata = c.find limit: limit,
                         offset: 0
     else
