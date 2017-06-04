@@ -1,1 +1,2 @@
-json.num_deposits @deposits.size
+json.num_refreshed @refreshed.size
+json.refreshed @refreshed

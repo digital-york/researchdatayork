@@ -28,6 +28,7 @@ class DepositsController < ApplicationController
 
     # This is an empty ActiveRecord object. It is never saved.
     @deposit = Deposit.new
+    @refreshed = []
 
     # if user asked for new/updated datasets, fetch or update them
     if params[:refresh] == 'true'
@@ -38,6 +39,7 @@ class DepositsController < ApplicationController
       unless num_datasets == 0
         solr_response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"','pure_uuid_tesim',num_datasets)
       end
+      c = nil
       if params[:refresh_num]
 
         c = get_uuids(params[:refresh_num])
@@ -57,10 +59,8 @@ class DepositsController < ApplicationController
         c = get_uuids
         get_datasets_from_collection(c, solr_response)
       end
-      # now delete 'refresh' from params so that it doesn't get called again on subsequent page actions
-      #params.delete(:refresh)
-      #params.delete(:refresh_num)
-      #params.delete(:refresh_from)
+      # make a list of all the refreshed pure records
+      @refreshed = c.map{|x| x["uuid"]}
     end
 
     # setup base query parameters
@@ -245,7 +245,7 @@ class DepositsController < ApplicationController
     respond_to do |format|
       if params[:refresh]
         format.html { redirect_to deposits_path }
-        format.json { render :index, status: :created }
+        format.json { render :index }
       else
         format.html { render :index }
         format.json { render :index }
