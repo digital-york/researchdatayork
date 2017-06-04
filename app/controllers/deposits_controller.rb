@@ -22,6 +22,34 @@ class DepositsController < ApplicationController
   include Googledrive
   helper_method :connected_to_google_api? # defined in Googledrive module so view can know whether or not to call google api
 
+  # given a number of pure records to refresh, or a number of days to refresh from, refresh the datasets from pure
+  def refresh_from_pure (refresh_num = nil, refresh_from = nil)
+    # Get number of results to return
+    num_datasets = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
+    solr_response = nil
+    # Get all dataset records from Solr
+    unless num_datasets == 0
+      solr_response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"','pure_uuid_tesim',num_datasets)
+    end
+    c = nil
+    if refresh_num
+      c = get_uuids(refresh_num)
+      get_datasets_from_collection(c, solr_response)
+    elsif refresh_from
+      c = get_uuids_created_from_tonow(refresh_from)
+      uuids = get_datasets_from_collection(c, solr_response)
+      # uuids is a list of new datasets created after the solr query
+      # these are used to ensure we don't create duplicates
+      c = get_uuids_modified_from_tonow(refresh_from)
+      get_datasets_from_collection(c, solr_response, uuids)
+    else
+      c = get_uuids
+      get_datasets_from_collection(c, solr_response)
+    end
+    # return a list of all the refreshed pure records
+    c.map{|x| x["uuid"]}
+  end
+
   # GET /deposits
   # GET /deposits.json
   def index
@@ -32,35 +60,7 @@ class DepositsController < ApplicationController
 
     # if user asked for new/updated datasets, fetch or update them
     if params[:refresh] == 'true'
-      # Get number of results to return
-      num_datasets = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset"')
-      solr_response = nil
-      # Get all dataset records from Solr
-      unless num_datasets == 0
-        solr_response = solr_query_short('has_model_ssim:"Dlibhydra::Dataset"','pure_uuid_tesim',num_datasets)
-      end
-      c = nil
-      if params[:refresh_num]
-
-        c = get_uuids(params[:refresh_num])
-        get_datasets_from_collection(c, solr_response)
-
-      elsif params[:refresh_from]
-
-        c = get_uuids_created_from_tonow(params[:refresh_from])
-        uuids = get_datasets_from_collection(c, solr_response)
-
-        # uuids is a list of new datasets created after the solr query
-        # these are used to ensure we don't create duplicates
-        c = get_uuids_modified_from_tonow(params[:refresh_from])
-        get_datasets_from_collection(c, solr_response, uuids)
-
-      else
-        c = get_uuids
-        get_datasets_from_collection(c, solr_response)
-      end
-      # make a list of all the refreshed pure records
-      @refreshed = c.map{|x| x["uuid"]}
+      @refreshed = refresh_from_pure(params[:refresh_num], params[:refresh_from])
     end
 
     # setup base query parameters
