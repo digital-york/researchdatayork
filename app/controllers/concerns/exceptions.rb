@@ -14,7 +14,9 @@ module Exceptions
     error_msg += "-------\n"
     error_msg += e.message + "\n\n"
     error_msg += "Additional info\n---------------\n" + msg_to_log + "\n\n" unless msg_to_log.empty?
-    error_msg += "User\n----\n" + current_user.email + "\n\n" if current_user and current_user.email 
+    if current_user and current_user.email
+      error_msg += "User\n----\n" + current_user.email + "\n\n" 
+    end
     # log the error
     Rails.logger.error error_msg
     # present the user with an error message
