@@ -40,7 +40,7 @@ module CreateDataset
     set_pure_creator(puree_dataset['person'])
     set_pure_managing_org(puree_dataset['owner'])
     add_permissions
-    @d.save
+    @d.save if @d.changed?
   end
 
   def set_uuid(uuid)
@@ -112,7 +112,7 @@ module CreateDataset
     o.name = a['name']
     # TODO remove this once current_person generates in callback
     o.preflabel = a['name']
-    o.save
+    o.save if o.changed?
     @d.managing_organisation_resource << o
   end
 
@@ -129,7 +129,7 @@ module CreateDataset
     person.pure_uuid = p['uuid'].to_s
     # TODO remove this once current_person generates in callback
     person.preflabel = p['name']['first'] + ' ' + p['name']['last']
-    person.save
+    person.save if person.changed?
     @d.creator_resource << person
   end
 
