@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'curation_concerns', '>= 1.7.0'
-gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git', branch: 'ferg20170603'
+gem 'dlibhydra', git: 'https://github.com/digital-york/dlibhydra.git'
 gem 'puree', '0.17.0'
 gem 'active_fedora-noid'
 # force app to use the latest possible 'browse everything' to resolve a dependency dispute between curation_concerns and google_api_client
