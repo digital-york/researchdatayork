@@ -28,6 +28,8 @@ gem 'browser'
 gem 'delayed_job_active_record'
 # include 'daemons' so that we can run the delayed_job daemon
 gem 'daemons'
+# include 'jquery-fileupload-rails' gem to make use of jquery file upload and chunked uploading functionality - needed for large file upload
+gem 'jquery-fileupload-rails'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
