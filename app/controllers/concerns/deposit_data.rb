@@ -69,6 +69,15 @@ module DepositData
     end
   end
 
+  def deposit_files_from_client2(files)
+    files.each do |f|
+      uploaded_io = f
+      File.open('/var/tmp/uploads/' + uploaded_io.original_filename, 'ab') do |file|
+        file.write(uploaded_io.read)
+      end
+    end
+  end
+
   def deposit_files_from_cloud(files, paths, mime_types)
     # initialise the google api
     service = initialise_api

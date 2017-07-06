@@ -147,3 +147,19 @@ ul.filedownload li {
 ul.filedownload li img {
   width: 30px
 }
+
+/* define some styles for displaying progress bar for file upload */
+#progress_container {
+  height: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.progressbar {
+  position:relative; top: 50%; transform: translateY(-50%);
+}
+#progressbar_empty {
+  width: 400px; height:10px; float: left; margin-right: 10px;
+}
+#progressbar_progress {
+  background-color: green; width: 0%; height: 100%;
+}

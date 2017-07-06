@@ -17,7 +17,8 @@
       <p>This information will be stored alongside and made available with your data.</p>
       <%= f.text_area :readme, cols: 100, rows: 6 %>
     </div>
-
+<% end %>
+<%= form_for @deposit, url: fileupload_path do |f| %>
     <div class="field">
       <%= f.label "Select local files to deposit" %>&nbsp;
       <%= f.file_field :file, id: "real_file_btn", style: "display: none", multiple: true %><br>
@@ -41,8 +42,45 @@
 
     <%= render "formgoogledrive" %>
 
+    <div id="progressbar_container">
+      <div id="progressbar_empty" class="progressbar">
+        <div id="progressbar_progress">&nbsp;</div>
+      </div>
+      <div id="progressinfo" class="progressbar"></div>
+    </div>
+    <div style="clear: both"/>
+
     <div class="actions">
-      <%= f.submit 'Deposit', data: { disable_with: 'Please wait...' }%>
+      <%= f.submit 'Deposit', id: "submit_btn", data: { disable_with: 'Please wait...' }%>
     </div>
 
 <% end %>
+
+<script>
+  // this script will use jquery file upload to handle the uploading of files in chunks
+  $(function () {
+      $('#real_file_btn').fileupload({
+          dataType: 'json',
+          sequentialUploads: true,
+          maxChunkSize: 1000000,
+          add: function (e, data) {            
+              $("#submit_btn").on('click', function (ev) {
+                  ev.preventDefault();
+                  data.submit();
+              });
+          },
+          progress: function (e, data) {
+              var progress = parseInt(data.loaded / data.total * 100, 10);
+              $('#progressbar_progress').css('width', progress + '%');
+              $('#progressinfo').html("uploading " + data.files[0].name);
+          },
+          done: function (e, data) {
+              $("#submit_btn").off('click');
+              $.each(data.result.files, function (index, file) {
+                  $('#progressinfo').html(file.name + " uploaded!");
+              });
+          }
+      });
+  });
+</script>
+

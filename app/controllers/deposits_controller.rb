@@ -301,6 +301,14 @@ class DepositsController < ApplicationController
     end
   end
 
+  # POST /deposits/1/fileupload.json
+  def fileupload
+    if params[:deposit][:file]
+      deposit_files_from_client2(params[:deposit][:file])
+      @files = params[:deposit][:file]
+    end
+  end
+
   # GET /deposits/new
   def new
     # This is a basic ActiveRecord object. It is never saved.
