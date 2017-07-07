@@ -1,4 +1,4 @@
-# app/controllers/concerns/search_pure.rb
+# app/controllers/concerns/deposit_data.rb
 module DepositData
   extend ActiveSupport::Concern
 
@@ -10,18 +10,22 @@ module DepositData
   end
 
   def new_deposit(dataset_id,aip_id)
-    @dir_dataset = ENV['TRANSFER_LOCATION'] + '/' + dataset_id
-    @dir_aip = @dir_dataset + '/' + aip_id + '/'
+    @dir_dataset = File.join(@deposit_dir, dataset_id)
+    @dir_aip = File.join(@dir_dataset, aip_id)
     make_data_directories
   end
 
   def make_data_directories
-    unless Dir.exists? (@dir_dataset)
-      FileUtils.mkdir(@dir_dataset)
-    end
-    unless Dir.exists? (@dir_aip)
-      FileUtils.mkdir(@dir_aip)
-    end
+    FileUtils.mkdir_p(@dir_dataset)
+    FileUtils.mkdir_p(@dir_aip)
+  end
+
+  def metadata_dir
+    File.join(@temp_upload_dir, @dataset.id, "metadata")
+  end
+
+  def submission_documentation_dir
+    File.join(metadata_dir, "submissionDocumentation")
   end
 
   # given a string of text, write it to a readme.txt file in the submission documentation folder
@@ -29,12 +33,22 @@ module DepositData
     # the text should be written to @dir_aip/metadata/submissionDocumentation/readme.txt
     #   according to
     #   https://www.archivematica.org/en/docs/archivematica-1.4/user-manual/transfer/transfer/#create-submission
-    target_dir = File.join(@dir_aip, "metadata", "submissionDocumentation")
+    target_dir = submission_documentation_dir
     target_file = File.join(target_dir, "readme.txt")
     FileUtils.mkdir_p(target_dir)
     File.open(target_file, "w") do |output|
       output.write text
     end
+  end
+
+  def add_metadata(metadata)
+    require 'json'
+    json = JSON.generate(JSON.parse metadata.gsub('=>', ':'))
+    # metadata.json needs to go in submission documentation dir
+    target_dir = submission_documentation_dir
+    FileUtils.mkdir_p(target_dir)
+    target_file = File.join(target_dir, "metadata.json")
+    File.write(target_file, json)
   end
 
   # given an array of files on the user's client machine, upload them, unzip them if they're zipped,
@@ -130,19 +144,13 @@ module DepositData
   # delete all files deposited in the AIP - this will be called to clean things up if there was a problem
   #   during file upload
   def delete_deposited_files
-    if @dir_aip
-      FileUtils.rm_rf(@dir_aip)
+    deposit_upload_dir = File.join(@temp_upload_dir, @dataset.id)
+    if Dir.exists?(deposit_upload_dir)
+      FileUtils.rm_rf(deposit_upload_dir)
     end
-  end
-
-  def add_metadata(metadata)
-    require 'json'
-    json = JSON.generate(JSON.parse metadata.gsub('=>', ':'))
-    # metadata.json needs to go in metadata/submissionDocumentation
-    target_dir = File.join(@dir_aip, "metadata", "submissionDocumentation")
-    FileUtils.mkdir_p(target_dir)
-    target_file = File.join(target_dir, "metadata.json")
-    File.write(target_file, json)
+    if @dir_dataset
+      FileUtils.rm_rf(@dir_dataset)
+    end
   end
 
   def add_submission_documentation

@@ -69,7 +69,7 @@ module CreateAip
   end
 
   def delete_aip
-    @aip.destroy_eradicate
+    @aip.delete
   end
 
   def add_aip_permissions

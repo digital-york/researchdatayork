@@ -1,4 +1,4 @@
-<%= form_for @deposit, url: deposit_path do |f| %>
+<%= form_for @deposit, url: deposit_path, html: {id: "deposit_main_form"} do |f| %>
     <% if @deposit.errors.any? %>
         <div id="error_explanation">
           <h2><%= pluralize(@deposit.errors.count, "error") %> prohibited this deposit from being saved:</h2>
@@ -82,6 +82,8 @@
               $.each(data.result.files, function (index, file) {
                   $('#progressinfo').html(file.name + " uploaded!");
               });
+              // now that we've uploaded all the files, submit the main form
+              $('#deposit_main_form').submit();
           }
       });
   });
