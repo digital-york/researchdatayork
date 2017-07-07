@@ -69,11 +69,37 @@ module DepositData
     end
   end
 
-  def deposit_files_from_client2(files)
+  def deposit_files_from_client2(files, path, dataset_id, size)
+    # work out the base folder into which this upload should go
+    upload_dir = File.join(@temp_upload_dir, dataset_id, "objects") 
     files.each do |f|
-      uploaded_io = f
-      File.open('/var/tmp/uploads/' + uploaded_io.original_filename, 'ab') do |file|
-        file.write(uploaded_io.read)
+      # the file name will either be in "original_filename" for normal uploads, or in "path" for directory uploads
+      uploaded_filename = path.empty? ? f.original_filename : path
+      # work out where to write it - it'll need to go in the temp upload directory for now, and it might have its own relative path
+      target_file = File.join(upload_dir, uploaded_filename)
+      target_dir = File.dirname(target_file)
+      FileUtils.mkdir_p(target_dir)
+      # if this is a chunked upload and this is the first chunk then we want to write a new file, else we want to append
+      if !request.env["HTTP_CONTENT_RANGE"] or request.env["HTTP_CONTENT_RANGE"].starts_with?("bytes 0-")
+        write_mode = 'wb'
+      else
+        write_mode = 'ab'
+      end
+      File.open(target_file, write_mode) do |file|
+        file.write(f.read)
+      end
+      # if we've finished writing the file and it's a zip file, unzip it
+      if (File.size(target_file).to_i == size.to_i and File.extname(target_file) == '.zip') then
+        Zip::File.open(target_file) do |zip_file|
+          zip_file.each do |entry|
+            # extract everything except mac osx guff
+            unless entry.name.include?("__MACOSX") then
+              entry.extract(File.join(File.dirname(target_file), entry.name))
+            end
+          end
+        end
+        # delete zip file after extracting
+        File.delete(target_file)
       end
     end
   end

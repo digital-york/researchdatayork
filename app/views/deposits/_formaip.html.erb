@@ -21,7 +21,7 @@
 <%= form_for @deposit, url: fileupload_path do |f| %>
     <div class="field">
       <%= f.label "Select local files to deposit" %>&nbsp;
-      <%= f.file_field :file, id: "real_file_btn", style: "display: none", multiple: true %><br>
+      <%= f.file_field :file, id: "real_file_btn", style: "display: none", multiple: true, class: "file_upload" %><br>
       <button type="button" class="btn btn-large btn-success" id="file_upload_btn">Choose Files</button>
       <span id="file_upload_status">No file chosen</span>
     </div>
@@ -29,7 +29,7 @@
     <div class="field">
       <%= f.label "Select a local directory to deposit" %>&nbsp;
       <em>Note: this option only works on certain browsers, including Chrome and Safari</em>
-      <%= f.file_field :file, id: "real_dir_btn", style: "display: none", multiple: true, directory: true, webkitdirectory: true, mozdirectory: true %><br>
+      <%= f.file_field :file, id: "real_dir_btn", style: "display: none", multiple: true, class: "file_upload", directory: true, webkitdirectory: true, mozdirectory: true %><br>
       <button type="button" class="btn btn-large btn-success" id="dir_upload_btn">Choose Directory</button>
       <span id="dir_upload_status">No directory chosen</span>
     </div>
@@ -59,11 +59,14 @@
 <script>
   // this script will use jquery file upload to handle the uploading of files in chunks
   $(function () {
-      $('#real_file_btn').fileupload({
+      $('.file_upload').fileupload({
           dataType: 'json',
           sequentialUploads: true,
           maxChunkSize: 1000000,
           add: function (e, data) {            
+              // pass the webkitRelativePath value (which contains the relative path to the file) to the form handler 
+              // so it can build dir structure, and also file actual size
+              data.formData = {"path": data.files[0].webkitRelativePath, "size": data.files[0].size};
               $("#submit_btn").on('click', function (ev) {
                   ev.preventDefault();
                   data.submit();
@@ -72,7 +75,7 @@
           progress: function (e, data) {
               var progress = parseInt(data.loaded / data.total * 100, 10);
               $('#progressbar_progress').css('width', progress + '%');
-              $('#progressinfo').html("uploading " + data.files[0].name);
+              $('#progressinfo').html(data.files[0].name);
           },
           done: function (e, data) {
               $("#submit_btn").off('click');

@@ -1,6 +1,7 @@
 class DepositsController < ApplicationController
   helper DepositsHelper
   before_action :set_deposit, only: [:show, :edit, :update, :destroy]
+  before_action :set_globals
 
   # TODO some kind of token based visibility
 
@@ -303,8 +304,9 @@ class DepositsController < ApplicationController
 
   # POST /deposits/1/fileupload.json
   def fileupload
-    if params[:deposit][:file]
-      deposit_files_from_client2(params[:deposit][:file])
+    if params[:deposit][:file] and params[:id] and params[:size]
+      path = params[:path] ? params[:path] : ""
+      deposit_files_from_client2(params[:deposit][:file], path, params[:id], params[:size])
       @files = params[:deposit][:file]
     end
   end
@@ -462,6 +464,11 @@ class DepositsController < ApplicationController
   def set_deposit
     @deposit = Deposit.new
     @dataset = Dlibhydra::Dataset.find(params[:id])
+  end
+
+  def set_globals
+    # define the location where temporary file uploads will go
+    @temp_upload_dir = File.join(ENV['TRANSFER_LOCATION'], "tmp") 
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
