@@ -113,11 +113,11 @@ module DepositData
               end
             end
           end
+          # delete zip file after extracting
+          File.delete(target_file)
         rescue
           # don't do anything about bad zips
         end
-        # delete zip file after extracting
-        File.delete(target_file)
       end
     end
   end
