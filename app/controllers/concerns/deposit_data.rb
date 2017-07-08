@@ -104,13 +104,17 @@ module DepositData
       end
       # if we've finished writing the file and it's a zip file, unzip it
       if (File.size(target_file).to_i == size.to_i and File.extname(target_file) == '.zip') then
-        Zip::File.open(target_file) do |zip_file|
-          zip_file.each do |entry|
-            # extract everything except mac osx guff
-            unless entry.name.include?("__MACOSX") then
-              entry.extract(File.join(File.dirname(target_file), entry.name))
+        begin
+          Zip::File.open(target_file) do |zip_file|
+            zip_file.each do |entry|
+              # extract everything except mac osx guff
+              unless entry.name.include?("__MACOSX") then
+                entry.extract(File.join(File.dirname(target_file), entry.name))
+              end
             end
           end
+        rescue
+          # don't do anything about bad zips
         end
         # delete zip file after extracting
         File.delete(target_file)
