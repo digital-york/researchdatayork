@@ -57,7 +57,11 @@ module ReingestAip
         rescue => e
           begin
             json_response = JSON.parse(response.body)
-            handle_exception(e, "Unable to reingest AIP: " + json_response['message'], "Response from Archivematica: " + json_response['message'])
+            if json_response.has_key?("message")
+              handle_exception(e, "Unable to reingest AIP: " + json_response['message'], "Response from Archivematica: " + json_response['message'])
+            elsif json_response.has_key?("error_message")
+              handle_exception(e, "Unable to reingest AIP - error from Archivematica: " + json_response['error_message'], "Error response from Archivematica: " + json_response['error_message'])
+            end
           rescue => e2
             if response.body and !response.body.empty?
               handle_exception(e2, "Unable to reingest AIP: " + response.body, "Dataset id: " + id + "\nError from Archivematica: " + response.body, true)
