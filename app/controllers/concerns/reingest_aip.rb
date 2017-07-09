@@ -45,10 +45,11 @@ module ReingestAip
       end 
 
       # make sure that the response was 200 series
-      # Temporarily for now, also ignore this 500 error
+      # In the past, I have also ignored this 500 error (uncomment 'or' clause if necessary):
       # Error in approve reingest API. Pipeline Archivematica on am-local (1937aad1-c5fe-4bb9-9d8a-0bd3488204c5) returned an unexpected status code: 500 (Permission denied)
-      if response.status and (response.status.to_s.match(/^2\d\d$/) or
-          (response.status.to_s.match(/^5\d\d$/) and response.body.include? 'Permission denied'))
+      if response.status and (response.status.to_s.match(/^2\d\d$/)
+          # or (response.status.to_s.match(/^5\d\d$/) and response.body.include? 'Permission denied')
+          )
         dip.dip_status =  approve_reingest(aip.id, aip.aip_uuid, id)
         dip.save
       else
