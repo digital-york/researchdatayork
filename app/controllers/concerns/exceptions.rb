@@ -20,7 +20,7 @@ module Exceptions
     # log the error
     Rails.logger.error error_msg
     # present the user with an error message
-    flash.now[:error] = msg_to_user
+    flash[:error] = msg_to_user
     # send an error email if appropriate
     if send_email
       begin
