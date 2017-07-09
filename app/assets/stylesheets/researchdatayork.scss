@@ -149,16 +149,18 @@ ul.filedownload li img {
 }
 
 /* define some styles for displaying progress bar for file upload */
-#progress_container {
-  padding-top: 20px;
-  margin-bottom: 0px;
-}
-.progressbar {
-  position:relative; top: 50%; transform: translateY(-50%);
+#progressbar_container {
+  margin-top: -5px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
 }
 #progressbar_empty {
   width: 400px; height:10px; float: left; margin-right: 10px;
 }
 #progressbar_progress {
-  background-color: #449d44; width: 40%; height: 100%;
+  background-color: #449d44; width: 0%; height: 100%;
+}
+#progressinfo {
+  height: 20px;
 }
