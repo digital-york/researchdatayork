@@ -150,9 +150,8 @@ ul.filedownload li img {
 
 /* define some styles for displaying progress bar for file upload */
 #progress_container {
-  height: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  padding-top: 20px;
+  margin-bottom: 0px;
 }
 .progressbar {
   position:relative; top: 50%; transform: translateY(-50%);
@@ -161,5 +160,5 @@ ul.filedownload li img {
   width: 400px; height:10px; float: left; margin-right: 10px;
 }
 #progressbar_progress {
-  background-color: green; width: 0%; height: 100%;
+  background-color: #449d44; width: 40%; height: 100%;
 }
