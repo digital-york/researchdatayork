@@ -38,7 +38,7 @@ module Googledrive
     # Initialise the API
     service = initialise_api
     files = service.list_files(q: "'#{folder}' in parents and trashed=false", order_by: 'folder,modifiedTime desc,name',
-                               fields: 'files(id, name, parents, iconLink, mimeType)')
+                               fields: 'files(id, name, parents, iconLink, mimeType, size)')
     files
   end
 
