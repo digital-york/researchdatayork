@@ -316,6 +316,15 @@ class DepositsController < ApplicationController
     end
   end
 
+  # GET /deposits/1/getgdrivefile.json
+  def getgdrivefile
+    @data = {}
+    if params[:fileid] and params[:path] and params[:size] and params[:dataset_id]
+      deposit_file_from_google(params[:fileid], params[:path], params[:dataset_id], params[:size], params[:byte_from], params[:byte_to])
+      @data = {"path" => params[:path], "filesize" => params[:size], "byte_from" => params[:byte_from], "byte_to" => params[:byte_to]}
+    end
+end
+
   # GET /deposits/new
   def new
     # This is a basic ActiveRecord object. It is never saved.

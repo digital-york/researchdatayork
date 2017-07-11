@@ -3,6 +3,7 @@ module Googledrive
 
   require 'google/apis/drive_v3'
   require 'fileutils'
+  require 'httplog'
 
   # are we connected/authenticated to the Google API?
   def connected_to_google_api?
@@ -61,7 +62,7 @@ module Googledrive
   end
 
   # given an initialised api service and a google drive file id, download the file and return it
-  def get_file_from_google(service, fileid, mime_type)
+  def get_file_from_google(service, fileid, mime_type, byte_from = nil, byte_to = nil)
     file_contents = StringIO.new
     # if the mime type for this file is a google document
     if google_docs_mimetypes.key?(mime_type)
@@ -71,7 +72,9 @@ module Googledrive
       file = service.export_file(fileid, export_mime_type, download_dest: file_contents)
     # otherwise it's a "normal" file - just download it
     else
-      file = service.get_file(fileid, download_dest: file_contents)
+      # specify which bytes we want to download if byte range given
+      options = (byte_from && byte_to) ? {header: {"Range" => "bytes=" + byte_from.to_s + "-" + byte_to.to_s}} : {}
+      file = service.get_file(fileid, download_dest: file_contents, options: options)
     end
     file_contents
   end

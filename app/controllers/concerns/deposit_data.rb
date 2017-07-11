@@ -121,6 +121,35 @@ module DepositData
       end
     end
   end
+  
+  def write_deposit_chunk (filechunk, path, dataset_id, size, write_mode)
+    # work out the base folder into which this file should go
+    upload_dir = File.join(@temp_upload_dir, dataset_id, "objects") 
+    # work out where to write it - it'll need to go in the temp upload directory for now, and it might have its own relative path
+    target_file = File.join(upload_dir, path)
+    target_dir = File.dirname(target_file)
+    FileUtils.mkdir_p(target_dir)
+    File.open(target_file, write_mode) do |file|
+      file.write(filechunk)
+    end
+    # if we've finished writing the file and it's a zip file, unzip it
+    if (File.size(target_file).to_i == size.to_i and File.extname(target_file) == '.zip') then
+      begin
+        Zip::File.open(target_file) do |zip_file|
+          zip_file.each do |entry|
+            # extract everything except mac osx guff
+            unless entry.name.include?("__MACOSX") then
+              entry.extract(File.join(File.dirname(target_file), entry.name))
+            end
+          end
+        end
+        # delete zip file after extracting
+        File.delete(target_file)
+      rescue
+        # don't do anything about bad zips
+      end
+    end
+  end
 
   def deposit_files_from_cloud(files, paths, mime_types)
     # initialise the google api
@@ -143,6 +172,18 @@ module DepositData
         output.write f.string
       end
     end
+  end
+
+  # given a google file id, a relative path for where it belongs, and a byte range, get the file data from google and write it
+  def deposit_file_from_google (file, path, dataset_id, size, byte_from, byte_to)
+    service = initialise_api
+    filechunk = get_file_from_google(service, file, "", byte_from, byte_to)
+    # if it's the first portion of the file, write mode should be "write", else "append"
+    write_mode = (!byte_from or byte_from.to_i == 0) ? "wb" : "ab"
+    write_deposit_chunk(filechunk.string, path, dataset_id, size, write_mode)
+    #File.open(File.join("/var/tmp/uploads/", file), write_mode) do |output|
+    #  output.write filedata.string
+    #end 
   end
 
   # delete all files deposited in the AIP - this will be called to clean things up if there was a problem

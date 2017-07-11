@@ -12,6 +12,8 @@
   var googleWindow;
   // take a count of how many folders are being opened so that I can print out a "still loading" message
   var loading_counter = 0;
+  // store the selected nodes in a global var so that it can be used by other js on this web page
+  var selectedNodes;
   // given a tree node, work out whether its parent is selected and return its relative path accordingly
   function relpath_to_node (jstree, node) {
     var id_path = jstree.get_path(node, false, true);

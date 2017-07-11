@@ -59,20 +59,55 @@
 <script>
   // this script will use jquery file upload to handle the uploading of files in chunks
   $(function () {
-      // by default, if user clicks submit, alert them about no selected files - this will be overridden once they've selected files
+      var chunkSize = 1000000;
+      var updateProgress = function (filename, progress) {
+        $('#progressbar_progress').css('width', progress + '%');
+        $('#progressinfo').html(filename + " " + progress + '%');
+      };
+      var getGoogleFileChunk = function (fileid, path, dataset_id, size, byte_from, byte_to) {
+        $.ajax({
+          url: "<%= getgdrivefile_path %>.json",
+          data: {fileid: fileid, path: path, dataset_id: dataset_id, size: size, byte_from: byte_from, byte_to: byte_to },
+          success: function (data) {
+            var progress = parseInt(Math.min(data["byte_to"], data["filesize"]) / data["filesize"] * 100, 10);
+            updateProgress(data["path"], progress);
+            console.log(data);
+            // get the next chunk if there's still data to get
+            if (byte_to < size)
+              getGoogleFileChunk(fileid, path, dataset_id, size, byte_to + 1, byte_to + chunkSize);
+          } 
+        });
+      };
+      // add a click handler for the submit button to fetch and deposit google drive files if they've selected some
       $('#submit_btn').on('click', function (ev) {
-        alert("You haven't selected any files to deposit");
+        // if 'selectedNodes' variable exists and is an array then the user has selected google drive files
+        if (typeof selectedNodes !== 'undefined' && selectedNodes instanceof Array && selectedNodes.length > 0) {
+          // remove default click handler
+          $('#submit_btn').off('click', alertNoFiles);
+          // for each google drive file selected
+          for (var i = 0; i < selectedNodes.length; i++) {
+            var filepath = relpath_to_node($("#jstree_div").jstree(), selectedNodes[i]);
+            // call application method to download a chunk of the file and write it to the correct place for this deposit
+            if ("data" in selectedNodes[i] && "size" in selectedNodes[i].data) {
+              updateProgress(filepath, 0);
+              getGoogleFileChunk(selectedNodes[i].id, filepath, "<%= @dataset.id %>", selectedNodes[i].data["size"], 0, chunkSize-1); 
+            }
+          }
+        }
       });
+      // add a default click handler for the submit button - an alert saying they haven't selected any files
+      var alertNoFiles = function () {alert("You haven't selected and files");};
+      $('#submit_btn').on('click', alertNoFiles);
       $('.file_upload').fileupload({
           dataType: 'json',
           sequentialUploads: true,
-          maxChunkSize: 1000000,
+          maxChunkSize: chunkSize,
           add: function (e, data) {            
               // pass the webkitRelativePath value (which contains the relative path to the file) to the form handler 
               // so it can build dir structure, and also file actual size
               data.formData = {"path": data.files[0].webkitRelativePath, "size": data.files[0].size};
-              // remove previous click handler for submit button (that alerted about no selected files)
-              $("#submit_btn").off('click');
+              // remove default click handler for submit button (that alerted about no selected files)
+              $("#submit_btn").off('click', alertNoFiles);
               // and add new click handler
               $("#submit_btn").on('click', function (ev) {
                   ev.preventDefault();
@@ -83,8 +118,7 @@
           },
           progress: function (e, data) {
               var progress = parseInt(data.loaded / data.total * 100, 10);
-              $('#progressbar_progress').css('width', progress + '%');
-              $('#progressinfo').html(data.files[0].name + " " + progress + '%');
+              updateProgress(data.files[0].name, progress);
           },
           done: function (e, data) {
               $("#submit_btn").off('click');
