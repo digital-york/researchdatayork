@@ -73,22 +73,11 @@
           // attach the selected files to the form as hidden input params
           // get an array of selected nodes
           selectedNodes = $("#jstree_div").jstree("get_bottom_selected", true);
-          // remove any existing selections from the form
-          $("input").remove("[name='selected_files[]']");
-          $("input").remove("[name='selected_paths[]']");
-          $("input").remove("[name='selected_mimetypes[]']");
-          $("input").remove("[name='selected_sizes[]']");
-          // for each selected file
-          for (var i = 0; i < selectedNodes.length; i++) {
-            // write it to the html form as a hidden input
-            $("<input type='hidden'>").attr('name', 'selected_files[]').attr('value', selectedNodes[i].id).appendTo("#new_deposit");
-            // write the desired path of this file to a hidden input as well
-            $("<input type='hidden'>").attr('name', 'selected_paths[]').attr('value', relpath_to_node($("#jstree_div").jstree(), selectedNodes[i])).appendTo("#new_deposit");
-            // write the mime type of this file to a hidden input as well
-            $("<input type='hidden'>").attr('name', 'selected_mimetypes[]').attr('value', selectedNodes[i].data["mime_type"]).appendTo("#new_deposit");
-            // write the size of this file to a hidden input as well
-            $("<input type='hidden'>").attr('name', 'selected_sizes[]').attr('value', selectedNodes[i].data["size"]).appendTo("#new_deposit");
-          }
+          // if files were selected, remove the 'no files selected' submit handler and add a handler for google files
+          //if (selectedNodes.length > 0) {
+          //  $("#submit_btn").off('click', alertNoFiles);
+          //  $("#submit_btn").on('click', uploadGoogleFiles);
+          //}  
           // update the status message next to the "select google drive files"
           $("#google_drive_status2").html(selectedNodes.length + " files selected");
           $( this ).dialog( "close" );

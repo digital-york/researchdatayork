@@ -3,7 +3,6 @@ module Googledrive
 
   require 'google/apis/drive_v3'
   require 'fileutils'
-  require 'httplog'
 
   # are we connected/authenticated to the Google API?
   def connected_to_google_api?
