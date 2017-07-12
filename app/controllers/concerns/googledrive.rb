@@ -24,7 +24,11 @@ module Googledrive
 
   # create a Google Drive API object, authenticate and return it
   def initialise_api
-    service = Google::Apis::DriveV3::DriveService.new
+    service = Google::Apis::DriveV3::DriveService.new.tap do |client|
+      client.request_options.timeout_sec = 1200
+      client.request_options.open_timeout_sec = 1200
+      client.request_options.retries = 3
+    end
     service.client_options.application_name = 'Research Data York Google Drive Browser'
     client = oauth2client
     client.update!(refresh_token: session[:refresh_token])

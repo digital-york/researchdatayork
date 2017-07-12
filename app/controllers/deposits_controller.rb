@@ -309,9 +309,9 @@ class DepositsController < ApplicationController
 
   # POST /deposits/1/fileupload.json
   def fileupload
-    if params[:deposit][:file] and params[:id] and params[:size]
+    if params[:deposit][:file] and not params[:deposit][:file].empty? and params[:id] and params[:size]
       path = params[:path] ? params[:path] : ""
-      deposit_files_from_client2(params[:deposit][:file], path, params[:id], params[:size])
+      deposit_file_chunk_from_client(params[:deposit][:file][0], path, params[:id], params[:size])
       @files = params[:deposit][:file]
     end
   end
