@@ -67,7 +67,7 @@
         $('#progressinfo').html(filename + " " + progress + '%');
       };
       var alertNoFiles = function () {alert("You haven't selected and files");};
-      var startUpload = function () {
+      var disableSubmit = function () {
         $("#submit_btn").attr("disabled", true);
         $("#submit_btn").html("Please wait...");
       };
@@ -76,23 +76,7 @@
         //$('#deposit_main_form').submit();
         alert("form will be posted now");
       };
-      //var getGoogleFileChunk = function (fileid, path, dataset_id, size, byte_from, byte_to, is_last) {
-      //  $.ajax({
-      //    url: "<%= getgdrivefile_path %>.json",
-      //    data: {fileid: fileid, path: path, dataset_id: dataset_id, size: size, byte_from: byte_from, byte_to: byte_to },
-      //    success: function (data) {
-      //      var progress = parseInt(Math.min(data["byte_to"], data["filesize"]) / data["filesize"] * 100, 10);
-      //      updateProgress(data["path"], progress);
-      //      console.log(data);
-      //      // get the next chunk if there's still data to get
-      //      if (byte_to < size) {
-      //        getGoogleFileChunk(fileid, path, dataset_id, size, byte_to + 1, byte_to + chunkSize, is_last);
-      //      } else if (is_last) {
-      //        finishUpload();
-      //      }
-      //    } 
-      //  });
-      //};
+      // fetch the selected google files in chunks - each successfully fetched chunk will trigger the fetching of the next chunk
       var getGoogleFileChunk = function (index, dataset_id, byte_from, byte_to) {
         var fileid = selectedNodes[index].id;
         var path = relpath_to_node($("#jstree_div").jstree(), selectedNodes[index]);
@@ -105,7 +89,6 @@
           success: function (data) {
             var progress = parseInt(Math.min(data["byte_to"], data["filesize"]) / data["filesize"] * 100, 10);
             updateProgress(data["path"], progress);
-            console.log(data);
             // get the next chunk of this file if there's still data to get
             if (byte_to < size) {
               getGoogleFileChunk(index, dataset_id, byte_to + 1, byte_to + chunkSize);
@@ -119,23 +102,16 @@
           } 
         });
       };
-      var uploadGoogleFiles = function (showNoFilesAlert) {
-      //var uploadGoogleFiles = function () {
+      // define function for handling the fetching of google files if some google files have been selected and 'alert no files' if not
+      var getGoogleFiles = function (showAlertIfNoFilesSelected) {
         // if 'selectedNodes' variable exists and is an array then the user has selected google drive files
         if (typeof selectedNodes !== 'undefined' && selectedNodes instanceof Array && selectedNodes.length > 0) {
-          startUpload();
-          // for each google drive file selected
-          //for (var i = 0; i < selectedNodes.length; i++) {
-          //  var filepath = relpath_to_node($("#jstree_div").jstree(), selectedNodes[i]);
-            // call application method to download a chunk of the file and write it to the correct place for this deposit
-          //  if ("data" in selectedNodes[i] && "size" in selectedNodes[i].data) {
-          //    updateProgress(filepath, 0);
-              //getGoogleFileChunk(selectedNodes[i].id, filepath, "<%= @dataset.id %>", selectedNodes[i].data["size"], 0, chunkSize-1, i == (selectedNodes.length-1)); 
-              getGoogleFileChunk(0, "<%= @dataset.id %>", 0, chunkSize-1); 
-          //  }
-          //}
+          disableSubmit();
+          // kick of the fetching of the google files - this will recursively fetch all chunks and call 'finishUpload' when done
+          getGoogleFileChunk(0, "<%= @dataset.id %>", 0, chunkSize-1); 
+        // otherwise, no google files selected, present 'no files selected' alert or call 'finishUpload'
         } else {
-          if (showNoFilesAlert) {
+          if (showAlertIfNoFilesSelected) {
             alertNoFiles();
           } else {
             finishUpload();
@@ -143,9 +119,8 @@
         }
       };
       // by default, when user presses submit, handle google uploads 
-      $('#submit_btn').on('click.googleFiles', function (ev) { uploadGoogleFiles(true) });
-      //$('#submit_btn').on('click.noFiles', function(ev) { alertNoFiles() });
-      //$('#submit_btn').on('click.googleFiles', function (ev) { uploadGoogleFiles() });
+      $('#submit_btn').on('click.googleFiles', function (ev) { getGoogleFiles(true) });
+      // handle local file upload using jquery file upload
       $('.file_upload').fileupload({
           dataType: 'json',
           singleFileUploads: true,
@@ -155,16 +130,11 @@
               // pass the webkitRelativePath value (which contains the relative path to the file) to the form handler 
               // so it can build dir structure, and also file actual size
               data.formData = {"path": data.files[0].webkitRelativePath, "size": data.files[0].size};
-              // remove default click handler for submit button (that alerted about no selected files)
-              //$("#submit_btn").off('click', uploadGoogleFiles(true));
-              //$("#submit_btn").off('click.noFiles');
+              // remove default click handler for submit button that handled google drive - this will be instead be called when uploads done
               $("#submit_btn").off('click.googleFiles');
-              // and add new click handler
+              // and add new click handler - note this 'add' function is called once for each selected file
               $("#submit_btn").on('click', function (ev) {
-                  ev.preventDefault();
-                  startUpload();
-                  //$(this).attr("disabled", true);
-                  //$(this).html("Please wait...");
+                  disableSubmit();
                   data.submit();
               });
               localFileCount++;
@@ -174,16 +144,14 @@
               updateProgress(data.files[0].name, progress);
           },
           done: function (e, data) {
-              //$("#submit_btn").off('click');
               $.each(data.result.files, function (index, file) {
                   $('#progressinfo').html(file.name + " uploaded!");
               });
-              // now that we've uploaded all the files, handle google files (if there are any), which will also submit main form
-              //uploadGoogleFiles();
               localFileUploadCount++;
               // if the number of 'done' files equals the number of selected files, then all uploads are done
+              // handle google files (if there are any), which will also submit main form
               if (localFileUploadCount == localFileCount) {
-                uploadGoogleFiles(false);
+                getGoogleFiles(false);
               }
           }
       });
