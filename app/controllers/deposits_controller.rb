@@ -258,8 +258,6 @@ class DepositsController < ApplicationController
   # GET /deposits/1.json
   def show
     if params[:deposit]
-      # if the user uploaded local file(s), they will be in params[:deposit][:file], if cloud file(s), they'll be in params[:selected_files]
-      #if params[:deposit][:file] or params[:selected_files]
       # if the user uploaded local file(s), they will be sitting in @temp_upload_dir
       uploaded_files_dir = File.join(@temp_upload_dir, @dataset.id)
       if Dir.exists?(uploaded_files_dir)
@@ -275,14 +273,6 @@ class DepositsController < ApplicationController
           # move uploaded files from temp upload dir to the deposit dir where Archivematica will be able to see them
           FileUtils.mv(Dir.glob(File.join(uploaded_files_dir, "*")), @dir_aip)
           FileUtils.remove_dir(uploaded_files_dir)
-          # handle upload of client side file(s)
-          #if params[:deposit][:file]
-          #  deposit_files_from_client(params[:deposit][:file])
-          #end
-          # handle upload of google drive file(s)
-          #if params[:selected_files] and params[:selected_paths] and params[:selected_mimetypes]
-          #  deposit_files_from_cloud(params[:selected_files], params[:selected_paths], params[:selected_mimetypes])
-          #end
         # if there was problem uploading files, delete the new AIP and delete any files that did get uploaded
         rescue => e
           # delete from aips membership
