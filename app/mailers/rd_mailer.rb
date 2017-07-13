@@ -10,7 +10,7 @@ class RdMailer < ApplicationMailer
     # remove any duplicates from the recipient list
     to.uniq!
     # send them an email telling them that the data is ready to download
-    mail(bcc: to, subject: 'Data available for dataset "' + @dataset.title[0].to_s + '"') unless to.empty?
+    mail(to: ENV['EMAIL_FROM'], bcc: to, subject: 'Data available for dataset "' + @dataset.title[0].to_s + '"') unless to.empty?
   end
 
   # send an email to the RDM team to tell them that someone has requested data
