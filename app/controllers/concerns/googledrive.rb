@@ -41,7 +41,8 @@ module Googledrive
   def list_files_in_folder(folder)
     # Initialise the API
     service = initialise_api
-    files = service.list_files(q: "'#{folder}' in parents and trashed=false", order_by: 'folder,modifiedTime desc,name',
+    files = service.list_files(q: "'#{folder}' in parents and trashed=false and (mimeType = 'application/vnd.google-apps.folder' or not mimeType contains 'application/vnd.google-apps')", 
+                               order_by: 'folder,modifiedTime desc,name',
                                fields: 'files(id, name, parents, iconLink, mimeType, size)')
     files
   end
@@ -73,8 +74,8 @@ module Googledrive
       export_mime_type = google_docs_mimetypes[mime_type]['export_mimetype']
       # export the file from google drive
       file = service.export_file(fileid, export_mime_type, download_dest: file_contents)
-    # otherwise it's a "normal" file - just download it
-    else
+    # otherwise, so long as it's not a google drive folder, it's a "normal" file - just download it
+    elsif mime_type != 'application/vnd.google-apps.folder'
       # specify which bytes we want to download if byte range given
       options = (byte_from && byte_to) ? {header: {"Range" => "bytes=" + byte_from.to_s + "-" + byte_to.to_s}} : {}
       file = service.get_file(fileid, download_dest: file_contents, options: options)

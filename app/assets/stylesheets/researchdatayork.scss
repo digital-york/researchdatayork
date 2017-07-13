@@ -159,7 +159,13 @@ ul.filedownload li img {
   width: 400px; height:10px; float: left; margin-right: 10px;
 }
 #progressbar_progress {
-  background-color: #449d44; width: 0%; height: 100%;
+  width: 0%; height: 100%;
+}
+#progressbar_progress.normal {
+  background-color: #449d44;
+}
+#progressbar_progress.fail {
+  background-color: red;
 }
 #progressinfo {
   height: 20px;

@@ -300,18 +300,28 @@ class DepositsController < ApplicationController
   # POST /deposits/1/fileupload.json
   def fileupload
     if params[:deposit][:file] and not params[:deposit][:file].empty? and params[:id] and params[:size]
-      path = params[:path] ? params[:path] : ""
-      deposit_file_chunk_from_client(params[:deposit][:file][0], path, params[:id], params[:size])
-      @files = params[:deposit][:file]
+      begin
+        path = params[:path] ? params[:path] : ""
+        deposit_file_chunk_from_client(params[:deposit][:file][0], path, params[:id], params[:size])
+        @files = params[:deposit][:file]
+      rescue => e
+        delete_deposited_files(params[:id])
+        raise
+      end
     end
   end
 
   # GET /deposits/1/getgdrivefile.json
   def getgdrivefile
     @data = {}
-    if params[:fileid] and params[:path] and params[:size] and params[:dataset_id]
-      deposit_file_from_google(params[:fileid], params[:path], params[:dataset_id], params[:size], params[:byte_from], params[:byte_to])
-      @data = {"path" => params[:path], "filesize" => params[:size], "byte_from" => params[:byte_from], "byte_to" => params[:byte_to]}
+    if params[:fileid] and params[:path] and params[:size] and params[:dataset_id] and params[:mime_type]
+      begin
+        deposit_file_from_google(params[:fileid], params[:path], params[:mime_type], params[:dataset_id], params[:size], params[:byte_from], params[:byte_to])
+        @data = {"path" => params[:path], "filesize" => params[:size], "byte_from" => params[:byte_from], "byte_to" => params[:byte_to]}
+      rescue => e
+        delete_deposited_files(params[:dataset_id])
+        raise e
+      end
     end
 end
 

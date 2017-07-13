@@ -63,6 +63,7 @@
       var localFileCount = 0;
       var localFileUploadCount = 0;
       var updateProgress = function (filename, progress) {
+        $('#progressbar_progress').removeClass('fail').addClass('normal');
         $('#progressbar_progress').css('width', progress + '%');
         $('#progressinfo').html(filename + " " + progress + '%');
       };
@@ -71,24 +72,35 @@
         $("#submit_btn").attr("disabled", true);
         $("#submit_btn").html("Please wait...");
       };
+      var enableSubmit = function () {
+        $("#submit_btn").attr("disabled", false);
+        $("#submit_btn").html("Submit");
+      };
       var finishUpload = function () {
         // submit the main form
-        //$('#deposit_main_form').submit();
-        alert("form will be posted now");
+        $('#deposit_main_form').submit();
+        //alert("form will be posted now");
       };
+      var uploadFail = function (info) {
+        $('#progressbar_progress').removeClass('normal').addClass('fail');
+        $('#progressbar_progress').css('width', '100%');
+        $('#progressinfo').html("Upload failed - please try again");
+        enableSubmit();
+      }
       // fetch the selected google files in chunks - each successfully fetched chunk will trigger the fetching of the next chunk
       var getGoogleFileChunk = function (index, dataset_id, byte_from, byte_to) {
         var fileid = selectedNodes[index].id;
         var path = relpath_to_node($("#jstree_div").jstree(), selectedNodes[index]);
-        var size = selectedNodes[index].data["size"];
-        var progress = parseInt(byte_from / size * 100, 10);
+        var mimeType = selectedNodes[index].data["mime_type"];
+        var size = selectedNodes[index].data["size"] || 0;
+        var progress = size != 0 ? parseInt(byte_from / size * 100, 10) : 0;
         updateProgress(path, progress);
         $.ajax({
           url: "<%= getgdrivefile_path %>.json",
-          data: {fileid: fileid, path: path, dataset_id: dataset_id, size: size, byte_from: byte_from, byte_to: byte_to },
+          data: {fileid: fileid, path: path, mime_type: mimeType, dataset_id: dataset_id, size: size, byte_from: byte_from, byte_to: byte_to },
           success: function (data) {
-            var progress = parseInt(Math.min(data["byte_to"], data["filesize"]) / data["filesize"] * 100, 10);
-            updateProgress(data["path"], progress);
+            var progress = data["filesize"] > 0 ? parseInt(Math.min(data["byte_to"], data["filesize"]) / data["filesize"] * 100, 10) : 0;
+            updateProgress(data["path"] || '', progress);
             // get the next chunk of this file if there's still data to get
             if (byte_to < size) {
               getGoogleFileChunk(index, dataset_id, byte_to + 1, byte_to + chunkSize);
@@ -99,7 +111,10 @@
             } else {
               finishUpload();
             }
-          } 
+          },
+          error: function (ajaxContext) {
+            uploadFail(ajaxContext.responseText);
+          }
         });
       };
       // define function for handling the fetching of google files if some google files have been selected and 'alert no files' if not

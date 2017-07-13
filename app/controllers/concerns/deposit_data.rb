@@ -64,9 +64,9 @@ module DepositData
   end
   
   # given a google file id, a relative path for where it belongs, and a byte range, get the file data from google and write it
-  def deposit_file_from_google (file, path, dataset_id, size, byte_from, byte_to)
+  def deposit_file_from_google (file, path, mime_type, dataset_id, size, byte_from, byte_to)
     service = initialise_api
-    filechunk = get_file_from_google(service, file, "", byte_from, byte_to)
+    filechunk = get_file_from_google(service, file, mime_type, byte_from, byte_to)
     # if it's the first portion of the file, write mode should be "write", else "append"
     write_mode = (!byte_from or byte_from.to_i == 0) ? "wb" : "ab"
     write_deposit_chunk(filechunk.string, path, dataset_id, size, write_mode)
@@ -104,8 +104,8 @@ module DepositData
 
   # delete all files deposited in the AIP - this will be called to clean things up if there was a problem
   #   during file upload
-  def delete_deposited_files
-    deposit_upload_dir = File.join(@temp_upload_dir, @dataset.id)
+  def delete_deposited_files (dataset_id)
+    deposit_upload_dir = File.join(@temp_upload_dir, dataset_id)
     if Dir.exists?(deposit_upload_dir)
       FileUtils.rm_rf(deposit_upload_dir)
     end
