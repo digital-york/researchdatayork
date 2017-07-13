@@ -14,7 +14,7 @@
 <% else %>
     <h1>Data Deposit</h1>
     <h2><%= @dataset.title[0] %></h2>
-    <p><% if @dataset.doi != [] and @dataset.doi != [""] %><strong>DOI: </strong><%= @dataset.doi.join("<br/>") %><% end %>
+    <p><% if @dataset.doi != [] and @dataset.doi != [""] %><strong>DOI: </strong><%= @dataset.doi.join("<br/>") %><% end %></p>
 
     <% if @dataset.aips.size > 0 %>
         <p>
