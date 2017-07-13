@@ -168,6 +168,9 @@
               if (localFileUploadCount == localFileCount) {
                 getGoogleFiles(false);
               }
+          },
+          fail: function (e, data) {
+            uploadFail(data.textStatus);
           }
       });
   });
