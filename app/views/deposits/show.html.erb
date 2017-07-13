@@ -12,8 +12,9 @@
     <p>If you submit another dataset to PURE, we'll send you a new deposit link.</p>
 
 <% else %>
-
-    <%= render 'datasets/dataset_metadata' %>
+    <h1>Data Deposit</h1>
+    <h2><%= @dataset.title[0] %></h2>
+    <p><% if @dataset.doi != [] and @dataset.doi != [""] %><strong>DOI: </strong><%= @dataset.doi.join("<br/>") %><% end %>
 
     <% if @dataset.aips.size > 0 %>
         <p>
@@ -29,7 +30,11 @@
           If you need to add, remove or update the data, please contact the RDM team.
         </p>
     <% else %>
-        <h1>Data Deposit</h1>
+        <p>By transferring data to the Research Data York service you are agreeing to the terms and conditions 
+        as stated in the Process for transferring research data to Research Data York 
+        (<a href="https://www.york.ac.uk/library/info-for/researchers/data/research-data-york/transferring-data">https://www.york.ac.uk/library/info-for/researchers/data/research-data-york/transferring-data</a>). 
+        Please note that, if your data is open (as recorded in the 'access options' field in Pure), a Creative 
+        Commons Attribution (CC BY) licence will be applied to it unless you instruct us otherwise.</p>
         <%= render 'formaip' %>
     <% end %>
 
