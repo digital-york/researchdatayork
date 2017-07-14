@@ -308,6 +308,7 @@ class DepositsController < ApplicationController
         @files = params[:deposit][:file]
       rescue => e
         delete_deposited_files(params[:id])
+        RdMailer.notify_rdm_team_about_dataset(params[:id], "An error occurred during local file upload: " + e.message, "Error during deposit", current_user).deliver_later
         raise
       end
     end
@@ -322,6 +323,7 @@ class DepositsController < ApplicationController
         @data = {"path" => params[:path], "filesize" => params[:size], "byte_from" => params[:byte_from], "byte_to" => params[:byte_to]}
       rescue => e
         delete_deposited_files(params[:dataset_id])
+        RdMailer.notify_rdm_team_about_dataset(params[:id], "An error occurred during google drive file upload: " + e.message, "Error during deposit", current_user).deliver_later
         raise e
       end
     end
