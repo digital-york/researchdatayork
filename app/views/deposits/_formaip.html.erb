@@ -60,14 +60,34 @@
   // this script will use jquery file upload to handle the uploading of files in chunks
   $(function () {
       var chunkSize = 1000000;
-      var localFileCount = 0;
       var localFileUploadCount = 0;
+      // prevent user from uploading too much data
+      var maxUploadSize = 20 * 1024 * 1024 * 1024;
+      var localFilesToUpload = [];
+      var bytesToMegabytes = function (bytes) {
+        return Math.round(bytes/1024/1024 * 10) / 10;
+      };
+      var totalUploadSize = function () {
+        var total = 0;
+        if (typeof selectedNodes !== 'undefined' && selectedNodes instanceof Array) {
+          for (var i = 0; i < selectedNodes.length; i++) {
+            total += selectedNodes[i].data["size"] ? parseInt(selectedNodes[i].data["size"]) : 0;
+          }
+        }
+        if (typeof localFilesToUpload !== 'undefined' && localFilesToUpload instanceof Array) {
+          for (var i = 0; i < localFilesToUpload.length; i++) {
+            total += localFilesToUpload[i].files[0].size || 0;
+          }
+        }
+        return total;
+      };
       var updateProgress = function (filename, progress) {
         $('#progressbar_progress').removeClass('fail').addClass('normal');
         $('#progressbar_progress').css('width', progress + '%');
         $('#progressinfo').html(filename + " " + progress + '%');
       };
       var alertNoFiles = function () {alert("You haven't selected and files");};
+      var alertUploadTooLarge = function () {alert("You are attempting to upload " + bytesToMegabytes(totalUploadSize()) + "Mb of data - the maximum amount of data you can deposit is " + bytesToMegabytes(maxUploadSize) + "Mb")}
       var disableSubmit = function () {
         $("#submit_btn").attr("disabled", true);
         $("#submit_btn").html("Please wait...");
@@ -121,9 +141,14 @@
       var getGoogleFiles = function (showAlertIfNoFilesSelected) {
         // if 'selectedNodes' variable exists and is an array then the user has selected google drive files
         if (typeof selectedNodes !== 'undefined' && selectedNodes instanceof Array && selectedNodes.length > 0) {
-          disableSubmit();
-          // kick of the fetching of the google files - this will recursively fetch all chunks and call 'finishUpload' when done
-          getGoogleFileChunk(0, "<%= @dataset.id %>", 0, chunkSize-1); 
+          // if the user isn't tring to upload too much data, kick off the upload
+          if (totalUploadSize() < maxUploadSize) {
+            disableSubmit();
+            // kick of the fetching of the google files - this will recursively fetch all chunks and call 'finishUpload' when done
+            getGoogleFileChunk(0, "<%= @dataset.id %>", 0, chunkSize-1); 
+          } else {
+            alertUploadTooLarge();
+          }
         // otherwise, no google files selected, present 'no files selected' alert or call 'finishUpload'
         } else {
           if (showAlertIfNoFilesSelected) {
@@ -145,14 +170,26 @@
               // pass the webkitRelativePath value (which contains the relative path to the file) to the form handler 
               // so it can build dir structure, and also file actual size
               data.formData = {"path": data.files[0].webkitRelativePath, "size": data.files[0].size};
+              // increment the total upload file size counter
+              //totalUploadSize += data.files[0].size;
               // remove default click handler for submit button that handled google drive - this will be instead be called when uploads done
               $("#submit_btn").off('click.googleFiles');
               // and add new click handler - note this 'add' function is called once for each selected file
               $("#submit_btn").on('click', function (ev) {
+                if (totalUploadSize() > maxUploadSize) {
+                  alertUploadTooLarge();
+                } else {
                   disableSubmit();
                   data.submit();
+                }
               });
-              localFileCount++;
+              localFilesToUpload.push(data);
+          },
+          change: function (e, data) {
+            // clear the list of files to upload and revert to default submit handler (note: 'add' may be subsequently called)
+            $("#submit_btn").off('click');
+            $("#submit_btn").on('click.googleFiles', function(ev) { getGoogleFiles(true) });
+            localFilesToUpload = [];
           },
           progress: function (e, data) {
               var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -165,7 +202,7 @@
               localFileUploadCount++;
               // if the number of 'done' files equals the number of selected files, then all uploads are done
               // handle google files (if there are any), which will also submit main form
-              if (localFileUploadCount == localFileCount) {
+              if (localFileUploadCount == localFilesToUpload.length) {
                 getGoogleFiles(false);
               }
           },
