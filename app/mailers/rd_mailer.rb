@@ -25,6 +25,14 @@ class RdMailer < ApplicationMailer
     mail(to: to, subject: "Data requested for dataset " + @dataset.id) unless to.nil? or to.empty?
   end
 
+  # send an email to the RDM team when someone has deposited data
+  def notify_rdm_team_about_dataset(dataset_id, info, summary)
+    @dataset = Dlibhydra::Dataset.find(dataset_id)
+    @info = info
+    to = ENV['RDM_EMAIL']
+    mail(to: to, subject: "Update on dataset " + @dataset.id + ": " + summary) unless to.nil? or to.empty?
+  end
+
   # send an email about an error/exception that occurred
   def notify_admin_about_error(error_message)
     @error_message = error_message
