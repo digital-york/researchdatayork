@@ -9,7 +9,7 @@ module Exceptions
     error_msg += "=====\n\n"
     error_msg += "Script(s)\n"
     error_msg += "---------\n"
-    error_msg += e.backtrace.select{ |i| i.include?(Rails.root.to_s) }.join("\n") + "\n\n"
+    error_msg += e.backtrace.select{ |i| i.include?(Rails.root.to_s) and i.exclude?("bundle") }.join("\n") + "\n\n"
     error_msg += "Message\n"
     error_msg += "-------\n"
     error_msg += e.message + "\n\n"
