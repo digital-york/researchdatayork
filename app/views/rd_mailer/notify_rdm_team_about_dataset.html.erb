@@ -1,6 +1,7 @@
 <p>Hello</p>
 <p>Update on dataset <%= @dataset.id %> ("<%= @dataset.title[0].to_s %>"):</p>
 <p><%= @info %></p>
+<% if (@user and !@user.empty?) %><p>User: <%= @user %></p><% end %> 
 <p>You can view the dataset at <%= url_for deposits_url %>?search=true&q=<%= @dataset.id %></p>
-<p>Thanks<br/>Research Data Auto-emailer</p>
+<p>Thanks<br/>Research Data York Auto-emailer</p>
 

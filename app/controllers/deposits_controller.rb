@@ -280,10 +280,12 @@ class DepositsController < ApplicationController
           # delete aip
           delete_aip
           delete_deposited_files
+          # notify RDM team about failed upload
+          RdMailer.notify_rdm_team_about_dataset(@dataset.id, "An error occurred during data deposit: " + e.message, "Error during deposit", current_user).deliver_later
           flash.now[:error] = 'Failed to deposit selected files: ' + e.message
         else
-          # TODO write metadata.json
-          # TODO add submission info
+          # notify RDM team about successful deposit
+          RdMailer.notify_rdm_team_about_dataset(@dataset.id, "A deposit has been successfully uploaded", "Data deposited", current_user).deliver_later
           flash.now[:notice] = 'The deposit was successful.'
           @dataset = nil
         end
