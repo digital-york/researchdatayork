@@ -39,6 +39,6 @@ class RdMailer < ApplicationMailer
     # get the admin email address
     to = ENV["ERROR_EMAIL_TO"]
     # send email
-    mail(to: to, subject: "Error in RDM application") unless to.nil? or to.empty?
+    mail(to: to, subject: "Error in RDYork application") unless to.nil? or to.empty?
   end
 end
