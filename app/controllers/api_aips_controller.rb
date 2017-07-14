@@ -6,6 +6,7 @@ class ApiAipsController < BaseApiController
                        if: proc { |c| c.request.format =~ %r{application/json} }
   include Dlibhydra
   include CreateAip
+  include Exceptions
 
   # https://www.airpair.com/ruby-on-rails/posts/building-a-restful-api-in-a-rails-application
 
@@ -15,6 +16,8 @@ class ApiAipsController < BaseApiController
   end
 
   def update
+    # get current aip status
+    old_status = @aip.aip_status.dup
     # update status
     aip_uuid(@json['package']['aip_uuid']) unless @json['package']['aip_uuid'].nil?
     # update uuid
@@ -33,10 +36,16 @@ class ApiAipsController < BaseApiController
       aip_origin_pipeline(@json['package']['origin_pipeline'])
     end
     if @aip.save
+      if @aip.package_ids and !@aip.package_ids.empty? and old_status.to_s != @aip.aip_status.to_s
+        RdMailer.notify_rdm_team_about_dataset(@aip.package_ids[0], "Archivematica processing step concluded and dataset AIP status changed from " + old_status + " to " + @aip.aip_status, "AIP updated").deliver_later 
+      end
       render json:  @aip.to_json, status: :ok
     else
       render nothing: true, status: :bad_request
     end
+  rescue => e
+    handle_exception(e, "Unable to update AIP properties", "Unable to update AIP properties", true)
+    raise
   end
 
   private
