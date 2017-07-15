@@ -14,13 +14,13 @@ module Exceptions
     error_msg += "-------\n"
     error_msg += e.message + "\n\n"
     error_msg += "Additional info\n---------------\n" + msg_to_log + "\n\n" unless msg_to_log.empty?
-    if current_user and current_user.email
+    if request and user_signed_in? and current_user and current_user.email
       error_msg += "User\n----\n" + current_user.email + "\n\n" 
     end
     # log the error
     Rails.logger.error error_msg
-    # present the user with an error message
-    flash[:error] = msg_to_user
+    # present the user with an error message so long as this is occured via a web request 
+    flash[:error] = msg_to_user if request
     # send an error email if appropriate
     if send_email
       begin
