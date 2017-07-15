@@ -158,8 +158,17 @@ module CreateDip
       end
     end
   rescue => e
-    handle_exception(e, "Unable to ingest DIP for given UUID. Make sure you entered the correct UUID and try again", "Given DIP location: " + dip_location)
+    delete_failed_ingest(@dataset) if @dataset
+    handle_exception(e, "Unable to ingest DIP", "Unable to ingest DIP. Given DIP location: " + dip_location, true)
     raise
+  end
+
+  # delete the ingested dip files from a dataset - this will be called to clean up after failed ingest
+  def delete_failed_ingest (dataset)
+    dataset.members.each do |member|
+      member.delete
+    end
+    dataset.save
   end
 
   # REVIEW: may not be needed after status.py update
