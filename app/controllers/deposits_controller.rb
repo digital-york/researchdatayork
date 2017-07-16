@@ -78,7 +78,7 @@ class DepositsController < ApplicationController
 
       unless params[:new].nil?
         fq << '!wf_status_tesim:*' # no workflow statuses
-        fq << '!packaged_by_ids_ssim:*' # no packages (was '!member_ids_ssim:*') 
+        fq << '!member_ids_ssim:*' # no packages (was '') 
       end
 
       unless params[:doi].nil?
