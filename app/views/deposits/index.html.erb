@@ -185,7 +185,9 @@
                   <%= dip_list.size %> aip<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
                       <%= dip.id %><br/>
-                      requested by <%= dip.requestor_email.join(", ") %> <br/>
+                      <% if !(dip.requestor_email.to_a - ["removed"]).empty? %>
+                        requested by <%= (dip.requestor_email.to_a - ["removed"]).join(", ") %> <br/>
+                      <% end %>
                       <% if dip.aip_status == 'UPLOADED' and dip.dip_status.nil? %>
                           <%= link_to 'Approve', '/reingest/' + upload['id'] %>
                       <% elsif dip.aip_status.nil? or dip.aip_status != 'UPLOADED' %>
