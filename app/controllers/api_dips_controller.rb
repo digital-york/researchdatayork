@@ -30,9 +30,6 @@ class ApiDipsController < BaseApiController
       # data (DIP) is now available so send an email to anyone who requested the data
       RdMailer.notify_requester(params[:id]).deliver_later
       RdMailer.notify_rdm_team_about_dataset(@dip.package_ids[0], "DIP has been created and uploaded and is ready to be downloaded", "DIP created").deliver_later if @dip.package_ids and !@dip.package_ids.empty?
-      # now that we've sent the dip available notification, delete the requestor email address
-      @dip.requestor_email = ["removed"]
-      @dip.save
       render json:  @dip.to_json, status: :ok
     else
       render nothing: true, status: :bad_request

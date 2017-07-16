@@ -9,6 +9,9 @@ class RdMailer < ApplicationMailer
     to = @dip.requestor_email.to_a
     # remove any duplicates from the recipient list
     to.uniq!
+    # now that we've sent the dip available notification, delete the requestor email address
+    @dip.requestor_email = ["removed"]
+    @dip.save
     # send them an email telling them that the data is ready to download
     mail(to: "Undisclosed Recipients <do-not-reply@york.ac.uk>", bcc: to, subject: 'Data available for dataset "' + @dataset.title[0].to_s + '"') unless to.empty?
   end
