@@ -121,9 +121,8 @@ module CreateDip
           obj_fs.apply_depositor
           # add this file to the FileSet
           obj_fs.preflabel = object
-          path = File.join(location, item, object)
-          f = open(path)
-          Hydra::Works::UploadFileToFileSet.call(obj_fs, f)
+          # just write an empty string to FileSet object - not going to store potentially 20gb files in Hydra, they'll be served from dip location
+          Hydra::Works::UploadFileToFileSet.call(obj_fs, StringIO.new(""))
           # get the first 36 characters of the filename - the "thumbnail" and "ocr text" corresponding to this file will have this prefix
           prefix = object[0..35]
           # find the "thumbnail" that corresponds to this file (it'll have the same filename prefix) if it exists and add it to the FileSet

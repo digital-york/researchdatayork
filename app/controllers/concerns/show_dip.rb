@@ -54,6 +54,7 @@ module ShowDip
             # the original file is in f.original_file - if it has a thumbnail, that's in f.thumbnail
             dip_structure[file_id][:file_uri] = f.original_file.uri.to_s
             dip_structure[file_id][:thumbnail_uri] = f.thumbnail.uri.to_s
+            dip_structure[file_id][:file_path_abs] = File.join(ENV['DIP_LOCATION'], dip.dip_current_path, "objects", f.preflabel)
           end
         end
       end

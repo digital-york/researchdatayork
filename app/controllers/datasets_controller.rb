@@ -67,8 +67,8 @@ class DatasetsController < ApplicationController
       log_download(dataset)
       # get the dip files structure array
       dip_files = dip_directory_structure(dataset)
-      # redirect the user the file they requested
-      redirect_to dip_files[params[:fileid]][:file_uri]
+      # give the user the file from the dip store (no longer storing files in hydra as they might be massive)
+      send_file(dip_files[params[:fileid]][:file_path_abs])
     else
       render :plain => "You do not have permission to download this file"
     end
