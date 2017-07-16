@@ -26,7 +26,7 @@ class ApiDipsController < BaseApiController
     @dip.dip_status = 'UPLOADED'
 
     if @dip.save
-      #ingest_dip(@dip.dip_current_path,@dip.id)
+      ingest_dip(@dip.dip_current_path,@dip.id)
       # data (DIP) is now available so send an email to anyone who requested the data
       RdMailer.notify_requester(params[:id]).deliver_later
       RdMailer.notify_rdm_team_about_dataset(@dip.package_ids[0], "DIP has been created and uploaded and is ready to be downloaded", "DIP created").deliver_later if @dip.package_ids and !@dip.package_ids.empty?
