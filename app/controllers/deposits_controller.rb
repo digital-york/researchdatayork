@@ -261,11 +261,11 @@ class DepositsController < ApplicationController
       # if the user uploaded local file(s), they will be sitting in @temp_upload_dir
       uploaded_files_dir = File.join(@temp_upload_dir, @dataset.id)
       if Dir.exists?(uploaded_files_dir)
-        @aip = create_aip
-        set_user_deposit(@dataset, params[:deposit][:readme])
-        new_deposit(@dataset.id, @aip.id)
-        add_metadata(@dataset.for_indexing[0])
         begin
+          @aip = create_aip
+          set_user_deposit(@dataset, params[:deposit][:readme])
+          new_deposit(@dataset.id, @aip.id)
+          add_metadata(@dataset.for_indexing[0])
           # handle readme (submission documentation)
           if params[:deposit][:readme] and !params[:deposit][:readme].empty?
             deposit_submission_documentation(params[:deposit][:readme])
@@ -279,7 +279,7 @@ class DepositsController < ApplicationController
           @dataset.aips.delete(@dataset.aips.last)
           # delete aip
           delete_aip
-          delete_deposited_files
+          delete_deposited_files(@dataset.id)
           # notify RDM team about failed upload
           RdMailer.notify_rdm_team_about_dataset(@dataset.id, "An error occurred during data deposit: " + e.message, "Error during deposit", current_user).deliver_later
           flash.now[:error] = 'Failed to deposit selected files: ' + e.message
