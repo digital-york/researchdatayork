@@ -183,7 +183,7 @@ module CreateDip
     # get the OS to create the zip
     result = ""
     begin
-      result = `zip -rq #{zip_file} #{path_to_dipfiles} 2>&1`
+      result = `zip -rqj #{zip_file} #{path_to_dipfiles} 2>&1`
       raise if !result.empty? or !$?.success?
     rescue => e
       handle_exception(e, "Failed to create zip file for dataset " + dataset_id + ", output: " + result, "Failed to create zip file for dataset " + dataset_id + ", output: " + result, true)
