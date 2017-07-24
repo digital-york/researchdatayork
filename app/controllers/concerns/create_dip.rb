@@ -111,6 +111,8 @@ module CreateDip
     Dir.foreach(location) do |item|
       # if it's the "objects" folder
       if File.directory?(File.join(location, item)) && item == 'objects'
+        # create a zip file of the objects folder contents 
+        create_zip(@dataset.id.to_s, File.join(location, item))
         # for each file in the "objects" folder
         Dir.foreach(File.join(location, item)) do |object|
           # skip any directories inside the objects folder
@@ -169,6 +171,28 @@ module CreateDip
     end
     dataset.save
   end
+
+  # create a zip file from a dip
+  def create_zip (dataset_id, path_to_dipfiles)
+    # quick sanity check on input
+    ds = find_dataset(dataset_id)
+    # create a folder for the zip file
+    zip_dir = File.join(ENV['DIP_LOCATION'], "zips", dataset_id)
+    zip_file = File.join(zip_dir, "dataset.zip")
+    FileUtils.mkdir_p(zip_dir)
+    # get the OS to create the zip
+    result = ""
+    begin
+      result = `zip -rq #{zip_file} #{path_to_dipfiles} 2>&1`
+      raise if !result.empty? or !$?.success?
+    rescue => e
+      handle_exception(e, "Failed to create zip file for dataset " + dataset_id + ", output: " + result, "Failed to create zip file for dataset " + dataset_id + ", output: " + result, true)
+    end
+  rescue => e
+    handle_exception(e, "Unable to create zip file for dataset " + dataset_id, "Unable to create zip file for dataset " + dataset_id, true)  
+  end
+  # if need to make this a background job, uncomment following line
+  #handle_asynchronously :create_zip
 
   # REVIEW: may not be needed after status.py update
   def get_dip_details(uuid)
