@@ -20,6 +20,7 @@ class DatasetsController < ApplicationController
     #  - user wants a zip download of the dataset files
     @dataset = find_dataset(params[:id])
     @dip_files = dip_directory_structure(@dataset)
+    @zip_file = File.join(ENV['DIP_LOCATION'], "zips", @dataset.id, "dataset.zip")
     if params[:request]
       # handle case where user has just provided an email address
       if params[:request][:email].include? '@'
@@ -36,13 +37,11 @@ class DatasetsController < ApplicationController
     elsif request.format.zip?
       # log the download time and increment the download count
       log_download(@dataset)
-      # create a zip file 
-      zip_file_stream = dip_as_zip_filestream(@dataset)
     end
     respond_to do |format|
       format.html { render :show, notice: @notice }
       format.json { render :show, status: :created, location: @deposit }
-      format.zip { send_data zip_file_stream.read, filename: 'dataset.zip' }
+      format.zip { send_file @zip_file, filename: 'dataset.zip' }
     end
   end
 

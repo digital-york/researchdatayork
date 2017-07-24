@@ -31,7 +31,11 @@
     <h3>Download the Data</h3>
     <% if @dip_files.length > 0 %>
       <h4>As a zip file</h4>
-      <p><%= link_to "Download zip", format: :zip %></p>
+      <% if File.exists?(@zip_file) %>
+        <p><%= link_to "Download zip", format: :zip %></p>
+      <% else %>
+        <p>Zip file is currently being generated - please try again later</p>
+      <% end %>
       <h4>As individual files</h4>
       <ul class="filedownload">
       <% @dip_files.each do |key, file| %>
