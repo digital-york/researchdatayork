@@ -160,6 +160,8 @@
       };
       // by default, when user presses submit, handle google uploads 
       $('#submit_btn').on('click.googleFiles', function (ev) { getGoogleFiles(true) });
+      var tooLargeAlerted = false;
+      var currentTotalUploadSize = 0;
       // handle local file upload using jquery file upload
       $('.file_upload').fileupload({
           dataType: 'json',
@@ -170,29 +172,33 @@
               // pass the webkitRelativePath value (which contains the relative path to the file) to the form handler 
               // so it can build dir structure, and also file actual size
               data.formData = {"path": data.files[0].webkitRelativePath, "size": data.files[0].size};
-              // increment the total upload file size counter
-              //totalUploadSize += data.files[0].size;
+              // if user has added too much data, alert them
+              localFilesToUpload.push(data);
               // remove default click handler for submit button that handled google drive - this will be instead be called when uploads done
               $("#submit_btn").off('click.googleFiles');
               // and add new click handler - note this 'add' function is called once for each selected file
               $("#submit_btn").on('click', function (ev) {
-                // run the following code block asyncronously - if user selected hundreds of files then it takes ages to execute the following and browser hangs without async
-                setTimeout(function() {
-                  if (totalUploadSize() > maxUploadSize) {
+                if (currentTotalUploadSize == 0) {
+                  currentTotalUploadSize = totalUploadSize();
+                }
+                if (currentTotalUploadSize > maxUploadSize) {
+                  if (!tooLargeAlerted) {
                     alertUploadTooLarge();
-                  } else {
-                    disableSubmit();
-                    data.submit();
+                    tooLargeAlerted = true;
                   }
-                }, 100);
+                } else {
+                  disableSubmit();
+                  data.submit();
+                }
               });
-              localFilesToUpload.push(data);
           },
           change: function (e, data) {
             // clear the list of files to upload and revert to default submit handler (note: 'add' may be subsequently called)
             $("#submit_btn").off('click');
             $("#submit_btn").on('click.googleFiles', function(ev) { getGoogleFiles(true) });
             localFilesToUpload = [];
+            tooLargeAlerted = false;
+            currentTotalUploadSize = 0;
           },
           progress: function (e, data) {
               var progress = parseInt(data.loaded / data.total * 100, 10);
