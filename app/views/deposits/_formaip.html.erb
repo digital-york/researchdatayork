@@ -176,12 +176,15 @@
               $("#submit_btn").off('click.googleFiles');
               // and add new click handler - note this 'add' function is called once for each selected file
               $("#submit_btn").on('click', function (ev) {
-                if (totalUploadSize() > maxUploadSize) {
-                  alertUploadTooLarge();
-                } else {
-                  disableSubmit();
-                  data.submit();
-                }
+                // run the following code block asyncronously - if user selected hundreds of files then it takes ages to execute the following and browser hangs without async
+                setTimeout(function() {
+                  if (totalUploadSize() > maxUploadSize) {
+                    alertUploadTooLarge();
+                  } else {
+                    disableSubmit();
+                    data.submit();
+                  }
+                }, 100);
               });
               localFilesToUpload.push(data);
           },
