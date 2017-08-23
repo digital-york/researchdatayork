@@ -195,6 +195,10 @@
                       <% elsif dip.dip_status == 'UPLOADED' %>
                           <%= dip.dip_status %>
                           <br/><br/>
+                          <%# info about who approved reingest and when will be stored in dip's altlabel field %>
+                          <% if !dip.altlabel.nil? and !dip.altlabel.empty? %>
+                            <%= dip.altlabel.join(", ") %> <br/><br/>
+                          <% end %>
                           Number of downloads: 
                           <% unless upload['number_of_downloads_isim'].nil? %>
                             <%= upload['number_of_downloads_isim'][0] %>

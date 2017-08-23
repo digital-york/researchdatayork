@@ -51,6 +51,12 @@ module ReingestAip
           # or (response.status.to_s.match(/^5\d\d$/) and response.body.include? 'Permission denied')
           )
         dip.dip_status =  approve_reingest(aip.id, aip.aip_uuid, id)
+        # get the current user (if there is one) and the current time and log these in the dip 
+        thisuser = ""
+        if request and user_signed_in? and current_user and current_user.email
+          thisuser = current_user.email
+        end
+        dip.altlabel = ["Re-ingest approved by " + thisuser + " at " + Time.now.strftime("%d/%m/%Y %H:%M")]
         dip.save
       else
         begin
