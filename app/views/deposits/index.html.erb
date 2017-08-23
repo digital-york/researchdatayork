@@ -155,7 +155,7 @@
                       In Progress
                   <% end %>
                   <br/>
-                  <%= aip_list.size %> aip<% unless aip_list.size < 2 %>s<% end %> deposited <br/>
+                  <%= aip_list.size %> AIP<% unless aip_list.size < 2 %>s<% end %> deposited <br/>
                   <% aip_list.each do |aip| %>
                       <%= aip %> <br/>
                   <% end %>
@@ -182,7 +182,7 @@
                       <% end %>
                   <% end %>
                   <br/>
-                  <%= dip_list.size %> aip<% unless dip_list.size < 2 %>s<% end %> created<br/>
+                  <%= dip_list.size %> DIP<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
                       <%= dip.id %><br/>
                       <% if !(dip.requestor_email.to_a - ["removed"]).empty? %>
