@@ -62,8 +62,7 @@
               <br/>
               <% unless upload['doi_tesim'].nil? %>
                   <strong>DOI:</strong>
-
-                  <% upload['doi_tesim'].each do |doi| %>
+                  <% upload['doi_tesim'].reject(&:empty?).each do |doi| %>
                       <% if check_doi(doi) %>
                           <%= render 'shared/tick' %>
                       <% end %>
@@ -117,7 +116,7 @@
                   <%= render 'shared/alert' %>
                   In Progress<br/>
               <% end %>
-              <% if upload['doi_tesim'].nil? %>
+              <% if upload['doi_tesim'].nil? or upload['doi_tesim'].empty? %>
                   <%= render 'shared/cross' %>
                   No DOI<br/>
               <% else %>
