@@ -60,7 +60,7 @@
                   <% end %>
               <% end %>
               <br/>
-              <% unless upload['doi_tesim'].nil? %>
+              <% unless upload['doi_tesim'].nil? or upload['doi_tesim'].reject(&:empty?).empty? %>
                   <strong>DOI:</strong>
                   <% upload['doi_tesim'].reject(&:empty?).each do |doi| %>
                       <% if check_doi(doi) %>
@@ -116,7 +116,7 @@
                   <%= render 'shared/alert' %>
                   In Progress<br/>
               <% end %>
-              <% if upload['doi_tesim'].nil? or upload['doi_tesim'].empty? %>
+              <% if upload['doi_tesim'].nil? or upload['doi_tesim'].reject(&:empty?).empty? %>
                   <%= render 'shared/cross' %>
                   No DOI<br/>
               <% else %>
