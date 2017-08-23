@@ -187,8 +187,12 @@ class DepositsController < ApplicationController
 
     # SORTING AND PAGING
     @results_per_page = 10
-    # set up an array for holding the sort clause - default to sorting on id
+    # set up an array for holding the sort clause - default to sorting on created date
     solr_sort_fields = ["id asc"]
+    if !params[:sort]
+      params[:sort] = 'created'
+      params[:sort_order] = 'desc'
+    end
     # if a valid sort parameter was given
     if params[:sort] and ["access", "created", "available"].include?(params[:sort])
       solr_sort = ''
