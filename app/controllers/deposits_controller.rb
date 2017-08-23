@@ -73,7 +73,7 @@ class DepositsController < ApplicationController
     unless params[:q].nil?
       # TODO or search for multiple words etc.
       unless params[:q] == ''
-        fq << 'for_indexing_tesim:"' + params[:q] + '" OR restriction_note_tesim:"' + params[:q] + '" OR id:"' + params[:q] + '"'
+        fq << 'for_indexing_tesim:"' + params[:q].strip + '" OR restriction_note_tesim:"' + params[:q].strip + '" OR id:"' + params[:q].strip + '" OR packagedBy_ssim:"' + params[:q].strip + '"'
       end
 
       unless params[:new].nil?
