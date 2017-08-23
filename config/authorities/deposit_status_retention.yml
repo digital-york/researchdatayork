@@ -3,3 +3,5 @@ terms:
     term: --
   - id: ten-yrs-last-access
     term: Ten years from last access
+  - id: indefinite
+    term: Indefinite
