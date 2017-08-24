@@ -170,3 +170,13 @@ ul.filedownload li img {
 #progressinfo {
   height: 20px;
 }
+ /* add some styling to the main dashboard table on the main deposits page */
+#main-dashboard-table {
+  table-layout: fixed;
+}
+#main-dashboard-table td, th {
+  overflow-wrap: break-word;
+}
+#main-container {
+  width: 1400px;
+}
