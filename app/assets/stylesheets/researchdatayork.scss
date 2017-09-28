@@ -177,6 +177,8 @@ ul.filedownload li img {
 #main-dashboard-table td, th {
   overflow-wrap: break-word;
 }
-#main-container {
-  width: 1520px;
+@media screen and (min-width: 1550px) {
+  #main-container {
+    width: 1520px;
+  }
 }
