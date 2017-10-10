@@ -175,7 +175,7 @@ module CreateDip
   # create a zip file from a dip
   def create_zip (dataset_id, path_to_dipfiles)
     # quick sanity check on input
-    ds = find_dataset(dataset_id)
+    ds = Dlibhydra::Dataset.find(dataset_id)
     # create a folder for the zip file
     zip_dir = File.join(ENV['DIP_LOCATION'], "zips", dataset_id)
     zip_file = File.join(zip_dir, "dataset.zip")
