@@ -91,7 +91,7 @@ class DepositsController < ApplicationController
 
       unless params[:status].nil?
         params[:status].each do |s|
-          q += ' and wf_status_tesim:' + s + ''
+          q += ' and wf_status_tesim:"' + s + '"'
         end
       end
 
@@ -221,6 +221,8 @@ class DepositsController < ApplicationController
       @current_page = params[:page].to_i
     end
 
+    Rails.logger.debug("q: #{q.inspect}; fq: #{fq.inspect}; no_results: #{no_results.inspect}")
+
     if no_results
       response = nil
     else
@@ -308,7 +310,8 @@ class DepositsController < ApplicationController
     if params[:deposit][:file] and not params[:deposit][:file].empty? and params[:id] and params[:size]
       begin
         path = params[:path] ? params[:path] : ""
-        deposit_file_chunk_from_client(params[:deposit][:file][0], path, params[:id], params[:size])
+        first = params[:first] ? params[:first] == "1" : false
+        deposit_file_chunk_from_client(params[:deposit][:file][0], path, params[:id], params[:size], first)
         @files = params[:deposit][:file]
       rescue => e
         delete_deposited_files(params[:id])
@@ -323,7 +326,7 @@ class DepositsController < ApplicationController
     @data = {}
     if params[:fileid] and params[:path] and params[:size] and params[:dataset_id] and params[:mime_type]
       begin
-        deposit_file_from_google(params[:fileid], params[:path], params[:mime_type], params[:dataset_id], params[:size], params[:byte_from], params[:byte_to])
+        deposit_file_from_google(params[:fileid], params[:path], params[:mime_type], params[:dataset_id], params[:size], params[:byte_from], params[:byte_to], params[:first_file])
         @data = {"path" => params[:path], "filesize" => params[:size], "byte_from" => params[:byte_from], "byte_to" => params[:byte_to]}
       rescue => e
         delete_deposited_files(params[:dataset_id])

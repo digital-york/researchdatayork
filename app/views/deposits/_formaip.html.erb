@@ -86,7 +86,7 @@
         $('#progressbar_progress').css('width', progress + '%');
         $('#progressinfo').html(filename + " " + progress + '%');
       };
-      var alertNoFiles = function () {alert("You haven't selected and files");};
+      var alertNoFiles = function () {alert("You haven't selected any files");};
       var alertUploadTooLarge = function () {alert("You are attempting to upload " + bytesToMegabytes(totalUploadSize()) + "Mb of data - the maximum amount of data you can deposit is " + bytesToMegabytes(maxUploadSize) + "Mb")}
       var disableSubmit = function () {
         $("#submit_btn").attr("disabled", true);
@@ -98,8 +98,8 @@
       };
       var finishUpload = function () {
         // submit the main form
-        $('#deposit_main_form').submit();
-        //alert("form will be posted now");
+        //$('#deposit_main_form').submit();
+        alert("form will be posted now");
       };
       var uploadFail = function (info) {
         $('#progressbar_progress').removeClass('normal').addClass('fail');
@@ -108,25 +108,26 @@
         enableSubmit();
       }
       // fetch the selected google files in chunks - each successfully fetched chunk will trigger the fetching of the next chunk
-      var getGoogleFileChunk = function (index, dataset_id, byte_from, byte_to) {
+      var getGoogleFileChunk = function (index, dataset_id, byte_from, byte_to, first_file) {
         var fileid = selectedNodes[index].id;
         var path = relpath_to_node($("#jstree_div").jstree(), selectedNodes[index]);
         var mimeType = selectedNodes[index].data["mime_type"];
         var size = selectedNodes[index].data["size"] || 0;
         var progress = size != 0 ? parseInt(byte_from / size * 100, 10) : 0;
+        var firstFile = first_file ? 1 : 0;
         updateProgress(path, progress);
         $.ajax({
           url: "<%= getgdrivefile_path %>.json",
-          data: {fileid: fileid, path: path, mime_type: mimeType, dataset_id: dataset_id, size: size, byte_from: byte_from, byte_to: byte_to },
+          data: {fileid: fileid, path: path, mime_type: mimeType, dataset_id: dataset_id, size: size, byte_from: byte_from, byte_to: byte_to, first_file: firstFile },
           success: function (data) {
             var progress = data["filesize"] > 0 ? parseInt(Math.min(data["byte_to"], data["filesize"]) / data["filesize"] * 100, 10) : 0;
             updateProgress(data["path"] || '', progress);
             // get the next chunk of this file if there's still data to get
             if (byte_to < size) {
-              getGoogleFileChunk(index, dataset_id, byte_to + 1, byte_to + chunkSize);
+              getGoogleFileChunk(index, dataset_id, byte_to + 1, byte_to + chunkSize, false);
             // otherwise, if there are more files, get the first chunk of the next file
             } else if (index + 1 < selectedNodes.length) {
-              getGoogleFileChunk(index + 1, dataset_id, 0, chunkSize - 1);
+              getGoogleFileChunk(index + 1, dataset_id, 0, chunkSize - 1, false);
             // otherwise, all done
             } else {
               finishUpload();
@@ -138,28 +139,27 @@
         });
       };
       // define function for handling the fetching of google files if some google files have been selected and 'alert no files' if not
-      var getGoogleFiles = function (showAlertIfNoFilesSelected) {
+      var getGoogleFiles = function (alreadyProcessedLocalFiles) {
         // if 'selectedNodes' variable exists and is an array then the user has selected google drive files
         if (typeof selectedNodes !== 'undefined' && selectedNodes instanceof Array && selectedNodes.length > 0) {
-          // if the user isn't tring to upload too much data, kick off the upload
+          // if the user isn't trying to upload too much data, kick off the upload
           if (totalUploadSize() < maxUploadSize) {
             disableSubmit();
             // kick of the fetching of the google files - this will recursively fetch all chunks and call 'finishUpload' when done
-            getGoogleFileChunk(0, "<%= @dataset.id %>", 0, chunkSize-1); 
+            // also pass in whether or not we've already processed local files - if not we need to know that this is the first file uploaded
+            getGoogleFileChunk(0, "<%= @dataset.id %>", 0, chunkSize-1, !alreadyProcessedLocalFiles); 
           } else {
             alertUploadTooLarge();
           }
         // otherwise, no google files selected, present 'no files selected' alert or call 'finishUpload'
         } else {
-          if (showAlertIfNoFilesSelected) {
+          if (!alreadyProcessedLocalFiles) {
             alertNoFiles();
           } else {
             finishUpload();
           }
         }
       };
-      // by default, when user presses submit, handle google uploads 
-      $('#submit_btn').on('click.googleFiles', function (ev) { getGoogleFiles(true) });
       var tooLargeAlerted = false;
       var currentTotalUploadSize = 0;
       // handle local file upload using jquery file upload
@@ -172,30 +172,11 @@
               // pass the webkitRelativePath value (which contains the relative path to the file) to the form handler 
               // so it can build dir structure, and also file actual size
               data.formData = {"path": data.files[0].webkitRelativePath, "size": data.files[0].size};
-              // if user has added too much data, alert them
+              // add this file to an array of files to upload
               localFilesToUpload.push(data);
-              // remove default click handler for submit button that handled google drive - this will be instead be called when uploads done
-              $("#submit_btn").off('click.googleFiles');
-              // and add new click handler - note this 'add' function is called once for each selected file
-              $("#submit_btn").on('click', function (ev) {
-                if (currentTotalUploadSize == 0) {
-                  currentTotalUploadSize = totalUploadSize();
-                }
-                if (currentTotalUploadSize > maxUploadSize) {
-                  if (!tooLargeAlerted) {
-                    alertUploadTooLarge();
-                    tooLargeAlerted = true;
-                  }
-                } else {
-                  disableSubmit();
-                  data.submit();
-                }
-              });
           },
           change: function (e, data) {
-            // clear the list of files to upload and revert to default submit handler (note: 'add' may be subsequently called)
-            $("#submit_btn").off('click');
-            $("#submit_btn").on('click.googleFiles', function(ev) { getGoogleFiles(true) });
+            // clear the list of files to upload (note: 'add' may be subsequently called)
             localFilesToUpload = [];
             tooLargeAlerted = false;
             currentTotalUploadSize = 0;
@@ -208,17 +189,43 @@
               $.each(data.result.files, function (index, file) {
                   $('#progressinfo').html(file.name + " uploaded!");
               });
-              localFileUploadCount++;
-              // if the number of 'done' files equals the number of selected files, then all uploads are done
-              // handle google files (if there are any), which will also submit main form
-              if (localFileUploadCount == localFilesToUpload.length) {
-                getGoogleFiles(false);
+              // if there are still more local files to upload, kick off the next file upload, otherwise, process selected google files
+              if (localFilesToUpload.length > 0) {
+                localFilesToUpload.shift().submit();
+              } else {
+                getGoogleFiles(true);
               }
           },
           fail: function (e, data) {
             uploadFail(data.textStatus);
           }
       });
+      // handle uploads - when user clicks submit button
+      $('#submit_btn').on('click', function (ev) {
+        // if there are some local files to upload
+        if (localFilesToUpload.length > 0) {
+          // throw an error if the upload size is too big
+          if (currentTotalUploadSize == 0) {
+            currentTotalUploadSize = totalUploadSize();
+          }
+          if (currentTotalUploadSize > maxUploadSize) {
+            if (!tooLargeAlerted) {
+              alertUploadTooLarge();
+              tooLargeAlerted = true;
+            }
+          // otherwise, disable the submit button and kick off the upload of the first file (subsequent ones will be kicked off by the 'done' callback)
+          } else {
+            disableSubmit();
+            firstFile = localFilesToUpload.shift();
+            // add in a post parameter to indicate that this is the first file of an upload (which can be used to delete any previous uploads)
+            firstFile.formData["first"] = 1;
+            firstFile.submit();
+          }
+        // if there are no local files selected, handle selected google drive files
+        } else {
+          getGoogleFiles(false);
+        }
+      }); 
   });
 </script>
 

@@ -52,11 +52,15 @@ module DepositData
   end
 
   # given a chunk of a local file and a relative path for where it should, write the chunk to the correct place in the temporary deposit 
-  def deposit_file_chunk_from_client(filechunk, path, dataset_id, size)
+  def deposit_file_chunk_from_client(filechunk, path, dataset_id, size, first)
     uploaded_filename = path.empty? ? filechunk.original_filename : path
     # if this is a chunked upload and this is the first chunk then we want to write a new file, else we want to append
     if !request.env["HTTP_CONTENT_RANGE"] or request.env["HTTP_CONTENT_RANGE"].starts_with?("bytes 0-")
       write_mode = 'wb'
+      # if this is the first file uploaded then delete all existing uploaded files for this dataset before uploading these files
+      if first
+        delete_deposited_files(dataset_id)
+      end
     else
       write_mode = 'ab'
     end
@@ -64,11 +68,19 @@ module DepositData
   end
   
   # given a google file id, a relative path for where it belongs, and a byte range, get the file data from google and write it
-  def deposit_file_from_google (file, path, mime_type, dataset_id, size, byte_from, byte_to)
+  def deposit_file_from_google (file, path, mime_type, dataset_id, size, byte_from, byte_to, first_file)
     service = initialise_api
     filechunk = get_file_from_google(service, file, mime_type, byte_from, byte_to)
     # if it's the first portion of the file, write mode should be "write", else "append"
-    write_mode = (!byte_from or byte_from.to_i == 0) ? "wb" : "ab"
+    if (!byte_from or byte_from.to_i == 0) 
+      write_mode = "wb" 
+      # if this is the first file uploaded then delete all existing uploaded files for this dataset before uploading these files
+      if (first_file == "1")
+        delete_deposited_files(dataset_id)
+      end
+    else
+      write_mode = "ab"
+    end
     write_deposit_chunk(filechunk.string, path, dataset_id, size, write_mode)
   end
 
