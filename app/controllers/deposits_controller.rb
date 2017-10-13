@@ -221,7 +221,7 @@ class DepositsController < ApplicationController
       @current_page = params[:page].to_i
     end
 
-    Rails.logger.debug("q: #{q.inspect}; fq: #{fq.inspect}; no_results: #{no_results.inspect}")
+    #Rails.logger.debug("q: #{q.inspect}; fq: #{fq.inspect}; no_results: #{no_results.inspect}")
 
     if no_results
       response = nil
