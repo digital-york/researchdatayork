@@ -79,6 +79,9 @@ a.delete {
 p.note:hover a.delete {
   display: inline
 }
+textarea#notes {
+  width: 100%
+}
 
 /* styles for presenting error message to user */
 div#errors label#error_label {
