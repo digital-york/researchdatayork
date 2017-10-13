@@ -209,7 +209,7 @@ module CreateDip
       faraday.response :logger # log requests to STDOUT
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
       faraday.options.open_timeout = 10
-      faraday.options.timeout = 30
+      faraday.options.timeout = 120
     end
 
     params = {
