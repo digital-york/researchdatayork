@@ -324,7 +324,7 @@ class DepositsController < ApplicationController
   # GET /deposits/1/getgdrivefile.json
   def getgdrivefile
     @data = {}
-    if params[:fileid] and params[:path] and params[:size] and params[:dataset_id] and params[:mime_type]
+    if params[:fileid] and params[:path] and params[:size] and params[:dataset_id] and params[:mime_type] and params[:first_file]
       begin
         deposit_file_from_google(params[:fileid], params[:path], params[:mime_type], params[:dataset_id], params[:size], params[:byte_from], params[:byte_to], params[:first_file])
         @data = {"path" => params[:path], "filesize" => params[:size], "byte_from" => params[:byte_from], "byte_to" => params[:byte_to]}
