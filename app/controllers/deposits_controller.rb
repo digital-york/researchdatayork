@@ -7,8 +7,8 @@ class DepositsController < ApplicationController
 
   # enforce some access control rules. All methods require the end user to be logged in
   before_action :authenticate_user!
-  # and most method (all except 'show' - the deposit upload page) require the end user to be an administrator
-  before_action :verify_is_admin, except: [:show]
+  # and most methods (all except 'show', 'fileupload' & 'getgdrivefile' - the deposit upload methods) require the end user to be an administrator
+  before_action :verify_is_admin, except: [:show, :fileupload, :getgdrivefile]
 
   include Dlibhydra
   include Puree
