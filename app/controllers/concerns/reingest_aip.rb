@@ -20,6 +20,8 @@ module ReingestAip
         faraday.request  :url_encoded             # form-encode POST params
         faraday.response :logger                  # log requests to STDOUT
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+        faraday.options.open_timeout = 10
+        faraday.options.timeout = 30
       end
 
       path = '/api/v2/file/' + aip.aip_uuid + '/reingest/'
@@ -97,6 +99,8 @@ module ReingestAip
       faraday.request  :url_encoded             # form-encode POST params
       faraday.response :logger                  # log requests to STDOUT
       faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+      faraday.options.open_timeout = 10
+      faraday.options.timeout = 30
 
     end
     path = '/api/ingest/reingest/approve'
