@@ -171,7 +171,7 @@
               <% if dip_list.size > 0 %>
                   <% unless dip.requestor_email.size == 0 %>
                       <%= render 'shared/tick' %> Requested </br>
-                      <% if dip.dip_status == 'APPROVE' %>
+                      <% if dip.dip_status == 'APPROVED' %>
                           <%= render 'shared/tick' %> Request Approved </br>
                           <%= render 'shared/cross' %> Not Available </br>
                       <% elsif dip.dip_status == 'UPLOADED' %>

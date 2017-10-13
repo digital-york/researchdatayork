@@ -64,7 +64,7 @@
             <%= check_box_tag('dip_status[]', "waiting", (params[:dip_status] and Array(params[:dip_status]).include?("waiting")), :id => 'dip-status-waiting') %>
             <%= label_tag('dip-status-waiting', "Waiting for Approval" ) %><br/>
 
-            <%= check_box_tag('dip_status[]', "APPROVE", (params[:dip_status] and Array(params[:dip_status]).include?("APPROVE")), :id => 'dip-status-approve') %>
+            <%= check_box_tag('dip_status[]', "APPROVED", (params[:dip_status] and Array(params[:dip_status]).include?("APPROVED")), :id => 'dip-status-approve') %>
             <%= label_tag('dip-status-approve', "Request Approved, Data In Progress" ) %><br/>
 
             <%= check_box_tag('dip_status[]', "nodip", (params[:dip_status] and Array(params[:dip_status]).include?("nodip")), :id => 'dip-status-nodip') %>

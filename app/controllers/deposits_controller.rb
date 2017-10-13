@@ -142,7 +142,7 @@ class DepositsController < ApplicationController
                                 'id,packagedBy_ssim', num_results)
           r['docs'].each do |dataset|
             dataset['packagedBy_ssim'].each do |dip|
-              if dipstatus == 'APPROVE' or dipstatus == 'UPLOADED'
+              if dipstatus == 'APPROVED' or dipstatus == 'UPLOADED'
                 num_results = get_number_of_results('id:'+ dip +' and dip_status_tesim:' + dipstatus, [])
                 if num_results == 0
                   fq << '!id:' + dataset['id']
