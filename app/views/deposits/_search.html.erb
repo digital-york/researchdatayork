@@ -53,10 +53,10 @@
             </td>
           <td>
             <%= check_box_tag('status[]', "held-pub-meta", (params[:status] and Array(params[:status]).include?("held-pub-meta")), :id => 'status-held-pub-meta') %>
-            <%= label_tag('status-held-pub-meta', "Metadata Held for Publication " ) %><br/>
+            <%= label_tag('status-held-pub-meta', "Metadata Held for Publication" ) %><br/>
 
             <%= check_box_tag('status[]', "held-pub-data", (params[:status] and Array(params[:status]).include?("held-pub-data")), :id => 'status-held-pub-data') %>
-            <%= label_tag('status-held-pub-data', "Data Held for Publication " ) %><br/>
+            <%= label_tag('status-held-pub-data', "Data Held for Publication" ) %><br/>
 
             <%= check_box_tag('dip_status[]', "UPLOADED", (params[:dip_status] and Array(params[:dip_status]).include?("UPLOADED")), :id => 'dip-status-uploaded') %>
             <%= label_tag('dip-status-uploaded', "Data Available" ) %><br/>
