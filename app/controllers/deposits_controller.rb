@@ -151,7 +151,7 @@ class DepositsController < ApplicationController
                   no_results = false
                 end
               elsif dipstatus == 'waiting'
-                num_results = get_number_of_results('id:'+ dip, ['requestor_email_tesim:*', '!dip_status_tesim:*'])
+                num_results = get_number_of_results('id:'+ dip, ['requestor_email_tesim:*', '!dip_status_tesim:*', '!aip_status_tesim:"FAILED"'])
                 if num_results == 0
                   fq << '!id:' + dataset['id']
                 else
