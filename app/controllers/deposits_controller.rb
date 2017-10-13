@@ -97,17 +97,17 @@ class DepositsController < ApplicationController
 
       unless params[:aip_status].nil?
         params[:aip_status].each do |aipstatus|
-
+          # all references to 'packagedBy_ssim' used to be 'member_ids_ssim'
           if aipstatus == 'noaip'
-            fq << '!member_ids_ssim:*'
+            fq << '!packagedBy_ssim:*'
           else
-            fq << 'member_ids_ssim:*'
-            num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',)
+            fq << 'packagedBy_ssim:*'
+            num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and packagedBy_ssim:*',)
             if num_results == 0
-              fq << 'member_ids_ssim:*'
+              fq << 'packagedBy_ssim:*'
             else
-              r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*', [],
-                                    'id,member_ids_ssim', num_results)
+              r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and packagedBy_ssim:*', [],
+                                    'id,packagedBy_ssim', num_results)
               if aipstatus == 'uploaded'
                 status_query = 'aip_status_tesim:UPLOADED'
               elsif aipstatus == 'inprogress'
@@ -116,7 +116,7 @@ class DepositsController < ApplicationController
                 status_query = 'aip_status_tesim:(ERROR or FAILED or USER_INPUT)'
               end
               r['docs'].each do |dataset|
-                dataset['member_ids_ssim'].each do |aip|
+                dataset['packagedBy_ssim'].each do |aip|
                   num_results = get_number_of_results('id:'+ aip, status_query)
                   if num_results == 0
                     fq << '!id:' + dataset['id']
@@ -134,14 +134,14 @@ class DepositsController < ApplicationController
     unless params[:dip_status].nil?
       no_results = true
       params[:dip_status].each do |dipstatus|
-        num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*',)
+        num_results = get_number_of_results('has_model_ssim:"Dlibhydra::Dataset" and packagedBy_ssim:*',)
         if num_results == 0
-          fq << 'member_ids_ssim:*'
+          fq << 'packagedBy_ssim:*'
         else
-          r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and member_ids_ssim:*', [],
-                                'id,member_ids_ssim', num_results)
+          r = solr_filter_query('has_model_ssim:"Dlibhydra::Dataset" and packagedBy_ssim:*', [],
+                                'id,packagedBy_ssim', num_results)
           r['docs'].each do |dataset|
-            dataset['member_ids_ssim'].each do |dip|
+            dataset['packagedBy_ssim'].each do |dip|
               if dipstatus == 'APPROVE' or dipstatus == 'UPLOADED'
                 num_results = get_number_of_results('id:'+ dip +' and dip_status_tesim:' + dipstatus, [])
                 if num_results == 0
