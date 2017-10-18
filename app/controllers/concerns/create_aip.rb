@@ -41,7 +41,8 @@ module CreateAip
   end
 
   def aip_size(value)
-    @aip.aip_size = value
+    # solr doesn't seem to cope with integers > 2^31 so cap the value at that
+    @aip.aip_size = [2147483646, value].min
   end
 
   def aip_current_location(value)
