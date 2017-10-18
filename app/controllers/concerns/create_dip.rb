@@ -65,7 +65,8 @@ module CreateDip
   end
 
   def dip_size(value)
-    @dip.dip_size = value
+    # solr doesn't seem to cope with integers > 2^31 so cap the value at that
+    @dip.dip_size = [2147483646, value].min
   end
 
   def dip_current_location(value)
