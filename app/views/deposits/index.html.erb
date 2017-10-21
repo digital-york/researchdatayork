@@ -188,7 +188,8 @@
                         requested by <%= (dip.requestor_email.to_a - ["removed"]).join(", ") %> <br/>
                       <% end %>
                       <% if dip.aip_status == 'UPLOADED' and dip.dip_status.nil? %>
-                          <%= button_to 'Approve', '/reingest/' + upload['id'], {method: :get, data: {disable_with: 'Please wait...'}} %>
+                        <%= button_to 'Approve', '/reingest/' + upload['id'], {method: :get, data: {disable_with: 'Please wait...'}} %>
+                        <p><em>Note that you might need to wait a few minutes after clicking 'Approve'</em></p>
                       <% elsif dip.aip_status.nil? or dip.aip_status != 'UPLOADED' %>
                           Waiting for AIP upload
                       <% elsif dip.dip_status == 'UPLOADED' %>
