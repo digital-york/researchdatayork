@@ -21,7 +21,7 @@ module ReingestAip
         faraday.response :logger                  # log requests to STDOUT
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
         faraday.options.open_timeout = 10
-        faraday.options.timeout = 1800 
+        faraday.options.timeout = 3600 
       end
 
       path = '/api/v2/file/' + aip.aip_uuid + '/reingest/'
