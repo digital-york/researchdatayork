@@ -62,11 +62,11 @@ class DatasetsController < ApplicationController
     dataset = find_dataset(params[:id])
     # if the user is allowed to download this file (i.e. they're an admin or it's an 'open' dataset)
     if (current_user && current_user.admin?) || (dataset.dc_access_rights[0] == 'Open') then
-      # log the last_access time and increment the number_of_downloads for this dataset
-      log_download(dataset)
       # get the dip files structure array
       dip_files = dip_directory_structure(dataset)
       if params[:fileid] and params[:fileid].to_s.match(/^[-a-zA-Z0-9]+$/) and dip_files[params[:fileid]] and dip_files[params[:fileid]][:file_path_abs]
+        # log the last_access time and increment the number_of_downloads for this dataset
+        log_download(dataset)
         # give the user the file from the dip store (no longer storing files in hydra as they might be massive)
         send_file(dip_files[params[:fileid]][:file_path_abs])
       else
