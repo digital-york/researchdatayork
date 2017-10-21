@@ -309,9 +309,12 @@ class DepositsController < ApplicationController
   def fileupload
     if params[:deposit][:file] and not params[:deposit][:file].empty? and params[:id] and params[:size]
       begin
+        if (!params[:size].to_s.match(/^[0-9]+$/)) or (!params[:id].to_s.match(/^[A-Za-z0-9]{5,10}$/))
+          raise "Invalid size or dataset id inputs"
+        end
         path = params[:path] ? params[:path] : ""
         first = params[:first] ? params[:first] == "1" : false
-        deposit_file_chunk_from_client(params[:deposit][:file][0], path, params[:id], params[:size], first)
+        deposit_file_chunk_from_client(params[:deposit][:file][0], path, params[:id].to_s, params[:size], first)
         @files = params[:deposit][:file]
       rescue => e
         delete_deposited_files(params[:id])
