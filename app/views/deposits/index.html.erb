@@ -211,7 +211,6 @@
                       <% else %>
                           <%= dip.dip_status %>
                       <% end %>
-                      <%= button_to 'Approve', '/reingest/' + upload['id'], {method: :get, data: {disable_with: 'Please wait...'}} %>
                   <% end %>
               <% else %>
                   <%= render 'shared/cross' %> Not Available <br/><br/>

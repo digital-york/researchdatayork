@@ -100,7 +100,7 @@ module ReingestAip
       faraday.response :logger                  # log requests to STDOUT
       faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       faraday.options.open_timeout = 10
-      faraday.options.timeout = 240
+      faraday.options.timeout = 2400
 
     end
     path = '/api/ingest/reingest/approve'
