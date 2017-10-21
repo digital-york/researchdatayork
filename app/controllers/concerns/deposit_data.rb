@@ -100,9 +100,11 @@ module DepositData
       begin
         Zip::File.open(target_file) do |zip_file|
           zip_file.each do |entry|
-            # extract everything except mac osx guff
+            # extract everything except mac osx guff into a folder with the base-name of the zip file
             unless entry.name.include?("__MACOSX") then
-              entry.extract(File.join(File.dirname(target_file), entry.name))
+              newpath = File.join(File.dirname(target_file), File.basename(target_file, File.extname(target_file)))
+              FileUtils.mkdir_p(newpath)
+              entry.extract(File.join(newpath, entry.name))
             end
           end
         end
