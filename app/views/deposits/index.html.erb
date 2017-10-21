@@ -188,7 +188,7 @@
                         requested by <%= (dip.requestor_email.to_a - ["removed"]).join(", ") %> <br/>
                       <% end %>
                       <% if dip.aip_status == 'UPLOADED' and dip.dip_status.nil? %>
-                          <%= link_to 'Approve', '/reingest/' + upload['id'] %>
+                          <%= button_to 'Approve', '/reingest/' + upload['id'], {method: :get, data: {disable_with: 'Please wait...'}} %>
                       <% elsif dip.aip_status.nil? or dip.aip_status != 'UPLOADED' %>
                           Waiting for AIP upload
                       <% elsif dip.dip_status == 'UPLOADED' %>
@@ -211,6 +211,7 @@
                       <% else %>
                           <%= dip.dip_status %>
                       <% end %>
+                      <%= button_to 'Approve', '/reingest/' + upload['id'], {method: :get, data: {disable_with: 'Please wait...'}} %>
                   <% end %>
               <% else %>
                   <%= render 'shared/cross' %> Not Available <br/><br/>
