@@ -12,7 +12,7 @@ module ShowDip
 
   # given a dataset, find its METS.xml file, parse it and return an array containing the file names
   #   and paths of all files in the DIP
-  def dip_directory_structure(dataset)
+  def dip_directory_structure_orig(dataset)
     # set up the return variable
     dip_structure = {}
     # if the dataset has a dip with downloadable files
@@ -61,6 +61,49 @@ module ShowDip
       # sort the resulting dip structure by file path
       dip_structure.sort_by { |file_id, file_details| file_details[:file_path].downcase }.to_h
     end
+    dip_structure
+  rescue => e
+    handle_exception(e, "Unable to present DIP files for download, failed to parse METS.xml",
+                     "Given dataset: " + dataset.id, true)
+    return {}
+  end
+
+  def dip_directory_structure (dataset)
+    # set up the return variable
+    dip_structure = {}
+    # if the dataset has a dip with downloadable files
+    if dataset.dips && !dataset.dips.empty?
+      # get the dip from the dataset
+      dip = dataset.aips[0]
+      dip_folder = File.join(ENV['DIP_LOCATION'], dip.dip_current_path)
+      # look for the METS file in the dip folder
+      mets_files = Dir[File.join(dip_folder, "METS*.xml")]
+      if !mets_files.empty?
+        # get Nokogiri to parse it
+        mets_doc = Nokogiri::XML(open(mets_files[0]))
+        # get the file ID of every file in the DIP package
+        dip_file_ids = mets_doc.xpath("//mets:fileSec/mets:fileGrp[@USE='original']/mets:file/@ID")
+        # get the file path of every file in the DIP package
+        dip_file_paths = mets_doc.xpath("//mets:fileSec/mets:fileGrp[@USE='original']/mets:file/mets:FLocat/@xlink:href")
+        # for each file
+        filecounter = 0
+        dip_file_ids.each do |f|
+          # get the file id as a string (need to parse out the "file-" prefix)
+          file_id = f.to_s[/^file-(.*)$/, 1]
+          # get the file path/name (parse out everything in the path before the DIP package id)
+          file_path = dip_file_paths[filecounter].to_s.sub(/^.*?objects\/([a-z0-9]{9}\/)?/, "")
+          # look for this file in the dip location
+          dip_files = Dir[File.join(dip_folder, "objects", file_id + "*")]
+          if !dip_files.empty?
+            # add these to the return array
+            dip_structure[file_id] = { file_path: file_path, file_path_abs: dip_files[0], thumbnail_uri: "https://qph.ec.quoracdn.net/main-qimg-45b95bb3a1cea7e91c55f94c86d6c1f9-c" }
+          end
+          filecounter += 1
+        end
+      end
+      # sort the resulting dip structure by file path
+      dip_structure.sort_by { |file_id, file_details| file_details[:file_path].downcase }.to_h
+    end  
     dip_structure
   rescue => e
     handle_exception(e, "Unable to present DIP files for download, failed to parse METS.xml",
