@@ -89,9 +89,11 @@ module DepositData
     # work out the base folder into which this file should go
     upload_dir = File.join(@temp_upload_dir, dataset_id, "objects") 
     # work out where to write it - it'll need to go in the temp upload directory for now, and it might have its own relative path
-    target_file = File.join(upload_dir, path)
+    target_file = sanitise_path(File.join(upload_dir, path))
     target_dir = File.dirname(target_file)
     FileUtils.mkdir_p(target_dir)
+    # validate that deposited chunk is OK
+    validate_deposit_chunk(filechunk, target_file, upload_dir, dataset_id, write_mode)
     File.open(target_file, write_mode) do |file|
       file.write(filechunk)
     end
@@ -104,7 +106,7 @@ module DepositData
             unless entry.name.include?("__MACOSX") then
               newpath = File.join(File.dirname(target_file), File.basename(target_file, File.extname(target_file)))
               FileUtils.mkdir_p(newpath)
-              entry.extract(File.join(newpath, entry.name))
+              entry.extract(File.join(newpath, sanitise_path(entry.name)))
             end
           end
         end
@@ -113,6 +115,32 @@ module DepositData
       rescue
         # don't do anything about bad zips
       end
+    end
+  end
+
+  # given a path to be written, remove any bad chars and generally sanitise it before returning it
+  def sanitise_path (path)
+    # strip any potentially dangerous chars from the file path and remove instances of ".."
+    path.gsub(/[^-A-Za-z0-9_ ~.\/\+()]/, "").gsub(/\.+/, ".")
+  end
+
+  # check that the uploaded chunk is valid
+  def validate_deposit_chunk (filechunk, target_file, upload_dir, dataset_id, write_mode)
+    dataset = find_dataset(dataset_id)
+    upload_size = (`du -bs #{upload_dir} | tail -n 1 | cut -f 1`).to_i
+    Rails.logger.debug("Upload size is #{upload_size.to_s} bytes")
+    # it's a problem if this dataset isn't accepting uploads
+    if dataset.aips.size > 0
+      raise "Files have already been deposited for this dataset"
+    # it's a problem if the filename > 254 chars or the path > 4095 chars
+    elsif File.basename(target_file).length > 254 or target_file.length > 4095
+      raise "File name or file path is too long"
+    # it's a problem if the size of the files already written plus the size of this chunk exceed the max upload size
+    elsif upload_size + filechunk.size > 20 * 1024 * 1024 * 1024
+      raise "Upload is too large - exceeds maximum upload size"
+    # it's a problem if this is a new file and the file already exists
+    elsif write_mode == "wb" and File.exists?(target_file)
+      raise "The file already exists"
     end
   end
 

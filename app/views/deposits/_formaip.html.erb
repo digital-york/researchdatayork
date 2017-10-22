@@ -110,7 +110,7 @@
       var uploadFail = function (info) {
         $('#progressbar_progress').removeClass('normal').addClass('fail');
         $('#progressbar_progress').css('width', '100%');
-        $('#progressinfo').html("Upload failed - please try again");
+        $('#progressinfo').html("Upload failed (" + info + ") - please try again");
         enableSubmit();
       }
       // fetch the selected google files in chunks - each successfully fetched chunk will trigger the fetching of the next chunk
@@ -203,7 +203,7 @@
               }
           },
           fail: function (e, data) {
-            uploadFail(data.textStatus);
+            uploadFail(data.jqXHR.responseJSON.error_message);
           }
       });
       // handle uploads - when user clicks submit button
