@@ -96,7 +96,7 @@ module ShowDip
           dip_files = Dir[File.join(dip_folder, "objects", file_id + "*")]
           if !dip_files.empty?
             # add these to the return array
-            dip_structure[file_id] = { file_path: file_path, file_path_abs: dip_files[0], thumbnail_uri: "https://qph.ec.quoracdn.net/main-qimg-45b95bb3a1cea7e91c55f94c86d6c1f9-c" }
+            dip_structure[file_id] = { file_path: file_path, file_path_abs: dip_files[0] }
           end
           filecounter += 1
         end

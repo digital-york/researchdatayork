@@ -39,8 +39,8 @@
       <h4>As individual files</h4>
       <ul class="filedownload">
       <% @dip_files.each do |key, file| %>
-        <li><%= image_tag(file[:thumbnail_uri]) %>
-        <%= link_to file[:file_path], filedownload_url(@dataset.id, key), :target => "_blank" %> <br/>
+        <% #<li><%= image_tag(file[:thumbnail_uri]) %>
+        <li><%= link_to file[:file_path], filedownload_url(@dataset.id, key), :target => "_blank" %> </li>
       <% end %>
       </ul>
     <% else %>
