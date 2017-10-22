@@ -23,7 +23,7 @@ class DatasetsController < ApplicationController
     @zip_file = File.join(ENV['DIP_LOCATION'], "zips", @dataset.id, "dataset.zip")
     if params[:request]
       # handle case where user has just provided an email address
-      if params[:request][:email].include? '@'
+      if params[:request][:email] and params[:request][:email].include? '@' and params[:request][:email].length < 255
         flash.now[:notice] = 'Thank you. We will send you an email when the data is available.'
         create_dip(@dataset)
         requestor_email(params[:request][:email])
