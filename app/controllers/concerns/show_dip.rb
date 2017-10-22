@@ -95,6 +95,9 @@ module ShowDip
           # look for this file in the dip location
           dip_files = Dir[File.join(dip_folder, "objects", file_id + "*")]
           if !dip_files.empty?
+            # replace the file name in the file path with the file name from the real dip file
+            # - the file name from METS might be .wav whereas dip might be .mp3 for example
+            file_path = file_path.sub(File.basename(file_path), File.basename(dip_files[0]).sub(file_id + "-", "")) 
             # add these to the return array
             dip_structure[file_id] = { file_path: file_path, file_path_abs: dip_files[0] }
           end
