@@ -100,9 +100,9 @@ module ShowDip
           end
           filecounter += 1
         end
+        # sort the resulting dip structure by file path
+        dip_structure = dip_structure.sort_by { |file_id, file_details| file_details[:file_path].downcase }.to_h
       end
-      # sort the resulting dip structure by file path
-      dip_structure.sort_by { |file_id, file_details| file_details[:file_path].downcase }.to_h
     end  
     dip_structure
   rescue => e
