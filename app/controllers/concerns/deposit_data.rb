@@ -128,7 +128,7 @@ module DepositData
   def validate_deposit_chunk (filechunk, target_file, upload_dir, dataset_id, write_mode)
     dataset = find_dataset(dataset_id)
     upload_size = (`du -bs #{upload_dir} | tail -n 1 | cut -f 1`).to_i
-    Rails.logger.debug("Upload size is #{upload_size.to_s} bytes")
+    #Rails.logger.debug("Upload size is #{upload_size.to_s} bytes")
     # it's a problem if this dataset isn't accepting uploads
     if dataset.aips.size > 0
       raise "Files have already been deposited for this dataset"
