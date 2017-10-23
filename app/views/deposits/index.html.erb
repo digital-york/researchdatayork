@@ -181,9 +181,7 @@
                       <% end %>
                   <% end %>
                   <br/>
-                  <%= dip_list.size %> DIP<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
-                      <%= dip.id %><br/>
                       <% if !(dip.requestor_email.to_a - ["removed"]).empty? %>
                         requested by <%= (dip.requestor_email.to_a - ["removed"]).join(", ") %> <br/>
                       <% end %>
@@ -193,6 +191,8 @@
                       <% elsif dip.aip_status.nil? or dip.aip_status != 'UPLOADED' %>
                           Waiting for AIP upload
                       <% elsif dip.dip_status == 'UPLOADED' %>
+                          <%= dip_list.size %> DIP<% unless dip_list.size < 2 %>s<% end %> created<br/>
+                          <%= dip.id %><br/>
                           <%= dip.dip_status %>
                           <br/><br/>
                           <%# info about who approved reingest and when will be stored in dip's altlabel field %>
