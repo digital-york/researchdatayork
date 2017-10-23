@@ -136,7 +136,7 @@ module DepositData
     elsif File.basename(target_file).length > 254 or target_file.length > 4095
       raise "File name or file path is too long"
     # it's a problem if the size of the files already written plus the size of this chunk exceed the max upload size
-    elsif upload_size + filechunk.size > 20 * 1024 * 1024 * 1024
+    elsif upload_size + filechunk.size > MAX_UPLOAD_BYTES
       raise "Upload is too large - exceeds maximum upload size"
     # it's a problem if this is a new file and the file already exists
     elsif write_mode == "wb" and File.exists?(target_file)
