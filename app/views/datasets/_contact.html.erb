@@ -9,7 +9,7 @@
       not available.
     <% end %>
 
-      Please email <%= mail_to 'library-research-support@york.ac.uk','Library Research Support' %> for further
+      Please email <%= mail_to ENV["RDM_EMAIL"],'Library Research Support' %> for further
       information.</p>
 
 <% end %>
