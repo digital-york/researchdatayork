@@ -62,7 +62,7 @@
       var chunkSize = 1000000;
       var localFileUploadCount = 0;
       // prevent user from uploading too much data
-      var maxUploadSize = 20 * 1024 * 1024 * 1024;
+      var maxUploadSize = <%= MAX_UPLOAD_BYTES %> // 20 * 1024 * 1024 * 1024;
       var localFilesToUpload = [];
       var bytesToMegabytes = function (bytes) {
         return Math.round(bytes/1024/1024 * 10) / 10;
