@@ -14,7 +14,7 @@ module ShowDip
     # set up the return variable
     dip_structure = {}
     # if the dataset has a dip with downloadable files
-    if dataset.dips && !dataset.dips.empty?
+    if (dataset.dips) and (!dataset.dips.empty?)
       # get the dip from the dataset
       dip = dataset.aips[0]
       dip_folder = File.join(ENV['DIP_LOCATION'], dip.dip_current_path)
