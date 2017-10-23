@@ -21,12 +21,16 @@ module ShowDip
       # look for the METS file in the dip folder
       mets_files = Dir[File.join(dip_folder, "METS*.xml")]
       if !mets_files.empty?
-        # get Nokogiri to parse it
+        # get a list of all DIP files
+        dip_files = Dir[File.join(dip_folder, "objects", "*")]
+        # get Nokogiri to parse the METS file
         mets_doc = Nokogiri::XML(open(mets_files[0]))
         # get the file ID of every file in the DIP package
         dip_file_ids = mets_doc.xpath("//mets:fileSec/mets:fileGrp[@USE='original']/mets:file/@ID")
         # get the file path of every file in the DIP package
         dip_file_paths = mets_doc.xpath("//mets:fileSec/mets:fileGrp[@USE='original']/mets:file/mets:FLocat/@xlink:href")
+        # only return the first MAX_DIP_FILES_TO_PRESENT
+        dip_file_ids = dip_file_ids.map{|x| x.to_s}.first(MAX_DIP_FILES_TO_PRESENT)
         # for each file
         filecounter = 0
         dip_file_ids.each do |f|
@@ -34,14 +38,14 @@ module ShowDip
           file_id = f.to_s[/^file-(.*)$/, 1]
           # get the file path/name (parse out everything in the path before the DIP package id)
           file_path = dip_file_paths[filecounter].to_s.sub(/^.*?objects\/([a-z0-9]{9}\/)?/, "")
-          # look for this file in the dip location
-          dip_files = Dir[File.join(dip_folder, "objects", file_id + "*")]
-          if !dip_files.empty?
+          # look for this file in the list of dip files 
+          matching_dip_files = dip_files.select {|s| s.include? file_id}
+          if !matching_dip_files.empty?
             # replace the file name in the file path with the file name from the real dip file
             # - the file name from METS might be .wav whereas dip might be .mp3 for example
-            file_path = file_path.sub(File.basename(file_path), File.basename(dip_files[0]).sub(file_id + "-", "")) 
+            file_path = file_path.sub(File.basename(file_path), File.basename(matching_dip_files[0]).sub(file_id + "-", "")) 
             # add these to the return array
-            dip_structure[file_id] = { file_path: file_path, file_path_abs: dip_files[0] }
+            dip_structure[file_id] = { file_path: file_path, file_path_abs: matching_dip_files[0] }
           end
           filecounter += 1
         end

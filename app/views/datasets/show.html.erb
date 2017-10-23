@@ -43,6 +43,10 @@
         <li><%= link_to file[:file_path], filedownload_url(@dataset.id, key), :target => "_blank" %> </li>
       <% end %>
       </ul>
+      <% # if MAX_DIP_FILES_TO_PRESENT files were presented, output a message stating that there might be more files in the zip %>
+      <% if @dip_files.size == MAX_DIP_FILES_TO_PRESENT %>
+        <p><em>Only showing <%= MAX_DIP_FILES_TO_PRESENT %> files - download the dataset zip for the full set of files</em></p>
+      <% end %>
     <% else %>
       <p>There are currently no downloadable files</p>
     <% end %>
