@@ -14,9 +14,9 @@ module ShowDip
     # set up the return variable
     dip_structure = {}
     # if the dataset has a dip with downloadable files
-    if (dataset.dips) and (!dataset.dips.empty?)
+    if dataset.dips and !dataset.dips.empty? and dataset.dips[0].dip_current_path
       # get the dip from the dataset
-      dip = dataset.aips[0]
+      dip = dataset.dips[0]
       dip_folder = File.join(ENV['DIP_LOCATION'], dip.dip_current_path)
       # look for the METS file in the dip folder
       mets_files = Dir[File.join(dip_folder, "METS*.xml")]
