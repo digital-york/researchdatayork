@@ -188,6 +188,10 @@ module ReingestAip
   # Add the default depositor
   # This required the dlibhydra depositor generator to have been run
   def write_aip_permissions
-    @aip.apply_depositor
+    if current_user and current_user.email
+      @aip.apply_depositor(current_user.email)
+    else
+      @aip.apply_depositor
+    end
   end
 end
