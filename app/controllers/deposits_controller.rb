@@ -263,6 +263,10 @@ class DepositsController < ApplicationController
   # GET /deposits/1
   # GET /deposits/1.json
   def show
+    # make sure the end user is either an administrator or an authorised depositor
+    if !(current_user.admin? or (@dataset.creator_string and @dataset.creator_string.include? current_user.email.split("@")[0]))
+      render :html => "<h1>Unauthorised</h1><p>You are not authorised to view this page</p>".html_safe, :status => :unauthorized, :layout => 'blacklight'
+    end
     if params[:deposit]
       # if the user uploaded local file(s), they will be sitting in @temp_upload_dir
       uploaded_files_dir = File.join(@temp_upload_dir, @dataset.id)
