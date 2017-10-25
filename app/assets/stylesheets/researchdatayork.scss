@@ -73,10 +73,10 @@ a, a:hover, a:visited, .navbar-inverse .navbar-nav > li > a, .navbar-inverse .na
 }
 
 /* some special css for the notes column of the main datasets table */
-a.delete {
+a.delete, a.delete_authorised_depositor {
   display: none
 }
-p.note:hover a.delete {
+p.note:hover a.delete, p.note:hover a.delete_authorised_depositor {
   display: inline
 }
 textarea#notes {

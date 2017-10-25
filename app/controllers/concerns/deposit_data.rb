@@ -141,6 +141,9 @@ module DepositData
     # it's a problem if this is a new file and the file already exists
     elsif write_mode == "wb" and File.exists?(target_file)
       raise "The file already exists"
+    # it's a problem if the remote user isn't a valid depositor
+    elsif !(current_user and current_user.email and (current_user.admin? or (!dataset.creator_string.nil? and dataset.creator_string.include? current_user.email.split("@")[0]))
+      raise "User is not allowed to deposit files for this dataset"
     end
   end
 

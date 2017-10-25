@@ -1,0 +1,26 @@
+<% unless @deposit.authorised_depositors.nil? or @deposit.authorised_depositors.empty? %>
+    <% @deposit.authorised_depositors.gsub('[','').gsub(']','').gsub('"','').split(',').each_with_index do | authorised_depositor, index | %>
+      <p class="note" id="authorised_depositor_<%= index %>"><%= authorised_depositor %> <a href="#" class="delete_authorised_depositor" data-dataset="<%= @dataset_id %>" data-authorised-depositor-idx="<%= index %>" title="Remove authorised depositor">x</a></p>
+        <%= form_for(@deposit, remote: true, :html => { :id => "delete_authorised_depositor_#{@dataset_id}_#{index}" }) do |f| %>
+            <%= hidden_field(:deposit, :id) %>
+            <%= hidden_field_tag "delete_authorised_depositor_at_index", index %>
+          <% end %> 
+     <% end %>       
+<% else %>
+  <p>None</p>
+<% end %>
+
+
+<%= form_for(@deposit, remote: true) do |f| %>
+    <div class="field" >
+      <%= hidden_field(:deposit, :id) %>
+    </div>
+
+    <div class="field">
+      <label>Add:</label>
+      <%= text_field_tag :authorised_depositors %>
+      <%= f.submit 'Save' %>
+    </div>
+
+<% end %>
+

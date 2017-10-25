@@ -42,6 +42,20 @@
 
       <tbody>
       <% @deposits['docs'].each do |upload| %>
+          <%
+            @deposit = Deposit.new
+            @deposit.id = upload['id']
+            @deposit.status = upload['wf_status_tesim']
+            unless upload['retention_policy_tesim'].nil?
+              @deposit.retention_policy = upload['retention_policy_tesim'][0]
+            end
+            unless upload['restriction_note_tesim'].nil?
+              @deposit.notes = upload['restriction_note_tesim']
+            end
+            unless upload['creator_string_tesim'].nil?
+              @deposit.authorised_depositors = upload['creator_string_tesim']
+            end
+          %>
           <tr>
             <td>
               <strong>PURE UUID:</strong> <%= upload['pure_uuid_tesim'][0] %><br/>
@@ -85,6 +99,11 @@
                   <strong>Request URL: </strong><br/>
                   <%= link_to 'http://researchdata.york.ac.uk/datasets/' + upload['id'], 'datasets/' + upload['id'] %>
               <% end %>
+              <p><strong>Authorised depositors:</strong></p>
+              <div id="<%= upload['id'] %>-authorised-depositors">
+                <% @dataset_id = upload['id'] %>
+                <%= render partial: 'authorised_depositors', object: @deposit %>
+              </div>
             </td>
             <td>
 
@@ -123,17 +142,6 @@
                   <%= render 'shared/tick' %>
                   DOI Created<br/>
               <% end %>
-              <%
-                @deposit = Deposit.new
-                @deposit.id = upload['id']
-                @deposit.status = upload['wf_status_tesim']
-                unless upload['retention_policy_tesim'].nil?
-                  @deposit.retention_policy = upload['retention_policy_tesim'][0]
-                end
-                unless upload['restriction_note_tesim'].nil?
-                  @deposit.notes = upload['restriction_note_tesim']
-                end
-              %>
               <div id="<%= upload['id'] %>">
                 <%= render partial: 'status', object: @deposit %>
               </div>
