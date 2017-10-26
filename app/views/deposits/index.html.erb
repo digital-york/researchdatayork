@@ -164,6 +164,8 @@
                   <% end %>
                   <br/>
                   <%= aip_list.size %> AIP<% unless aip_list.size < 2 %>s<% end %> deposited <br/>
+                  <% if aip.depositor and !aip.depositor.empty? %>by <%= aip.depositor %><% end %> 
+                  <% if aip.date_uploaded and !aip.date_uploaded.empty? %>at <%= aip.date_uploaded.to_datetime.strftime('%d-%b-%Y %H:%M:%S') %><% end %><br/>
                   <% aip_list.each do |aip| %>
                       <%= aip %> <br/>
                   <% end %>

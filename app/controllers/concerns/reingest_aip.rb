@@ -146,10 +146,11 @@ module ReingestAip
   end
 
   def set_user_deposit(dataset, readme)
-    set_aip_title('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime('%Y-%m-%d %R')}")
+    set_aip_title('AIP for ' + dataset.pure_uuid + " (deposited #{DateTime.now.strftime('%Y-%m-%d %R')})")
     dataset.readme = readme
     set_aip_status('Not Yet Processed')
     set_aip_uuid('tbc') # temporary; need an aip_uid to be able to add to dataset.aips
+    set_aip_upload_date(Time.now.utc.iso8601)
     add_aip_permissions
     set_member_of(dataset)
     @aip.save
@@ -175,6 +176,10 @@ module ReingestAip
   def set_aip_status(status)
     # TODO: check vocab?
     @aip.aip_status = status
+  end
+
+  def set_aip_upload_date(upload_date)
+    @aip.date_uploaded = upload_date
   end
 
   def add_aip_permissions
