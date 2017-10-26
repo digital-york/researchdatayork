@@ -27,7 +27,7 @@
     <table class="table-striped table-bordered table" id="main-dashboard-table">
       <thead>
       <tr>
-        <th style="width:25%">Dataset</th>
+        <th style="width:24%">Dataset</th>
         <th style="width:7%"><%= link_to "Access", params.merge(:sort => "access").merge(:sort_order => if params[:sort] == "access" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= access_arrow.html_safe %></th>
         <th style="width:7%"><%= link_to "Created (PURE)", params.merge(:sort => "created").merge(:sort_order => if params[:sort] == "created" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= created_arrow.html_safe %></th>
         <th style="width:7%"><%= link_to "Date Available", params.merge(:sort => "available").merge(:sort_order => if params[:sort] == "available" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= available_arrow.html_safe %></th>
@@ -35,7 +35,7 @@
         <th style="width:13%">AIP</th>
         <th style="width:15%">DIP</th>
 
-        <th style="width:11%">Notes</th>
+        <th style="width:12%">Notes</th>
 
       </tr>
       </thead>
