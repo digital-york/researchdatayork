@@ -94,7 +94,7 @@ class DatasetsController < ApplicationController
   def log_download(dataset)
     # only log if the user is a human, not a bot (e.g. googlebot) - uses the 'browser' gem
     if !browser.bot? then
-      dataset.last_access = Time.now.utc.iso8601
+      dataset.last_access = Time.now.iso8601
       dataset.number_of_downloads = dataset.number_of_downloads.to_i + 1
       dataset.save
     end

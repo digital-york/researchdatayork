@@ -150,7 +150,7 @@ module ReingestAip
     dataset.readme = readme
     set_aip_status('Not Yet Processed')
     set_aip_uuid('tbc') # temporary; need an aip_uid to be able to add to dataset.aips
-    set_aip_upload_date(Time.now.utc.iso8601)
+    set_aip_upload_date(Time.now.iso8601)
     add_aip_permissions
     set_member_of(dataset)
     @aip.save
