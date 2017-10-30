@@ -1,2 +1,3 @@
 $("#<%= raw @dataset_id %>").empty().append("<%= escape_javascript(render partial: 'status', object: @deposit ) %>");
 $("#<%= raw @dataset_id %>-notes").empty().append("<%= escape_javascript(render partial: 'notes', object: @deposit ) %>");
+$("#<%= raw @dataset_id %>-authorised-depositors").empty().append("<%= escape_javascript(render partial: 'authorised_depositors', object: @deposit ) %>");

@@ -40,7 +40,7 @@ module CreateDataset
     set_pure_creator(puree_dataset['person'])
     set_pure_managing_org(puree_dataset['owner'])
     add_permissions
-    @d.save
+    @d.save if @d.changed?
   end
 
   def set_uuid(uuid)
@@ -68,11 +68,11 @@ module CreateDataset
   end
 
   def set_publisher(a)
-    @d.publisher << a
+    @d.publisher << a unless @d.publisher.include?(a)
   end
 
   def set_doi(a)
-    @d.doi << a
+    @d.doi << a unless @d.doi.include?(a)
   end
 
   def set_link(a)
@@ -112,8 +112,8 @@ module CreateDataset
     o.name = a['name']
     # TODO remove this once current_person generates in callback
     o.preflabel = a['name']
-    o.save
-    @d.managing_organisation_resource << o
+    o.save if o.changed?
+    @d.managing_organisation_resource << o unless @d.managing_organisation_resource.include?(o)
   end
 
   def create_pure_person(p, type)
@@ -129,8 +129,8 @@ module CreateDataset
     person.pure_uuid = p['uuid'].to_s
     # TODO remove this once current_person generates in callback
     person.preflabel = p['name']['first'] + ' ' + p['name']['last']
-    person.save
-    @d.creator_resource << person
+    person.save if person.changed?
+    @d.creator_resource << person unless @d.creator_resource.include?(person)
   end
 
   def add_permissions

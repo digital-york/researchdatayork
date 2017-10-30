@@ -4,45 +4,28 @@
     </div>
 
     <div class="field">
-      <% is_checked = checked('awaiting-info') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "awaiting-info", nil) %>
-      <span class="check_box_<%= is_checked.to_s %>"></span><span>Researcher Contacted - Awaiting Info</span> <br />
-      <% is_checked = checked('phd-data') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "phd-data", nil) %>
-      <span class="check_box_<%= is_checked.to_s %>"></span><span>Data from PhD Student</span> <br />
-      <br />
-      <span>DATA</span>
-      <br />
-      <% is_checked = checked('awaiting-data') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "awaiting-data", nil) %>
-      <span class="check_box_<%= is_checked.to_s %>"></span><span>Researcher Contacted - Awaiting Data </span> <br />
 
-      <% is_checked = checked('nodata-external') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "nodata-external", nil) %>
-        <span class="check_box_<%= is_checked.to_s %>"></span><span>Data Externally Held </span> <br />
-
-      <% is_checked = checked('nodata-dept') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "nodata-dept", nil) %>
-          <span class="check_box_<%= is_checked.to_s %>"></span><span>Data Held By Dept </span> <br />
-
-      <br />
-      <span>ACCESS</span>
-      <br />
-      <% is_checked = checked('held-pub-meta') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "held-pub-meta", nil) %>
-            <span class="check_box_<%= is_checked.to_s %>"></span><span>Metadata Held for Publication  </span> <br />
-
-      <% is_checked = checked('held-pub-data') %>
-      <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, "held-pub-data", nil) %>
-              <span class="check_box_<%= is_checked.to_s %>"></span><span>Data Held for Publication  </span> <br />
-
-      <br />
-      <span>RETENTION</span>
-      <br />
-      <span class="check_box_<%= selected("ten-yrs-last-access") %>"></span>
-      <%= collection_select :deposit,:retention_policy, {nil:"--","ten-yrs-last-access":"Ten years from last access"},
+      <% @deposit_status_general.each do |option| %>
+        <% is_checked = checked(option["id"]) %>
+        <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, option["id"], nil) %>
+        <span class="check_box_<%= is_checked.to_s %>"></span><span><%= option["label"] %></span> <br />
+      <% end %>
+      <br/><span>DATA</span><br/>
+      <% @deposit_status_data.each do |option| %>
+        <% is_checked = checked(option["id"]) %>
+        <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, option["id"], nil) %>
+        <span class="check_box_<%= is_checked.to_s %>"></span><span><%= option["label"] %></span> <br />
+      <% end %>
+      <br/><span>ACCESS</span><br/>
+      <% @deposit_status_access.each do |option| %>
+        <% is_checked = checked(option["id"]) %>
+        <%= check_box("deposit", "status", {:multiple => true, :checked => is_checked}, option["id"], nil) %>
+        <span class="check_box_<%= is_checked.to_s %>"></span><span><%= option["label"] %></span> <br />
+      <% end %>
+      <br/><span>RETENTION</span><br/>
+      <span class="check_box_<%= !selected("nil") %>"></span>
+      <%= collection_select :deposit,:retention_policy, @deposit_status_retention.collect {|x| [x['id'], x['label']]},
                               :first, :last, {:selected => @deposit.retention_policy} %>
-
     </div>
 
     <div class="actions">

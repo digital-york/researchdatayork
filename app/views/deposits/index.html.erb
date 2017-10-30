@@ -24,24 +24,38 @@
        created_arrow = if params[:sort] == "created" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end
        available_arrow = if params[:sort] == "available" then if params[:sort_order] == "asc" then up_arrow else down_arrow end else "" end
     %>
-    <table class="table-striped table-bordered table">
+    <table class="table-striped table-bordered table" id="main-dashboard-table">
       <thead>
       <tr>
-        <th style="width:20%">Dataset</th>
-        <th style="width:5%"><%= link_to "Access", params.merge(:sort => "access").merge(:sort_order => if params[:sort] == "access" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= access_arrow.html_safe %></th>
-        <th style="width:5%"><%= link_to "Created (PURE)", params.merge(:sort => "created").merge(:sort_order => if params[:sort] == "created" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= created_arrow.html_safe %></th>
-        <th style="width:5%"><%= link_to "Date Available", params.merge(:sort => "available").merge(:sort_order => if params[:sort] == "available" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= available_arrow.html_safe %></th>
+        <th style="width:25%">Dataset</th>
+        <th style="width:7%"><%= link_to "Access", params.merge(:sort => "access").merge(:sort_order => if params[:sort] == "access" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= access_arrow.html_safe %></th>
+        <th style="width:7%"><%= link_to "Created (PURE)", params.merge(:sort => "created").merge(:sort_order => if params[:sort] == "created" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= created_arrow.html_safe %></th>
+        <th style="width:7%"><%= link_to "Date Available", params.merge(:sort => "available").merge(:sort_order => if params[:sort] == "available" and params[:sort_order] == "asc" then "desc" else "asc" end).except(:page, :refresh) %>&nbsp;<%= available_arrow.html_safe %></th>
         <th style="width:15%">Status</th>
-        <th style="width:10%">AIP</th>
-        <th style="width:10%">DIP</th>
+        <th style="width:13%">AIP</th>
+        <th style="width:15%">DIP</th>
 
-        <th style="width:20%">Notes</th>
+        <th style="width:11%">Notes</th>
 
       </tr>
       </thead>
 
       <tbody>
       <% @deposits['docs'].each do |upload| %>
+          <%
+            @deposit = Deposit.new
+            @deposit.id = upload['id']
+            @deposit.status = upload['wf_status_tesim']
+            unless upload['retention_policy_tesim'].nil?
+              @deposit.retention_policy = upload['retention_policy_tesim'][0]
+            end
+            unless upload['restriction_note_tesim'].nil?
+              @deposit.notes = upload['restriction_note_tesim']
+            end
+            unless upload['creator_string_tesim'].nil?
+              @deposit.authorised_depositors = upload['creator_string_tesim']
+            end
+          %>
           <tr>
             <td>
               <strong>PURE UUID:</strong> <%= upload['pure_uuid_tesim'][0] %><br/>
@@ -60,10 +74,9 @@
                   <% end %>
               <% end %>
               <br/>
-              <% unless upload['doi_tesim'].nil? %>
+              <% unless upload['doi_tesim'].nil? or upload['doi_tesim'].reject(&:empty?).empty? %>
                   <strong>DOI:</strong>
-
-                  <% upload['doi_tesim'].each do |doi| %>
+                  <% upload['doi_tesim'].reject(&:empty?).each do |doi| %>
                       <% if check_doi(doi) %>
                           <%= render 'shared/tick' %>
                       <% end %>
@@ -86,6 +99,12 @@
                   <strong>Request URL: </strong><br/>
                   <%= link_to 'http://researchdata.york.ac.uk/datasets/' + upload['id'], 'datasets/' + upload['id'] %>
               <% end %>
+              <br/></br/>
+              <p><strong>Authorised depositors:</strong></p>
+              <div id="<%= upload['id'] %>-authorised-depositors">
+                <% @dataset_id = upload['id'] %>
+                <%= render partial: 'authorised_depositors', object: @deposit %>
+              </div>
             </td>
             <td>
 
@@ -117,24 +136,13 @@
                   <%= render 'shared/alert' %>
                   In Progress<br/>
               <% end %>
-              <% if upload['doi_tesim'].nil? %>
+              <% if upload['doi_tesim'].nil? or upload['doi_tesim'].reject(&:empty?).empty? %>
                   <%= render 'shared/cross' %>
                   No DOI<br/>
               <% else %>
                   <%= render 'shared/tick' %>
                   DOI Created<br/>
               <% end %>
-              <%
-                @deposit = Deposit.new
-                @deposit.id = upload['id']
-                @deposit.status = upload['wf_status_tesim']
-                unless upload['retention_policy_tesim'].nil?
-                  @deposit.retention_policy = upload['retention_policy_tesim'][0]
-                end
-                unless upload['restriction_note_tesim'].nil?
-                  @deposit.notes = upload['restriction_note_tesim']
-                end
-              %>
               <div id="<%= upload['id'] %>">
                 <%= render partial: 'status', object: @deposit %>
               </div>
@@ -155,7 +163,9 @@
                       In Progress
                   <% end %>
                   <br/>
-                  <%= aip_list.size %> aip<% unless aip_list.size < 2 %>s<% end %> deposited <br/>
+                  <%= aip_list.size %> AIP<% unless aip_list.size < 2 %>s<% end %> deposited 
+                  <% if aip.depositor and !aip.depositor.empty? %>by <%= aip.depositor %><% end %> 
+                  <% if aip.date_uploaded and !aip.date_uploaded.empty? %>at <%= aip.date_uploaded.to_datetime.strftime('%d-%b-%Y %H:%M:%S') %><% end %><br/>
                   <% aip_list.each do |aip| %>
                       <%= aip %> <br/>
                   <% end %>
@@ -172,7 +182,7 @@
               <% if dip_list.size > 0 %>
                   <% unless dip.requestor_email.size == 0 %>
                       <%= render 'shared/tick' %> Requested </br>
-                      <% if dip.dip_status == 'APPROVE' %>
+                      <% if dip.dip_status == 'APPROVED' %>
                           <%= render 'shared/tick' %> Request Approved </br>
                           <%= render 'shared/cross' %> Not Available </br>
                       <% elsif dip.dip_status == 'UPLOADED' %>
@@ -182,17 +192,24 @@
                       <% end %>
                   <% end %>
                   <br/>
-                  <%= dip_list.size %> dip<% unless dip_list.size < 2 %>s<% end %> created<br/>
                   <% dip_list.each do |dip| %>
-                      <%= dip.id %><br/>
-                      requested by <%= dip.requestor_email.join(", ") %> <br/>
+                      <% if !(dip.requestor_email.to_a - ["removed"]).empty? %>
+                        requested by <%= (dip.requestor_email.to_a - ["removed"]).join(", ") %> <br/>
+                      <% end %>
                       <% if dip.aip_status == 'UPLOADED' and dip.dip_status.nil? %>
-                          <%= link_to 'Approve', '/reingest/' + upload['id'] %>
+                        <%= button_to 'Approve', '/reingest/' + upload['id'], {method: :get, data: {disable_with: 'Please wait...'}} %>
+                        <p><em>Note that you might need to wait a few minutes after clicking 'Approve'</em></p>
                       <% elsif dip.aip_status.nil? or dip.aip_status != 'UPLOADED' %>
                           Waiting for AIP upload
                       <% elsif dip.dip_status == 'UPLOADED' %>
+                          <%= dip_list.size %> DIP<% unless dip_list.size < 2 %>s<% end %> created<br/>
+                          <%= dip.id %><br/>
                           <%= dip.dip_status %>
                           <br/><br/>
+                          <%# info about who approved reingest and when will be stored in dip's altlabel field %>
+                          <% if !dip.altlabel.nil? and !dip.altlabel.empty? %>
+                            <%= dip.altlabel.join(", ") %> <br/><br/>
+                          <% end %>
                           Number of downloads: 
                           <% unless upload['number_of_downloads_isim'].nil? %>
                             <%= upload['number_of_downloads_isim'][0] %>
@@ -205,16 +222,6 @@
                           <% end %> <br/>
                       <% else %>
                           <%= dip.dip_status %>
-                          <%= form_for @deposit, url: dipuuid_path do |f| %>
-                              <%= f.hidden_field :id, :value => upload['id'] %>
-                              <div class="field">
-                                <%= f.label 'DIP UUID' %><br>
-                                <%= f.text_field :dipuuid %>
-                              </div>
-                              <div class="actions">
-                                <%= f.submit 'Update DIP' %>
-                              </div>
-                          <% end %>
                       <% end %>
                   <% end %>
               <% else %>

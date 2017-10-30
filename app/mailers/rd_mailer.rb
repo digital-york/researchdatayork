@@ -9,8 +9,11 @@ class RdMailer < ApplicationMailer
     to = @dip.requestor_email.to_a
     # remove any duplicates from the recipient list
     to.uniq!
+    # now that we've sent the dip available notification, delete the requestor email address
+    @dip.requestor_email = ["removed"]
+    @dip.save
     # send them an email telling them that the data is ready to download
-    mail(to: to, subject: 'Data available for dataset "' + @dataset.title[0].to_s + '"') unless to.empty?
+    mail(to: "Undisclosed Recipients <do-not-reply@york.ac.uk>", bcc: to, subject: 'Requested data now available for download') unless to.empty?
   end
 
   # send an email to the RDM team to tell them that someone has requested data
@@ -25,12 +28,21 @@ class RdMailer < ApplicationMailer
     mail(to: to, subject: "Data requested for dataset " + @dataset.id) unless to.nil? or to.empty?
   end
 
+  # send an email to the RDM team when someone has deposited data
+  def notify_rdm_team_about_dataset(dataset_id, info, summary, user = nil)
+    @dataset = Dlibhydra::Dataset.find(dataset_id)
+    @info = info
+    @user = user
+    to = ENV['RDM_EMAIL']
+    mail(to: to, subject: "Update on dataset " + @dataset.id + ": " + summary) unless to.nil? or to.empty?
+  end
+
   # send an email about an error/exception that occurred
   def notify_admin_about_error(error_message)
     @error_message = error_message
     # get the admin email address
     to = ENV["ERROR_EMAIL_TO"]
     # send email
-    mail(to: to, subject: "Error in RDM application") unless to.nil? or to.empty?
+    mail(to: to, subject: "Error in RDYork application") unless to.nil? or to.empty?
   end
 end

@@ -5,7 +5,8 @@
 
 <p>If you are depositing data, you should have been provided with a Deposit URL.</p>
 
-<p>If you are looking for datasets, please search the <%= link_to 'Data Catalogue', datasets_url %>.</p>
+<%# the following line used to link to a holding page: <%= link_to 'Data Catalogue', datasets_url %>
+<p>If you are looking for datasets, please search the <%= link_to 'Data Catalogue', 'https://www.york.ac.uk/library/info-for/researchers/datasets/' %>.</p>
 
-<p>Please email <%= mail_to 'library-research-support@york.ac.uk','Library Research Support' %> if you need for further
+<p>Please email <%= mail_to ENV["RDM_EMAIL"],'Library Research Support' %> if you need for further
   help or information.</p></p>

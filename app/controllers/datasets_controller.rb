@@ -20,14 +20,15 @@ class DatasetsController < ApplicationController
     #  - user wants a zip download of the dataset files
     @dataset = find_dataset(params[:id])
     @dip_files = dip_directory_structure(@dataset)
+    @zip_file = File.join(ENV['DIP_LOCATION'], "zips", @dataset.id, "dataset.zip")
     if params[:request]
       # handle case where user has just provided an email address
-      if params[:request][:email].include? '@'
+      if params[:request][:email] and params[:request][:email].include? '@' and params[:request][:email].length < 255
         flash.now[:notice] = 'Thank you. We will send you an email when the data is available.'
         create_dip(@dataset)
         requestor_email(params[:request][:email])
         # send an email to RDM team to tell them that data has been requested
-        RdMailer.notify_rdm_team_about_request(params[:id], params[:request][:email]).deliver_now
+        RdMailer.notify_rdm_team_about_request(params[:id], params[:request][:email]).deliver_later
       # handle case where user hasn't provided an email address
       else
         flash.now[:error] = 'Please provide a full email address.'
@@ -36,13 +37,11 @@ class DatasetsController < ApplicationController
     elsif request.format.zip?
       # log the download time and increment the download count
       log_download(@dataset)
-      # create a zip file 
-      zip_file_stream = dip_as_zip_filestream(@dataset)
     end
     respond_to do |format|
       format.html { render :show, notice: @notice }
       format.json { render :show, status: :created, location: @deposit }
-      format.zip { send_data zip_file_stream.read, filename: 'dataset.zip' }
+      format.zip { send_file @zip_file, filename: 'dataset.zip' }
     end
   end
 
@@ -63,12 +62,16 @@ class DatasetsController < ApplicationController
     dataset = find_dataset(params[:id])
     # if the user is allowed to download this file (i.e. they're an admin or it's an 'open' dataset)
     if (current_user && current_user.admin?) || (dataset.dc_access_rights[0] == 'Open') then
-      # log the last_access time and increment the number_of_downloads for this dataset
-      log_download(dataset)
       # get the dip files structure array
       dip_files = dip_directory_structure(dataset)
-      # redirect the user the file they requested
-      redirect_to dip_files[params[:fileid]][:file_uri]
+      if params[:fileid] and params[:fileid].to_s.match(/^[-a-zA-Z0-9]+$/) and dip_files[params[:fileid]] and dip_files[params[:fileid]][:file_path_abs]
+        # log the last_access time and increment the number_of_downloads for this dataset
+        log_download(dataset)
+        # give the user the file from the dip store (no longer storing files in hydra as they might be massive)
+        send_file(dip_files[params[:fileid]][:file_path_abs])
+      else
+        render :plain => "The requested file can not be served"
+      end
     else
       render :plain => "You do not have permission to download this file"
     end
@@ -91,7 +94,7 @@ class DatasetsController < ApplicationController
   def log_download(dataset)
     # only log if the user is a human, not a bot (e.g. googlebot) - uses the 'browser' gem
     if !browser.bot? then
-      dataset.last_access = Time.now.utc.iso8601
+      dataset.last_access = Time.now.iso8601
       dataset.number_of_downloads = dataset.number_of_downloads.to_i + 1
       dataset.save
     end

@@ -12,7 +12,7 @@ module SearchPure
       c.basic_auth = true
     end
     c = Puree::Collection.new resource: :dataset
-    if c_from.nil?
+    if c_from.nil? and m_from.nil?
       metadata = c.find limit: limit,
                         offset: 0
     else
@@ -34,7 +34,7 @@ module SearchPure
   def get_uuids_created_from_tonow(from_no)
     d = DateTime.now
     from = d - Integer(from_no)
-    c = get_uuids(nil, c_from = from.strftime('%Y-%m-%d'), c_to = d.tomorrow.strftime('%Y-%m-%d'))
+    c = get_uuids(-1, c_from = from.strftime('%Y-%m-%d'), c_to = d.tomorrow.strftime('%Y-%m-%d'))
     c
   end
 
@@ -42,7 +42,7 @@ module SearchPure
   def get_uuids_modified_from_tonow(from_no)
     d = DateTime.now
     from = d - Integer(from_no)
-    c = get_uuids(nil, nil, nil, m_from = from.strftime('%Y-%m-%d'), m_to = d.tomorrow.strftime('%Y-%m-%d'))
+    c = get_uuids(-1, nil, nil, m_from = from.strftime('%Y-%m-%d'), m_to = d.tomorrow.strftime('%Y-%m-%d'))
     c
   end
 

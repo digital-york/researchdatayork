@@ -24,7 +24,11 @@ module Googledrive
 
   # create a Google Drive API object, authenticate and return it
   def initialise_api
-    service = Google::Apis::DriveV3::DriveService.new
+    service = Google::Apis::DriveV3::DriveService.new.tap do |client|
+      #client.request_options.timeout_sec = 1200
+      #client.request_options.open_timeout_sec = 1200
+      #client.request_options.retries = 3
+    end
     service.client_options.application_name = 'Research Data York Google Drive Browser'
     client = oauth2client
     client.update!(refresh_token: session[:refresh_token])
@@ -37,8 +41,9 @@ module Googledrive
   def list_files_in_folder(folder)
     # Initialise the API
     service = initialise_api
-    files = service.list_files(q: "'#{folder}' in parents and trashed=false", order_by: 'folder,modifiedTime desc,name',
-                               fields: 'files(id, name, parents, iconLink, mimeType)')
+    files = service.list_files(q: "'#{folder}' in parents and trashed=false and (mimeType = 'application/vnd.google-apps.folder' or not mimeType contains 'application/vnd.google-apps')", 
+                               order_by: 'folder,modifiedTime desc,name',
+                               fields: 'files(id, name, parents, iconLink, mimeType, size)')
     files
   end
 
@@ -61,7 +66,7 @@ module Googledrive
   end
 
   # given an initialised api service and a google drive file id, download the file and return it
-  def get_file_from_google(service, fileid, mime_type)
+  def get_file_from_google(service, fileid, mime_type, byte_from = nil, byte_to = nil)
     file_contents = StringIO.new
     # if the mime type for this file is a google document
     if google_docs_mimetypes.key?(mime_type)
@@ -69,9 +74,11 @@ module Googledrive
       export_mime_type = google_docs_mimetypes[mime_type]['export_mimetype']
       # export the file from google drive
       file = service.export_file(fileid, export_mime_type, download_dest: file_contents)
-    # otherwise it's a "normal" file - just download it
-    else
-      file = service.get_file(fileid, download_dest: file_contents)
+    # otherwise, so long as it's not a google drive folder, it's a "normal" file - just download it
+    elsif mime_type != 'application/vnd.google-apps.folder'
+      # specify which bytes we want to download if byte range given
+      options = (byte_from && byte_to) ? {header: {"Range" => "bytes=" + byte_from.to_s + "-" + byte_to.to_s}} : {}
+      file = service.get_file(fileid, download_dest: file_contents, options: options)
     end
     file_contents
   end

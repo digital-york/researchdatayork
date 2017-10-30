@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161213225130) do
+ActiveRecord::Schema.define(version: 20171025132730) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -30,6 +30,22 @@ ActiveRecord::Schema.define(version: 20161213225130) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "delayed_jobs", force: :cascade do |t|
+    t.integer  "priority",   default: 0, null: false
+    t.integer  "attempts",   default: 0, null: false
+    t.text     "handler",                null: false
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority"
+
   create_table "deposits", force: :cascade do |t|
     t.string   "uuid"
     t.string   "title"
@@ -38,13 +54,14 @@ ActiveRecord::Schema.define(version: 20161213225130) do
     t.string   "available"
     t.string   "embargo_end"
     t.string   "access"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
     t.string   "dipuuid"
     t.string   "status"
     t.string   "release"
     t.string   "retention_policy"
     t.string   "notes"
+    t.string   "authorised_depositors"
   end
 
   create_table "reingests", force: :cascade do |t|

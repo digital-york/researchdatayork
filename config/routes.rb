@@ -28,6 +28,10 @@ Rails.application.routes.draw do
   get '/datasets/:id/documentation' => 'datasets#documentation', as: :documentation, :defaults => { :format => :text }
   # custom route for detecting dataset file download requests
   get '/datasets/:id/filedownload/:fileid' => 'datasets#filedownload', as: :filedownload
+  # custom route for uploading files
+  post '/deposits/:id/fileupload', to: 'deposits#fileupload', as: :fileupload
+  # custom route for downloading google drive files
+  get '/deposits/:id/getgdrivefile', to: 'deposits#getgdrivefile', as: :getgdrivefile
 
   # update api for archivematica
   scope '/api' do

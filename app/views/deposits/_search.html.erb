@@ -12,63 +12,63 @@
         <tr>
           <td>
 
-            <%= check_box_tag(:new, "new") %>
+            <%= check_box_tag(:new, "new", (params[:new] and params[:new] == "new"), :id => :new) %>
             <%= label_tag(:new, "New - Awaiting Action" ) %><br/>
 
-            <%= check_box_tag('status[]',"awaiting-info") %>
-            <%= label_tag('status[]', "Researcher Contacted - Awaiting Info" ) %><br/>
+            <%= check_box_tag('status[]',"awaiting-info", (params[:status] and Array(params[:status]).include?("awaiting-info")), :id => 'status-awaiting-info') %>
+            <%= label_tag('status-awaiting-info', "Researcher Contacted - Awaiting Info" ) %><br/>
            
-            <%= check_box_tag('status[]',"awaiting-data") %>
-            <%= label_tag('status[]', "Researcher Contacted - Awaiting Data " ) %><br/>
+            <%= check_box_tag('status[]',"awaiting-data", (params[:status] and Array(params[:status]).include?("awaiting-data")), :id => 'status-awaiting-data') %>
+            <%= label_tag('status-awaiting-data', "Researcher Contacted - Awaiting Data " ) %><br/>
            
-            <%= check_box_tag(:doi,"doi") %>
+            <%= check_box_tag(:doi,"doi", (params[:doi] and params[:doi] == "doi"), :id => 'doi') %>
             <%= label_tag('doi', "DOI Created") %><br/>
 
-            <%= check_box_tag(:doi,"nodoi") %>
-            <%= label_tag(:doi, "DOI Not Yet Created " ) %><br/>
-            <%= check_box_tag('status[]',"phd-data") %>
-            <%= label_tag('status[]', "PhD Student Deposit" ) %><br/>
+            <%= check_box_tag(:doi,"nodoi", (params[:doi] and params[:doi] == "nodoi"), :id => 'nodoi') %>
+            <%= label_tag('nodoi', "DOI Not Yet Created " ) %><br/>
+
+            <%= check_box_tag('status[]',"phd-data", (params[:status] and Array(params[:status]).include?("phd-data")), :id => 'status-phd-data') %>
+            <%= label_tag('status-phd-data', "PhD Student Deposit" ) %><br/>
             </td>
             <td>
            
-            <%= check_box_tag('status[]',"nodata-external") %>
-            <%= label_tag('status[]', "Data Externally Held " ) %><br/>
+            <%= check_box_tag('status[]',"nodata-external", (params[:status] and Array(params[:status]).include?("nodata-external")), :id => 'status-nodata-external') %>
+            <%= label_tag('status-nodata-external', "Data Externally Held " ) %><br/>
 
-           
-            <%= check_box_tag('status[]',"nodata-dept") %>
-            <%= label_tag('status[]', "Data Held By Dept " ) %><br/>
+            <%= check_box_tag('status[]',"nodata-dept", (params[:status] and Array(params[:status]).include?("nodata-dept")), :id => 'status-nodata-dept') %>
+            <%= label_tag('status-nodata-dept', "Data Held By Dept " ) %><br/>
 
-              <%= check_box_tag('aip_status[]', "inprogress") %>
-              <%= label_tag('aip_status[]', "Upload in Progress" ) %><br/>
+            <%= check_box_tag('aip_status[]', "inprogress", (params[:aip_status] and Array(params[:aip_status]).include?("inprogress")), :id => 'aip-status-inprogress') %>
+            <%= label_tag('aip-status-inprogress', "Upload in Progress" ) %><br/>
 
-              <%= check_box_tag('aip_status[]', "uploaded") %>
-              <%= label_tag('aip_status[]', "Data Uploaded" ) %><br/>
+            <%= check_box_tag('aip_status[]', "uploaded", (params[:aip_status] and Array(params[:aip_status]).include?("uploaded")), :id => 'aip-status-uploaded') %>
+            <%= label_tag('aip-status-uploaded', "Data Uploaded" ) %><br/>
 
-              <%= check_box_tag('aip_status[]', "problem") %>
-              <%= label_tag('aip_status[]', "Upload Problem" ) %><br/>
+            <%= check_box_tag('aip_status[]', "problem", (params[:aip_status] and Array(params[:aip_status]).include?("problem")), :id => 'aip-status-problem') %>
+            <%= label_tag('aip-status-problem', "Upload Problem" ) %><br/>
 
-              <%= check_box_tag('aip_status[]', "noaip") %>
-              <%= label_tag('aip_status[]', "Data Not Uploaded" ) %><br/>
+            <%= check_box_tag('aip_status[]', "noaip", (params[:aip_status] and Array(params[:aip_status]).include?("noaip")), :id => 'aip-status-noaip') %>
+            <%= label_tag('aip-status-noaip', "Data Not Uploaded" ) %><br/>
 
             </td>
           <td>
-            <%= check_box_tag('status[]', "held-pub-meta") %>
-            <%= label_tag('status[]', "Metadata Held for Publication " ) %><br/>
+            <%= check_box_tag('status[]', "held-pub-meta", (params[:status] and Array(params[:status]).include?("held-pub-meta")), :id => 'status-held-pub-meta') %>
+            <%= label_tag('status-held-pub-meta', "Metadata Held for Publication" ) %><br/>
 
-            <%= check_box_tag('status[]', "held-pub-data") %>
-            <%= label_tag('status[]', "Data Held for Publication " ) %><br/>
+            <%= check_box_tag('status[]', "held-pub-data", (params[:status] and Array(params[:status]).include?("held-pub-data")), :id => 'status-held-pub-data') %>
+            <%= label_tag('status-held-pub-data', "Data Held for Publication" ) %><br/>
 
-            <%= check_box_tag('dip_status[]', "UPLOADED") %>
-            <%= label_tag('dip_status[]', "Data Available" ) %><br/>
+            <%= check_box_tag('dip_status[]', "UPLOADED", (params[:dip_status] and Array(params[:dip_status]).include?("UPLOADED")), :id => 'dip-status-uploaded') %>
+            <%= label_tag('dip-status-uploaded', "Data Available" ) %><br/>
 
-            <%= check_box_tag('dip_status[]', "waiting") %>
-            <%= label_tag('dip_status[]', "Waiting for Approval" ) %><br/>
+            <%= check_box_tag('dip_status[]', "waiting", (params[:dip_status] and Array(params[:dip_status]).include?("waiting")), :id => 'dip-status-waiting') %>
+            <%= label_tag('dip-status-waiting', "Waiting for Approval" ) %><br/>
 
-            <%= check_box_tag('dip_status[]', "APPROVE") %>
-            <%= label_tag('dip_status[]', "Request Approved, Data In Progress" ) %><br/>
+            <%= check_box_tag('dip_status[]', "APPROVED", (params[:dip_status] and Array(params[:dip_status]).include?("APPROVED")), :id => 'dip-status-approve') %>
+            <%= label_tag('dip-status-approve', "Request Approved, Data In Progress" ) %><br/>
 
-            <%= check_box_tag('dip_status[]', "nodip") %>
-            <%= label_tag('dip_status[]', "Data Not Available" ) %><br/>
+            <%= check_box_tag('dip_status[]', "nodip", (params[:dip_status] and Array(params[:dip_status]).include?("nodip")), :id => 'dip-status-nodip') %>
+            <%= label_tag('dip-status-nodip', "Data Not Available" ) %><br/>
           </td>
         </tr>
       </table>

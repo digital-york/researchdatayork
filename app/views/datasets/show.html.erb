@@ -31,10 +31,21 @@
     <h3>Download the Data</h3>
     <% if @dip_files.length > 0 %>
       <h4>As a zip file</h4>
-      <p><%= link_to "Download zip", format: :zip %></p>
+      <% if File.exists?(@zip_file) %>
+        <p><%= link_to "Download zip", format: :zip %></p>
+      <% else %>
+        <p>Zip file is currently being generated - please try again later</p>
+      <% end %>
       <h4>As individual files</h4>
+      <ul class="filedownload">
       <% @dip_files.each do |key, file| %>
-        <%= link_to file[:file_path], filedownload_url(@dataset.id, key), :target => "_blank" %> <br/>
+        <% #<li><%= image_tag(file[:thumbnail_uri]) %>
+        <li><%= link_to file[:file_path], filedownload_url(@dataset.id, key), :target => "_blank" %> </li>
+      <% end %>
+      </ul>
+      <% # if MAX_DIP_FILES_TO_PRESENT files were presented, output a message stating that there might be more files in the zip %>
+      <% if @dip_files.size == MAX_DIP_FILES_TO_PRESENT %>
+        <p><em>Only showing <%= MAX_DIP_FILES_TO_PRESENT %> files - download the dataset zip for the full set of files</em></p>
       <% end %>
     <% else %>
       <p>There are currently no downloadable files</p>
@@ -48,8 +59,9 @@
   <% # otherwise tell them that the data hasn't been deposited %>
   <% else %>
     <p>The researcher has not yet deposited the data. 
-       Please email <%= mail_to 'library-research-support@york.ac.uk','Library Research Support' %> for further
+       Please email <%= mail_to ENV["RDM_EMAIL"],'Library Research Support' %> for further
        information.</p>
   <% end %>
+  <p>For comments and queries about depositing and accessing datasets through Research Data York please contact <%= mail_to ENV["RDM_EMAIL"] %></p>
 <% end %>
 

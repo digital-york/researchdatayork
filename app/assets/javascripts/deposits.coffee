@@ -24,4 +24,7 @@ $(document).on 'turbolinks:load', ->
 $(document).on 'click', 'a.delete', (event)->
   event.preventDefault()
   $("#delete_note_"+$(this).attr('data-dataset')+"_"+$(this).attr('data-noteidx')).submit()
+$(document).on 'click', 'a.delete_authorised_depositor', (event)->
+  event.preventDefault()
+  $("#delete_authorised_depositor_"+$(this).attr('data-dataset')+"_"+$(this).attr('data-authorised-depositor-idx')).submit()
   

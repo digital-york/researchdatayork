@@ -1,2 +1,2 @@
-class Dataset < Dlibhydra::Package
+class Package < Dlibhydra::Package
 end

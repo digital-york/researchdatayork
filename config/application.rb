@@ -35,5 +35,7 @@ module Researchdatayork
     config.active_record.raise_in_transactional_callbacks = true
     # handle 404 and 500 errors dynamically
     config.exceptions_app = ->(env) { ErrorsController.action(:show).call(env) }
+    # use 'delayed_job' as the background job processor
+    config.active_job.queue_adapter = :delayed_job
   end
 end

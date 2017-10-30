@@ -24,6 +24,12 @@ gem 'google-api-client', '~> 0.9' # require: 'google/apis/drive_v3'
 gem 'omniauth-shibboleth'
 # include 'browser' to help us detect whether requests are coming from humans or bots
 gem 'browser'
+# include 'delayed_job' to allow us to run commands asyncronously, in the background (e.g. sending email)
+gem 'delayed_job_active_record'
+# include 'daemons' so that we can run the delayed_job daemon
+gem 'daemons'
+# include 'jquery-fileupload-rails' gem to make use of jquery file upload and chunked uploading functionality - needed for large file upload
+gem 'jquery-fileupload-rails'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'

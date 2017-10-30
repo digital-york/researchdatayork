@@ -5,8 +5,8 @@ class OmniauthcallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_omniauth(request.env["omniauth.auth"])
     # capture data about the user from shib
     session['shib_user_data'] = request.env["omniauth.auth"]
-    # if the shib data indicates that this person is a member of staff in information systems, make them an admin
-    if request.env["omniauth.auth"].info[:affiliation].include?("Staff")
+    # if the shib data indicates that this person is a member of staff in Information Systems (dept code = 0085), make them an admin
+    if request.env["omniauth.auth"].info[:affiliation].include?("g0085stf")   # change to "Staff" for testing with testshib.org
       @user.update_attribute :admin, true
     else
       @user.update_attribute :admin, false

@@ -65,7 +65,8 @@ module CreateDip
   end
 
   def dip_size(value)
-    @dip.dip_size = value
+    # solr doesn't seem to cope with integers > 2^31 so cap the value at that
+    @dip.dip_size = [2147483646, value].min
   end
 
   def dip_current_location(value)
@@ -111,6 +112,8 @@ module CreateDip
     Dir.foreach(location) do |item|
       # if it's the "objects" folder
       if File.directory?(File.join(location, item)) && item == 'objects'
+        # create a zip file of the objects folder contents 
+        create_zip(@dataset.id.to_s, File.join(location, item))
         # for each file in the "objects" folder
         Dir.foreach(File.join(location, item)) do |object|
           # skip any directories inside the objects folder
@@ -121,9 +124,8 @@ module CreateDip
           obj_fs.apply_depositor
           # add this file to the FileSet
           obj_fs.preflabel = object
-          path = File.join(location, item, object)
-          f = open(path)
-          Hydra::Works::UploadFileToFileSet.call(obj_fs, f)
+          # just write an empty string to FileSet object - not going to store potentially 20gb files in Hydra, they'll be served from dip location
+          Hydra::Works::UploadFileToFileSet.call(obj_fs, StringIO.new(""))
           # get the first 36 characters of the filename - the "thumbnail" and "ocr text" corresponding to this file will have this prefix
           prefix = object[0..35]
           # find the "thumbnail" that corresponds to this file (it'll have the same filename prefix) if it exists and add it to the FileSet
@@ -158,9 +160,40 @@ module CreateDip
       end
     end
   rescue => e
-    handle_exception(e, "Unable to ingest DIP for given UUID. Make sure you entered the correct UUID and try again", "Given DIP location: " + dip_location)
+    delete_failed_ingest(@dataset) if @dataset
+    handle_exception(e, "Unable to ingest DIP", "Unable to ingest DIP. Given DIP location: " + dip_location, true)
     raise
   end
+
+  # delete the ingested dip files from a dataset - this will be called to clean up after failed ingest
+  def delete_failed_ingest (dataset)
+    dataset.members.each do |member|
+      member.delete
+    end
+    dataset.save
+  end
+
+  # create a zip file from a dip
+  def create_zip (dataset_id, path_to_dipfiles)
+    # quick sanity check on input
+    ds = Dlibhydra::Dataset.find(dataset_id)
+    # create a folder for the zip file
+    zip_dir = File.join(ENV['DIP_LOCATION'], "zips", dataset_id)
+    zip_file = File.join(zip_dir, "dataset.zip")
+    FileUtils.mkdir_p(zip_dir)
+    # get the OS to create the zip
+    result = ""
+    begin
+      result = `zip -rqj #{zip_file} #{path_to_dipfiles} 2>&1`
+      raise if !result.empty? or !$?.success?
+    rescue => e
+      handle_exception(e, "Failed to create zip file for dataset " + dataset_id + ", output: " + result, "Failed to create zip file for dataset " + dataset_id + ", output: " + result, true)
+    end
+  rescue => e
+    handle_exception(e, "Unable to create zip file for dataset " + dataset_id, "Unable to create zip file for dataset " + dataset_id, true)  
+  end
+  # if need to make this a background job, uncomment following line
+  #handle_asynchronously :create_zip
 
   # REVIEW: may not be needed after status.py update
   def get_dip_details(uuid)
@@ -176,6 +209,8 @@ module CreateDip
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger # log requests to STDOUT
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
+      faraday.options.open_timeout = 10
+      faraday.options.timeout = 240
     end
 
     params = {

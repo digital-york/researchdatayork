@@ -1,6 +1,6 @@
 <%# include javascript and css libraries for jstree (in /vendor/assets) which will help user browse google drive files %>
 <% content_for :head do %>
-    <%= stylesheet_link_tag "jstree.min.css" %>
+    <%= stylesheet_link_tag "jstree.css" %>
     <%= javascript_include_tag "jstree.min.js" %>
 <% end %>
 
@@ -12,8 +12,9 @@
     <p>If you submit another dataset to PURE, we'll send you a new deposit link.</p>
 
 <% else %>
-
-    <%= render 'datasets/dataset_metadata' %>
+    <h1>Data Deposit</h1>
+    <h2><%= @dataset.title[0] %></h2>
+    <p><% if @dataset.doi != [] and @dataset.doi != [""] %><strong>DOI: </strong><%= @dataset.doi.join("<br/>") %><% end %></p>
 
     <% if @dataset.aips.size > 0 %>
         <p>
@@ -21,16 +22,23 @@
           data deposit
           <% if @dataset.aips.size > 1 %>s have
           <% else %>
-              deposit has
+              has
           <% end %>
           been added for this PURE dataset.
         </p>
-        <p>
-          If you need to add, remove or update the data, please contact the RDM team.
-        </p>
     <% else %>
-        <h1>Data Deposit</h1>
+        <p>By transferring data to the Research Data York service you are agreeing to the terms and conditions 
+        as stated in the  
+        <a href="https://www.york.ac.uk/library/info-for/researchers/data/research-data-york/transferring-data" target="_blank">Process for transferring research data to Research Data York</a>. 
+        Please note that, if your data is open (as recorded in the 'access options' field in Pure), a 
+        <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">Creative Commons Attribution (CC BY) licence</a>
+        will be applied to it unless you instruct us otherwise.</p>
+        <p>When uploading larger datasets or those consisting of many thousands of files, please be patient as this may take time. 
+        If you experience any problems with this deposit form or if you wish to deposit datasets larger than 20GB in size please 
+        contact <%= mail_to ENV["RDM_EMAIL"] %>.</p>
         <%= render 'formaip' %>
     <% end %>
+
+    <p>For comments and queries about depositing and accessing datasets through Research Data York please contact <%= mail_to ENV["RDM_EMAIL"] %></p>
 
 <% end %>

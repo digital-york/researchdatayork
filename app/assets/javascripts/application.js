@@ -18,4 +18,6 @@
 // Required by Blacklight
 //= require blacklight/blacklight
 //= require browse_everything
+// require jquery file upload files
+//= require jquery-fileupload/basic
 //= require_tree .
